@@ -1,4 +1,5 @@
-﻿import { RestCove } from "./features/rest-cove";
+﻿import { Archetype } from "./shared/types/archetypes";
+import { RestCove } from "./features/rest-cove";
 import { NotificationsSettings } from "./features/notifications";
 import { StatsDashboard } from "./features/statistics";
 import { useState } from "react";
@@ -8,6 +9,7 @@ import { DailyPlanning } from "./features/daily-planning";
 import { TodayTasks } from "./features/today-tasks";
 import { DayPlanner } from "./features/archetype-planning";
 import { GoalsList, useGoalsSystem } from "./features/goals-system";
+import { ArchetypeBadge } from "./features/archetype-planning/ui/ArchetypeBadge";
 
 const Navigation = ({ currentScreen, onScreenChange }: any) => (
   <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2">
@@ -43,6 +45,9 @@ export function App() {
   const [selectedSphere, setSelectedSphere] = useState<LifeSphere | null>(null);
   const { spheres, updateSphereValue } = useBalanceWheel();
   const { goals, addGoal, toggleStep, deleteGoal } = useGoalsSystem();
+  const [currentArchetype, setCurrentArchetype] = useState<Archetype | null>(
+    null
+  );
 
   // Единое состояние для всех задач
   const [allTasks, setAllTasks] = useState<Task[]>([]);
@@ -132,6 +137,15 @@ export function App() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <main className="container mx-auto px-4 py-8 pb-20">
+        {/* Шапка с архетипом */}
+        <div className="flex justify-between items-center mb-6 p-4 bg-white rounded-lg shadow-sm">
+          <h1 className="text-2xl font-bold text-gray-800">Opening Horizons</h1>
+          <ArchetypeBadge
+            archetype={currentArchetype}
+            onArchetypeChange={setCurrentArchetype}
+          />
+        </div>
+
         {renderScreen()}
       </main>
       <Navigation
