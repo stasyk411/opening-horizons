@@ -14,12 +14,9 @@ const Navigation = ({ currentScreen, onScreenChange }: any) => (
     <div className="flex justify-around">
       {[
         { id: "balance", icon: "⚖️", label: "Баланс" },
-        { id: "archetypes", icon: "🦊", label: "Архетипы" },
-        { id: "goals", icon: "🎯", label: "Цели" },
-        { id: "planning", icon: "📅", label: "Планы" },
+        { id: "plans", icon: "🎯", label: "Планы" },
         { id: "tasks", icon: "✅", label: "Задачи" },
-        { id: "review", icon: "📊", label: "Обзор" },
-        { id: "rest", icon: "🌴", label: "Отдых" },
+        { id: "analysis", icon: "📊", label: "Анализ" },
         { id: "settings", icon: "⚙️", label: "Настройки" },
       ].map((screen) => (
         <button
@@ -39,15 +36,7 @@ const Navigation = ({ currentScreen, onScreenChange }: any) => (
   </nav>
 );
 
-type AppScreen =
-  | "balance"
-  | "archetypes"
-  | "goals"
-  | "planning"
-  | "tasks"
-  | "review"
-  | "rest"
-  | "settings";
+type AppScreen = "balance" | "plans" | "tasks" | "analysis" | "settings";
 
 export function App() {
   const [currentScreen, setCurrentScreen] = useState<AppScreen>("balance");
@@ -60,7 +49,7 @@ export function App() {
 
   const handleSphereSelect = (sphere: LifeSphere) => {
     setSelectedSphere(sphere);
-    setCurrentScreen("planning");
+    setCurrentScreen("plans");
   };
 
   // Функции для управления задачами
@@ -90,35 +79,25 @@ export function App() {
             onSphereSelect={handleSphereSelect}
           />
         );
-      case "archetypes":
-        return <DayPlanner />;
-      case "goals":
+      case "plans":
         return (
-          <GoalsList
-            goals={goals}
-            onAddGoal={addGoal}
-            onToggleStep={toggleStep}
-            onDeleteGoal={deleteGoal}
-          />
-        );
-      case "planning":
-        return selectedSphere ? (
-          <DailyPlanning
-            selectedSphere={selectedSphere}
-            tasks={allTasks}
-            onAddTask={handleAddTask}
-            onToggleTask={handleToggleTask}
-            onDeleteTask={handleDeleteTask}
-          />
-        ) : (
-          <div className="text-center p-8">
-            <p>Пожалуйста, выберите сферу жизни сначала</p>
-            <button
-              onClick={() => setCurrentScreen("balance")}
-              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg"
-            >
-              Вернуться к колесу баланса
-            </button>
+          <div className="space-y-6">
+            <DayPlanner />
+            <GoalsList
+              goals={goals}
+              onAddGoal={addGoal}
+              onToggleStep={toggleStep}
+              onDeleteGoal={deleteGoal}
+            />
+            {selectedSphere && (
+              <DailyPlanning
+                selectedSphere={selectedSphere}
+                tasks={allTasks}
+                onAddTask={handleAddTask}
+                onToggleTask={handleToggleTask}
+                onDeleteTask={handleDeleteTask}
+              />
+            )}
           </div>
         );
       case "tasks":
@@ -130,10 +109,13 @@ export function App() {
             onDeleteTask={handleDeleteTask}
           />
         );
-      case "review":
-        return <StatsDashboard tasks={allTasks} spheres={spheres} />;
-      case "rest":
-        return <RestCove tasks={allTasks} spheres={spheres} />;
+      case "analysis":
+        return (
+          <div className="space-y-6">
+            <StatsDashboard tasks={allTasks} spheres={spheres} />
+            <RestCove tasks={allTasks} spheres={spheres} />
+          </div>
+        );
       case "settings":
         return <NotificationsSettings />;
       default:
