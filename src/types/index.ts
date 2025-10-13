@@ -1,12 +1,6 @@
-export interface LifeSphere {
-  id: string;
-  name: string;
-  color: string;
-  value: number;
-  icon: string;
-  description?: string;
-}
+// Создай файл: src/shared/types/index.ts
 
+// Базовые типы для приложения
 export interface Task {
   id: string;
   title: string;
@@ -19,4 +13,11 @@ export interface Task {
 export interface UserSettings {
   theme: "light" | "dark";
   notifications: boolean;
+}
+export interface LifeSphere {
+  id: string;
+  name: string;
+  color: string;
+  value: number;
+  icon?: string;
 }

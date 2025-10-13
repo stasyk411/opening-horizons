@@ -1,99 +1,163 @@
-﻿import React, { useState, useEffect } from "react";
-import { InteractiveWheel } from "./widgets/InteractiveWheel/InteractiveWheel";
-import { DailyPlanning } from "./features/DailyPlanning/DailyPlanning";
-import { TodayTasks } from "./features/TodayTasks/TodayTasks";
-import { EveningReview } from "./features/EveningReview/EveningReview";
-import { Navigation } from "./widgets/Navigation/Navigation";
-import { LifeSphere } from "./shared/types";
-import { dataManager } from "./shared/lib/data-manager";
+﻿import { RestCove } from "./features/rest-cove";
+import { NotificationsSettings } from "./features/notifications";
+import { StatsDashboard } from "./features/statistics";
+import { useState } from "react";
+import { LifeSphere, Task } from "./shared/types";
+import { BalanceWheel, useBalanceWheel } from "./features/balance-wheel";
+import { DailyPlanning } from "./features/daily-planning";
+import { TodayTasks } from "./features/today-tasks";
+import { DayPlanner } from "./features/archetype-planning";
+import { GoalsList, useGoalsSystem } from "./features/goals-system";
 
-type ActiveView =
-  | "wheel"
+const Navigation = ({ currentScreen, onScreenChange }: any) => (
+  <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2">
+    <div className="flex justify-around">
+      {[
+        { id: "balance", icon: "⚖️", label: "Баланс" },
+        { id: "archetypes", icon: "🦊", label: "Архетипы" },
+        { id: "goals", icon: "🎯", label: "Цели" },
+        { id: "planning", icon: "📅", label: "Планы" },
+        { id: "tasks", icon: "✅", label: "Задачи" },
+        { id: "review", icon: "📊", label: "Обзор" },
+        { id: "rest", icon: "🌴", label: "Отдых" },
+        { id: "settings", icon: "⚙️", label: "Настройки" },
+      ].map((screen) => (
+        <button
+          key={screen.id}
+          onClick={() => onScreenChange(screen.id)}
+          className={`flex flex-col items-center px-3 py-2 rounded-lg min-w-[60px] ${
+            currentScreen === screen.id
+              ? "bg-blue-500 text-white"
+              : "text-gray-600 hover:text-blue-500"
+          }`}
+        >
+          <div className="text-lg mb-1">{screen.icon}</div>
+          <div className="text-xs font-medium">{screen.label}</div>
+        </button>
+      ))}
+    </div>
+  </nav>
+);
+
+type AppScreen =
+  | "balance"
+  | "archetypes"
+  | "goals"
   | "planning"
   | "tasks"
   | "review"
-  | "goals"
-  | "cove"
+  | "rest"
   | "settings";
 
-export const App: React.FC = () => {
-  const [activeView, setActiveView] = useState<ActiveView>("wheel");
-  const [selectedSphere, setSelectedSphere] = useState<LifeSphere>("health");
-  const [isInitialized, setIsInitialized] = useState(false);
+export function App() {
+  const [currentScreen, setCurrentScreen] = useState<AppScreen>("balance");
+  const [selectedSphere, setSelectedSphere] = useState<LifeSphere | null>(null);
+  const { spheres, updateSphereValue } = useBalanceWheel();
+  const { goals, addGoal, toggleStep, deleteGoal } = useGoalsSystem();
 
-  useEffect(() => {
-    const initializeApp = async () => {
-      await dataManager.init();
-      setIsInitialized(true);
-    };
-    initializeApp();
-  }, []);
+  // Единое состояние для всех задач
+  const [allTasks, setAllTasks] = useState<Task[]>([]);
 
   const handleSphereSelect = (sphere: LifeSphere) => {
     setSelectedSphere(sphere);
-    setActiveView("planning");
+    setCurrentScreen("planning");
   };
 
-  const renderActiveView = () => {
-    if (!isInitialized) {
-      return (
-        <div className="flex items-center justify-center min-h-[40vh] py-4">
-          <div className="text-white text-base">Загрузка...</div>
-        </div>
-      );
-    }
+  // Функции для управления задачами
+  const handleAddTask = (task: Task) => {
+    setAllTasks((prev) => [...prev, task]);
+  };
 
-    switch (activeView) {
-      case "wheel":
-        return <InteractiveWheel onSphereSelect={handleSphereSelect} />;
+  const handleToggleTask = (taskId: string) => {
+    setAllTasks((prev) =>
+      prev.map((task) =>
+        task.id === taskId ? { ...task, completed: !task.completed } : task
+      )
+    );
+  };
+
+  const handleDeleteTask = (taskId: string) => {
+    setAllTasks((prev) => prev.filter((task) => task.id !== taskId));
+  };
+
+  const renderScreen = () => {
+    switch (currentScreen) {
+      case "balance":
+        return (
+          <BalanceWheel
+            spheres={spheres}
+            onSphereChange={updateSphereValue}
+            onSphereSelect={handleSphereSelect}
+          />
+        );
+      case "archetypes":
+        return <DayPlanner />;
+      case "goals":
+        return (
+          <GoalsList
+            goals={goals}
+            onAddGoal={addGoal}
+            onToggleStep={toggleStep}
+            onDeleteGoal={deleteGoal}
+          />
+        );
       case "planning":
-        return <DailyPlanning selectedSphere={selectedSphere} />;
+        return selectedSphere ? (
+          <DailyPlanning
+            selectedSphere={selectedSphere}
+            tasks={allTasks}
+            onAddTask={handleAddTask}
+            onToggleTask={handleToggleTask}
+            onDeleteTask={handleDeleteTask}
+          />
+        ) : (
+          <div className="text-center p-8">
+            <p>Пожалуйста, выберите сферу жизни сначала</p>
+            <button
+              onClick={() => setCurrentScreen("balance")}
+              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg"
+            >
+              Вернуться к колесу баланса
+            </button>
+          </div>
+        );
       case "tasks":
-        return <TodayTasks />;
+        return (
+          <TodayTasks
+            tasks={allTasks}
+            spheres={spheres}
+            onToggleTask={handleToggleTask}
+            onDeleteTask={handleDeleteTask}
+          />
+        );
       case "review":
-        return <EveningReview />;
+        return <StatsDashboard tasks={allTasks} spheres={spheres} />;
+      case "rest":
+        return <RestCove tasks={allTasks} spheres={spheres} />;
+      case "settings":
+        return <NotificationsSettings />;
       default:
         return (
-          <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 md:p-6 shadow-lg mx-2 md:mx-0">
-            <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-2 md:mb-3">
-              {activeView === "goals" && "Цели"}
-              {activeView === "cove" && "Бухта отдыха"}
-              {activeView === "settings" && "Настройки"}
-            </h2>
-            <p className="text-gray-600 text-sm md:text-base">
-              Раздел в разработке
-            </p>
-          </div>
+          <BalanceWheel
+            spheres={spheres}
+            onSphereChange={updateSphereValue}
+            onSphereSelect={handleSphereSelect}
+          />
         );
     }
   };
 
   return (
-    <div className="min-h-screen bg-main-gradient safe-area">
-      {/* Safe area для современных мобильных устройств */}
-      <div className="container mx-auto px-3 md:px-4 py-3 md:py-4 min-h-screen flex flex-col">
-        {/* Адаптивный заголовок */}
-        <header className="text-center mb-3 md:mb-6 flex-shrink-0">
-          <h1 className="text-xl md:text-3xl lg:text-4xl font-bold text-white mb-1 md:mb-2 px-2">
-            Opening Horizons
-          </h1>
-          <p className="text-white/80 text-xs md:text-sm lg:text-base px-2">
-            Твой друг-коуч для осознанного управления временем
-          </p>
-        </header>
-
-        {/* Основной контент с адаптивными отступами */}
-        <main className="flex-1 w-full max-w-full md:max-w-4xl mx-auto px-1 md:px-2">
-          {renderActiveView()}
-        </main>
-
-        {/* Навигация с адаптацией под мобильные */}
-        <div className="flex-shrink-0 mt-4 md:mt-6">
-          <Navigation activeView={activeView} onViewChange={setActiveView} />
-        </div>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <main className="container mx-auto px-4 py-8 pb-20">
+        {renderScreen()}
+      </main>
+      <Navigation
+        currentScreen={currentScreen}
+        onScreenChange={setCurrentScreen}
+      />
     </div>
   );
-};
+}
 
 export default App;
