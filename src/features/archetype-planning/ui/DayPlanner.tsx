@@ -1,115 +1,132 @@
 import React from "react";
-import { useArchetypePlanning } from "../model/useArchetypePlanning";
-import { ArchetypeSelector } from "./ArchetypeSelector";
-import { TimeBlock } from "../../../shared/types/archetypes";
+import { Archetype } from "../../../shared/types/archetypes";
 
-export const DayPlanner: React.FC = () => {
-  const { archetype, setArchetype, tasks } = useArchetypePlanning();
+interface DayPlannerProps {
+  currentArchetype: Archetype;
+}
 
-  const getTimeBlocks = (): TimeBlock[] => {
-    const blocks = {
-      fox: [
-        { time: "7:00-9:00", label: "Утренний фокус", type: "focus" as const },
-        { time: "9:00-12:00", label: "Активная работа", type: "work" as const },
-        { time: "12:00-13:00", label: "Обед + отдых", type: "break" as const },
-        {
-          time: "13:00-17:00",
-          label: "Коммуникации",
-          type: "meeting" as const,
-        },
-        {
-          time: "17:00-19:00",
-          label: "Завершение дня",
-          type: "wrapup" as const,
-        },
-      ],
-      dolphin: [
-        { time: "9:00-11:00", label: "Вход в день", type: "work" as const },
-        {
-          time: "11:00-14:00",
-          label: "Пик продуктивности",
-          type: "focus" as const,
-        },
-        {
-          time: "14:00-16:00",
-          label: "Перерыв + движение",
-          type: "break" as const,
-        },
-        {
-          time: "16:00-19:00",
-          label: "Второй пик энергии",
-          type: "work" as const,
-        },
-        {
-          time: "19:00-21:00",
-          label: "Творческие задачи",
-          type: "focus" as const,
-        },
-      ],
-      owl: [
-        {
-          time: "10:00-12:00",
-          label: "Медленный старт",
-          type: "work" as const,
-        },
-        {
-          time: "12:00-15:00",
-          label: "Административные задачи",
-          type: "work" as const,
-        },
-        {
-          time: "15:00-19:00",
-          label: "Коммуникации, встречи",
-          type: "meeting" as const,
-        },
-        { time: "19:00-23:00", label: "Фокус-блок", type: "focus" as const },
-      ],
+export const DayPlanner: React.FC<DayPlannerProps> = ({ currentArchetype }) => {
+  const getArchetypeConfig = () => {
+    const configs = {
+      fox: {
+        emoji: "🦊",
+        title: "Лиса",
+        description: "Энергичен и сфокусирован с утра",
+        energyLevel: "Высокая энергия",
+        characteristics: [
+          "💪 Много энергии для достижения целей",
+          "🎯 Лучшая продуктивность с 7:00 до 12:00",
+          "⚡ Быстро принимает решения",
+          "📈 Эффективен в сложных задачах",
+        ],
+        recommendations: [
+          "Сложные задачи планируй на утро",
+          "Используй утреннюю энергию для главных целей",
+          "После обеда - встречи и коммуникации",
+        ],
+      },
+      dolphin: {
+        emoji: "🐬",
+        title: "Дельфин",
+        description: "Нужна гибкость и разнообразие",
+        energyLevel: "Два пика энергии",
+        characteristics: [
+          "🔄 Два пика энергии: утро и вечер",
+          "🎭 Любит разнообразие в задачах",
+          "🤝 Эффективен в команде",
+          "⚖️ Нужен баланс работы и отдыха",
+        ],
+        recommendations: [
+          "Чередуй типы задач в течение дня",
+          "Сложные задачи - в пики энергии (11:00-14:00, 17:00-20:00)",
+          "Делай короткие перерывы между задачами",
+        ],
+      },
+      owl: {
+        emoji: "🦉",
+        title: "Сова",
+        description: "Творческий и продуктивный вечером",
+        energyLevel: "Энергия растет к вечеру",
+        characteristics: [
+          "🎨 Творческий подход к задачам",
+          "🌙 Пик продуктивности после 18:00",
+          "💡 Генерирует идеи в спокойной обстановке",
+          "📚 Любит глубокое погружение в темы",
+        ],
+        recommendations: [
+          "Утром - легкие, разогревающие задачи",
+          "Основную работу планируй на вечер",
+          "Используй вечер для творческих проектов",
+        ],
+      },
     };
 
-    return archetype ? blocks[archetype] : blocks.fox;
+    return configs[currentArchetype] || configs.fox;
   };
 
-  if (!archetype) {
-    return <ArchetypeSelector />;
-  }
-
-  const currentArchetype = useArchetypePlanning().archetypes.find(
-    (a) => a.id === archetype
-  );
+  const config = getArchetypeConfig();
 
   return (
-    <div className="p-4">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2">
-          <span className="text-2xl">{currentArchetype?.icon}</span>
-          <div>
-            <h2 className="font-bold">План дня</h2>
-            <p className="text-sm text-gray-600">
-              Режим "{currentArchetype?.title}"
-            </p>
-          </div>
+    <div className="p-4 bg-white rounded-lg shadow-sm">
+      {/* Заголовок с архетипом */}
+      <div className="flex items-center gap-3 mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
+        <span className="text-3xl">{config.emoji}</span>
+        <div>
+          <h2 className="font-bold text-lg text-gray-800">{config.title}</h2>
+          <p className="text-sm text-gray-600">{config.description}</p>
+          <p className="text-xs text-blue-500 font-medium mt-1">
+            {config.energyLevel}
+          </p>
         </div>
-        <button
-          className="text-sm text-blue-500"
-          onClick={() => setArchetype(null)}
-        >
-          Сменить
-        </button>
       </div>
 
-      <div className="space-y-4">
-        {getTimeBlocks().map((block) => (
-          <div key={block.time} className="border rounded-lg p-4">
-            <div className="flex justify-between items-center mb-2">
-              <span className="font-semibold">{block.time}</span>
-              <span className="text-sm text-gray-500">{block.label}</span>
-            </div>
-            <div className="text-sm text-gray-600">
-              {tasks.filter((task) => task.timeBlock === block.time).length}{" "}
-              задач
-            </div>
+      <div className="space-y-6">
+        {/* Характеристики архетипа */}
+        <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
+          <h3 className="font-semibold text-amber-800 mb-3 flex items-center gap-2">
+            <span>✨</span>
+            Особенности {config.title}:
+          </h3>
+          <ul className="space-y-2 text-sm text-amber-700">
+            {config.characteristics.map((char, index) => (
+              <li key={index} className="flex items-start gap-2">
+                <span className="mt-0.5">•</span>
+                <span>{char}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Рекомендации по планированию */}
+        <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+          <h3 className="font-semibold text-green-800 mb-3 flex items-center gap-2">
+            <span>💡</span>
+            Рекомендации по планированию:
+          </h3>
+          <ul className="space-y-2 text-sm text-green-700">
+            {config.recommendations.map((rec, index) => (
+              <li key={index} className="flex items-start gap-2">
+                <span className="mt-0.5">🎯</span>
+                <span>{rec}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Призыв к действию */}
+        <div className="text-center py-4">
+          <p className="text-gray-500 mb-4 text-sm">
+            Используй свои сильные стороны для эффективного планирования
+          </p>
+          <div className="flex flex-col gap-2 max-w-md mx-auto">
+            <button className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors font-medium">
+              + Добавить задачу
+            </button>
+            <button className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors font-medium">
+              + Создать цель
+            </button>
           </div>
-        ))}
+        </div>
       </div>
     </div>
   );

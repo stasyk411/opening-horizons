@@ -2,7 +2,6 @@
 import { RestCove } from "./features/rest-cove";
 import { NotificationsSettings } from "./features/notifications";
 import { StatsDashboard } from "./features/statistics";
-import { useState } from "react";
 import { LifeSphere, Task } from "./shared/types";
 import { BalanceWheel, useBalanceWheel } from "./features/balance-wheel";
 import { DailyPlanning } from "./features/daily-planning";
@@ -10,6 +9,42 @@ import { TodayTasks } from "./features/today-tasks";
 import { DayPlanner } from "./features/archetype-planning";
 import { GoalsList, useGoalsSystem } from "./features/goals-system";
 import { ArchetypeBadge } from "./features/archetype-planning/ui/ArchetypeBadge";
+import { ArchetypeSelector } from "./features/archetype-planning/ui/ArchetypeSelector";
+import { WelcomeMessage } from "./components/WelcomeMessage"; // ДОБАВЬ ЭТОТ ИМПОРТ
+import { useState, useEffect } from "react";
+
+// Хук для работы с сохранением архетипа
+const useArchetypeStorage = () => {
+  const [archetype, setArchetype] = useState<Archetype | null>(null);
+
+  // Загружаем из localStorage при монтировании компонента
+  useEffect(() => {
+    const savedArchetype = localStorage.getItem(
+      "currentArchetype"
+    ) as Archetype;
+    if (savedArchetype && ["fox", "dolphin", "owl"].includes(savedArchetype)) {
+      setArchetype(savedArchetype);
+    }
+  }, []);
+
+  // Функция для сохранения архетипа
+  const saveArchetype = (newArchetype: Archetype) => {
+    setArchetype(newArchetype);
+    localStorage.setItem("currentArchetype", newArchetype);
+  };
+
+  // Функция для сброса архетипа
+  const clearArchetype = () => {
+    setArchetype(null);
+    localStorage.removeItem("currentArchetype");
+  };
+
+  return {
+    archetype,
+    saveArchetype,
+    clearArchetype,
+  };
+};
 
 const Navigation = ({ currentScreen, onScreenChange }: any) => (
   <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2">
@@ -45,19 +80,49 @@ export function App() {
   const [selectedSphere, setSelectedSphere] = useState<LifeSphere | null>(null);
   const { spheres, updateSphereValue } = useBalanceWheel();
   const { goals, addGoal, toggleStep, deleteGoal } = useGoalsSystem();
-  const [currentArchetype, setCurrentArchetype] = useState<Archetype | null>(
-    null
-  );
+
+  // ДОБАВЛЯЕМ СЮДА логику приветствия
+  const [showWelcome, setShowWelcome] = useState(true);
+
+  // Показываем приветствие только при первом посещении
+  useEffect(() => {
+    const hasSeenWelcome = localStorage.getItem("hasSeenWelcome");
+    if (hasSeenWelcome) {
+      setShowWelcome(false);
+    }
+  }, []);
+
+  const handleWelcomeDismiss = () => {
+    setShowWelcome(false);
+    localStorage.setItem("hasSeenWelcome", "true");
+  };
+
+  // Используем наш хук для архетипа
+  const {
+    archetype: currentArchetype,
+    saveArchetype,
+    clearArchetype,
+  } = useArchetypeStorage();
 
   // Единое состояние для всех задач
   const [allTasks, setAllTasks] = useState<Task[]>([]);
 
+  // ПЕРВОЕ что проверяем - приветствие
+  if (showWelcome) {
+    return <WelcomeMessage onDismiss={handleWelcomeDismiss} />;
+  }
+
+  // ВТОРОЕ что проверяем - архетип
+  if (!currentArchetype) {
+    return <ArchetypeSelector onArchetypeSelect={saveArchetype} />;
+  }
+
+  // Остальные функции...
   const handleSphereSelect = (sphere: LifeSphere) => {
     setSelectedSphere(sphere);
     setCurrentScreen("plans");
   };
 
-  // Функции для управления задачами
   const handleAddTask = (task: Task) => {
     setAllTasks((prev) => [...prev, task]);
   };
@@ -87,13 +152,7 @@ export function App() {
       case "plans":
         return (
           <div className="space-y-6">
-            <DayPlanner />
-            <GoalsList
-              goals={goals}
-              onAddGoal={addGoal}
-              onToggleStep={toggleStep}
-              onDeleteGoal={deleteGoal}
-            />
+            <DayPlanner currentArchetype={currentArchetype} />
             {selectedSphere && (
               <DailyPlanning
                 selectedSphere={selectedSphere}
@@ -137,12 +196,11 @@ export function App() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <main className="container mx-auto px-4 py-8 pb-20">
-        {/* Шапка с архетипом */}
         <div className="flex justify-between items-center mb-6 p-4 bg-white rounded-lg shadow-sm">
           <h1 className="text-2xl font-bold text-gray-800">Opening Horizons</h1>
           <ArchetypeBadge
             archetype={currentArchetype}
-            onArchetypeChange={setCurrentArchetype}
+            onArchetypeChange={clearArchetype}
           />
         </div>
 
