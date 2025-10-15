@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Task, LifeSphere } from "../../../shared/types";
+import { generateId } from "../../../shared/lib/id-generator";
 
 interface UseDailyPlanningProps {
   selectedSphere: LifeSphere | null;
@@ -22,12 +23,13 @@ export const useDailyPlanning = ({
     if (!newTaskTitle.trim() || !selectedSphere) return;
 
     const newTask: Task = {
-      id: Date.now().toString(),
+      id: generateId(), // ← ИСПРАВЛЕНО: используем наш генератор
       title: newTaskTitle,
       completed: false,
       priority: "medium",
       category: selectedSphere.id,
       date: new Date().toISOString().split("T")[0],
+      createdAt: new Date().toISOString(), // ← ДОБАВЛЕНО: поле createdAt
     };
 
     onAddTask(newTask);

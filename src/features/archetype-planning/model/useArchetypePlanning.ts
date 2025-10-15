@@ -1,68 +1,60 @@
-import { useState } from "react";
-import {
-  Archetype,
-  ArchetypeConfig,
-  Task,
-} from "../../../shared/types/archetypes";
+import { useState, useEffect } from "react";
+import { Archetype, UserArchetype } from "../../../shared/types/archetypes";
+import { ARCHETYPES } from "../../../shared/lib/archetype-configs";
 
 export const useArchetypePlanning = () => {
-  const [archetype, setArchetype] = useState<Archetype | null>(null);
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [selectedArchetype, setSelectedArchetype] = useState<Archetype | null>(
+    null
+  );
+  const [userArchetype, setUserArchetype] = useState<UserArchetype | null>(
+    null
+  );
 
-  const archetypes: ArchetypeConfig[] = [
-    {
-      id: "fox",
-      icon: "🦊",
-      title: "Лиса",
-      description: "Ранняя пташка, максимум энергии с утра",
-      schedule: [
-        "7:00-9:00 - Фокус",
-        "9:00-12:00 - Активная работа",
-        "12:00-13:00 - Обед",
-      ],
-    },
-    {
-      id: "dolphin",
-      icon: "🐬",
-      title: "Дельфин",
-      description: "Гибкий график, два пика продуктивности",
-      schedule: [
-        "9:00-11:00 - Вход в день",
-        "11:00-14:00 - Пик",
-        "16:00-19:00 - Второй пик",
-      ],
-    },
-    {
-      id: "owl",
-      icon: "🦉",
-      title: "Сова",
-      description: "Ночной режим, креативность вечером",
-      schedule: ["10:00-12:00 - Медленный старт", "19:00-23:00 - Фокус-блок"],
-    },
-  ];
+  // Загрузка выбранного архетипа из localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem("userArchetype");
+    if (saved) {
+      try {
+        const archetypeData = JSON.parse(saved) as UserArchetype;
+        setUserArchetype(archetypeData);
+        setSelectedArchetype(archetypeData.type);
+      } catch (error) {
+        console.error("Error parsing saved archetype:", error);
+      }
+    }
+  }, []);
 
-  const addTask = (task: Omit<Task, "id">) => {
-    const newTask: Task = {
-      ...task,
-      id: Date.now().toString(),
+  // Выбор архетипа
+  const selectArchetype = (archetype: Archetype) => {
+    const userArchetypeData: UserArchetype = {
+      type: archetype,
+      selectedAt: new Date(),
     };
-    setTasks((prev) => [...prev, newTask]);
+
+    setSelectedArchetype(archetype);
+    setUserArchetype(userArchetypeData);
+    localStorage.setItem("userArchetype", JSON.stringify(userArchetypeData));
   };
 
-  const completeTask = (taskId: string) => {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === taskId ? { ...task, completed: !task.completed } : task
-      )
-    );
+  // Сброс выбора
+  const resetArchetype = () => {
+    setSelectedArchetype(null);
+    setUserArchetype(null);
+    localStorage.removeItem("userArchetype");
+  };
+
+  // Получение конфигурации текущего архетипа
+  const getCurrentArchetypeConfig = () => {
+    if (!selectedArchetype) return null;
+    return ARCHETYPES[selectedArchetype];
   };
 
   return {
-    archetype,
-    setArchetype,
-    tasks,
-    addTask,
-    completeTask,
-    archetypes,
+    selectedArchetype,
+    userArchetype,
+    selectArchetype,
+    resetArchetype,
+    getCurrentArchetypeConfig,
+    archetypesConfig: ARCHETYPES,
   };
 };

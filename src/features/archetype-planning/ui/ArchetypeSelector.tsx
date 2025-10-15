@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { Archetype, ARCHETYPES } from "../../../shared/types";
+import { useState } from "react";
+import { Archetype } from "../../../shared/types/archetypes";
+import { ARCHETYPES } from "../../../shared/lib/archetype-configs";
 
 interface ArchetypeSelectorProps {
   onArchetypeSelect: (archetype: Archetype) => void;
@@ -35,7 +36,7 @@ export const ArchetypeSelector: React.FC<ArchetypeSelectorProps> = ({
 
         {/* Выбор архетипа */}
         <div className="space-y-4 mb-8">
-          {Object.entries(ARCHETYPES).map(([key, archetype]) => (
+          {Object.entries(ARCHETYPES).map(([key, archetype]: [string, any]) => (
             <button
               key={key}
               onClick={() => handleArchetypeSelect(key as Archetype)}
@@ -74,7 +75,7 @@ export const ArchetypeSelector: React.FC<ArchetypeSelectorProps> = ({
               </h3>
               <div className="space-y-2 text-sm">
                 {Object.values(ARCHETYPES[selectedArchetype].energyWindows).map(
-                  (window, index) => (
+                  (window: any, index: number) => (
                     <div key={index} className="flex items-center space-x-2">
                       <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0"></div>
                       <span className="text-gray-700">{window}</span>

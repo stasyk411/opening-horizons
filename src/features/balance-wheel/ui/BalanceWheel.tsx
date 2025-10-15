@@ -1,8 +1,8 @@
 import React from "react";
-import { LifeSphere } from "../../../shared/types";
+import { LifeSphereConfig, LifeSphere } from "../../../shared/types";
 
 interface BalanceWheelProps {
-  spheres: LifeSphere[];
+  spheres: LifeSphereConfig[];
   onSphereChange: (sphereId: string, newValue: number) => void;
   onSphereSelect: (sphere: LifeSphere) => void;
 }
@@ -10,7 +10,7 @@ interface BalanceWheelProps {
 export const BalanceWheel: React.FC<BalanceWheelProps> = ({
   spheres,
   onSphereChange,
-  onSphereSelect, // ← ДОБАВЛЕНО!
+  onSphereSelect,
 }) => {
   return (
     <div className="p-6">
@@ -30,25 +30,30 @@ export const BalanceWheel: React.FC<BalanceWheelProps> = ({
             <div className="flex items-center justify-center space-x-2 mb-3">
               <button
                 onClick={() =>
-                  onSphereChange(sphere.id, Math.max(0, sphere.value - 1))
+                  onSphereChange(
+                    sphere.id,
+                    Math.max(0, (sphere.value || 0) - 1)
+                  )
                 }
                 className="w-8 h-8 bg-gray-200 rounded-full"
               >
                 -
               </button>
-              <span className="text-xl font-bold">{sphere.value}/10</span>
+              <span className="text-xl font-bold">{sphere.value || 0}/10</span>
               <button
                 onClick={() =>
-                  onSphereChange(sphere.id, Math.min(10, sphere.value + 1))
+                  onSphereChange(
+                    sphere.id,
+                    Math.min(10, (sphere.value || 0) + 1)
+                  )
                 }
                 className="w-8 h-8 bg-gray-200 rounded-full"
               >
                 +
               </button>
             </div>
-            {/* ДОБАВЛЕНА КНОПКА ВЫБОРА */}
             <button
-              onClick={() => onSphereSelect(sphere)}
+              onClick={() => onSphereSelect(sphere.id)}
               className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600"
             >
               Выбрать

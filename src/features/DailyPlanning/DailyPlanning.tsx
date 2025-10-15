@@ -1,12 +1,8 @@
 import React, { useState, useEffect } from "react";
-import {
-  Task,
-  LifeSphere,
-  Priority,
-  RecurrenceType,
-  Archetype,
-} from "../../shared/types";
+import { Task, LifeSphere } from "../../shared/types";
+import { Archetype } from "../../shared/types/archetypes";
 import { dataManager } from "../../shared/lib/data-manager";
+import { generateId } from "../../shared/lib/id-generator";
 import {
   Plus,
   Clock,
@@ -24,7 +20,7 @@ interface DailyPlanningProps {
 }
 
 const PRIORITY_OPTIONS: {
-  value: Priority;
+  value: "low" | "medium" | "high";
   label: string;
   color: string;
   bgColor: string;
@@ -47,16 +43,10 @@ const PRIORITY_OPTIONS: {
     color: "text-green-600",
     bgColor: "bg-green-100",
   },
-  {
-    value: "none",
-    label: "Без приоритета",
-    color: "text-gray-600",
-    bgColor: "bg-gray-100",
-  },
 ];
 
 const RECURRENCE_OPTIONS: {
-  value: RecurrenceType;
+  value: string;
   label: string;
   icon: string;
 }[] = [
@@ -124,15 +114,27 @@ const ARCHETYPE_CONFIG: Record<
   },
 };
 
+interface TaskForm {
+  title: string;
+  sphere: LifeSphere;
+  date: string;
+  timeSlot?: { start: string; end: string };
+  priority: "low" | "medium" | "high";
+  withAlarm: boolean;
+  alarmTime?: string;
+  recurrence: string;
+  goalId?: string;
+}
+
 export const DailyPlanning: React.FC<DailyPlanningProps> = ({
   selectedSphere,
 }) => {
-  const [task, setTask] = useState<Omit<Task, "id" | "isCompleted">>({
-    text: "",
+  const [task, setTask] = useState<TaskForm>({
+    title: "",
     sphere: selectedSphere || "health",
     date: new Date().toISOString().split("T")[0],
     timeSlot: undefined,
-    priority: "none",
+    priority: "low",
     withAlarm: false,
     alarmTime: undefined,
     recurrence: "none",
@@ -160,25 +162,36 @@ export const DailyPlanning: React.FC<DailyPlanningProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!task.text.trim()) return;
+    if (!task.title.trim()) return;
 
-    await dataManager.addTask(task);
+    // Создаем задачу в правильном формате
+    const newTask: Task = {
+      id: generateId(),
+      title: task.title,
+      completed: false,
+      priority: task.priority,
+      sphere: task.sphere,
+      date: task.date,
+      createdAt: new Date().toISOString(),
+    };
+
+    await dataManager.addTask(newTask);
 
     setShowSuccess(true);
     setTimeout(() => setShowSuccess(false), 3000);
 
     // Сбрасываем форму, но сохраняем выбранную сферу и архетип
-    setTask((prev) => ({
-      text: "",
-      sphere: prev.sphere,
+    setTask({
+      title: "",
+      sphere: task.sphere,
       date: new Date().toISOString().split("T")[0],
       timeSlot: undefined,
-      priority: "none",
+      priority: "low",
       withAlarm: false,
       alarmTime: undefined,
       recurrence: "none",
       goalId: undefined,
-    }));
+    });
   };
 
   const requestNotificationPermission = async () => {
@@ -234,7 +247,7 @@ export const DailyPlanning: React.FC<DailyPlanningProps> = ({
               </div>
 
               <ul className="space-y-1">
-                {config.tips.map((tip, index) => (
+                {config.tips.map((tip: string, index: number) => (
                   <li
                     key={index}
                     className={`text-xs ${
@@ -287,9 +300,9 @@ export const DailyPlanning: React.FC<DailyPlanningProps> = ({
             Опишите задачу *
           </label>
           <textarea
-            value={task.text}
+            value={task.title}
             onChange={(e) =>
-              setTask((prev) => ({ ...prev, text: e.target.value }))
+              setTask((prev) => ({ ...prev, title: e.target.value }))
             }
             placeholder="Например: Утренняя пробежка 30 минут..."
             className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 resize-none shadow-sm text-sm md:text-base"
@@ -338,9 +351,7 @@ export const DailyPlanning: React.FC<DailyPlanningProps> = ({
                   }
                   className={`p-2 md:p-3 rounded-lg border-2 text-center transition-all duration-200 ${
                     task.priority === option.value
-                      ? `${option.bgColor} border-${
-                          option.color.split("-")[1]
-                        }-300 font-semibold`
+                      ? `${option.bgColor} border-gray-300 font-semibold`
                       : "bg-white border-gray-200 hover:border-gray-300"
                   }`}
                 >
@@ -389,7 +400,11 @@ export const DailyPlanning: React.FC<DailyPlanningProps> = ({
                 onChange={(e) =>
                   setTask((prev) => ({
                     ...prev,
-                    timeSlot: { ...prev.timeSlot, start: e.target.value },
+                    timeSlot: {
+                      ...prev.timeSlot,
+                      start: e.target.value,
+                      end: prev.timeSlot?.end || "",
+                    },
                   }))
                 }
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm text-sm"
@@ -401,7 +416,11 @@ export const DailyPlanning: React.FC<DailyPlanningProps> = ({
                 onChange={(e) =>
                   setTask((prev) => ({
                     ...prev,
-                    timeSlot: { ...prev.timeSlot, end: e.target.value },
+                    timeSlot: {
+                      ...prev.timeSlot,
+                      start: prev.timeSlot?.start || "",
+                      end: e.target.value,
+                    },
                   }))
                 }
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm text-sm"
@@ -427,7 +446,7 @@ export const DailyPlanning: React.FC<DailyPlanningProps> = ({
               className="w-full px-3 py-2 md:px-4 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm text-sm md:text-base"
             >
               <option value="">Без привязки</option>
-              {goals.map((goal) => (
+              {goals.map((goal: any) => (
                 <option key={goal.id} value={goal.id}>
                   {goal.title}
                 </option>

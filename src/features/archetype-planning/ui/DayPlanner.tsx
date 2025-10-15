@@ -1,13 +1,22 @@
-import React from "react";
+import { useState } from "react";
 import { Archetype } from "../../../shared/types/archetypes";
 
 interface DayPlannerProps {
   currentArchetype: Archetype;
 }
 
+interface ArchetypeConfig {
+  emoji: string;
+  title: string;
+  description: string;
+  energyLevel: string;
+  characteristics: string[];
+  recommendations: string[];
+}
+
 export const DayPlanner: React.FC<DayPlannerProps> = ({ currentArchetype }) => {
-  const getArchetypeConfig = () => {
-    const configs = {
+  const getArchetypeConfig = (): ArchetypeConfig => {
+    const configs: Record<Archetype, ArchetypeConfig> = {
       fox: {
         emoji: "🦊",
         title: "Лиса",
@@ -88,7 +97,7 @@ export const DayPlanner: React.FC<DayPlannerProps> = ({ currentArchetype }) => {
             Особенности {config.title}:
           </h3>
           <ul className="space-y-2 text-sm text-amber-700">
-            {config.characteristics.map((char, index) => (
+            {config.characteristics.map((char: string, index: number) => (
               <li key={index} className="flex items-start gap-2">
                 <span className="mt-0.5">•</span>
                 <span>{char}</span>
@@ -104,7 +113,7 @@ export const DayPlanner: React.FC<DayPlannerProps> = ({ currentArchetype }) => {
             Рекомендации по планированию:
           </h3>
           <ul className="space-y-2 text-sm text-green-700">
-            {config.recommendations.map((rec, index) => (
+            {config.recommendations.map((rec: string, index: number) => (
               <li key={index} className="flex items-start gap-2">
                 <span className="mt-0.5">🎯</span>
                 <span>{rec}</span>
