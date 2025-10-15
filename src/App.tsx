@@ -10,7 +10,8 @@ import { DayPlanner } from "./features/archetype-planning";
 import { GoalsList, useGoalsSystem } from "./features/goals-system";
 import { ArchetypeBadge } from "./features/archetype-planning/ui/ArchetypeBadge";
 import { ArchetypeSelector } from "./features/archetype-planning/ui/ArchetypeSelector";
-import { WelcomeMessage } from "./components/WelcomeMessage"; // ДОБАВЬ ЭТОТ ИМПОРТ
+import { WelcomeMessage } from "./components/WelcomeMessage";
+import { PomodoroTimer } from "./features/pomodoro-timer/ui/PomodoroTimer"; // ← ДОБАВЛЕНО
 import { useState, useEffect } from "react";
 
 // Хук для работы с сохранением архетипа
@@ -54,6 +55,7 @@ const Navigation = ({ currentScreen, onScreenChange }: any) => (
         { id: "plans", icon: "🎯", label: "Планы" },
         { id: "tasks", icon: "✅", label: "Задачи" },
         { id: "analysis", icon: "📊", label: "Анализ" },
+        { id: "pomodoro", icon: "🍅", label: "Таймер" }, // ← ДОБАВЛЕНО
         { id: "settings", icon: "⚙️", label: "Настройки" },
       ].map((screen) => (
         <button
@@ -73,7 +75,13 @@ const Navigation = ({ currentScreen, onScreenChange }: any) => (
   </nav>
 );
 
-type AppScreen = "balance" | "plans" | "tasks" | "analysis" | "settings";
+type AppScreen =
+  | "balance"
+  | "plans"
+  | "tasks"
+  | "analysis"
+  | "pomodoro"
+  | "settings"; // ← ОБНОВЛЕНО
 
 export function App() {
   const [currentScreen, setCurrentScreen] = useState<AppScreen>("balance");
@@ -178,6 +186,12 @@ export function App() {
           <div className="space-y-6">
             <StatsDashboard tasks={allTasks} spheres={spheres} />
             <RestCove tasks={allTasks} spheres={spheres} />
+          </div>
+        );
+      case "pomodoro": // ← ДОБАВЛЕНО
+        return (
+          <div className="flex justify-center">
+            <PomodoroTimer />
           </div>
         );
       case "settings":
