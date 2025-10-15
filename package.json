@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "celebrate": "echo '🎉 ПОЗДРАВЛЯЕМ! Уровень Strong Middle+ developer достигнут! 🚀' && echo '🍅 Pomodoro система готова! 🎯' && echo '💾 Код защищен на GitHub! 🛡️'"
   },
   "dependencies": {
     "idb": "^8.0.3",
