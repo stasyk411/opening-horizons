@@ -11,8 +11,9 @@ import { GoalsList, useGoalsSystem } from "./features/goals-system";
 import { ArchetypeBadge } from "./features/archetype-planning/ui/ArchetypeBadge";
 import { ArchetypeSelector } from "./features/archetype-planning/ui/ArchetypeSelector";
 import { WelcomeMessage } from "./components/WelcomeMessage";
-import { PomodoroTimer } from "./features/pomodoro-timer/ui/PomodoroTimer"; // ← ДОБАВЛЕНО
+import { PomodoroTimer } from "./features/pomodoro-timer/ui/PomodoroTimer";
 import { useState, useEffect } from "react";
+import { useServiceWorker } from "./hooks/useServiceWorker"; // ← ДОБАВЛЕНО
 
 // Хук для работы с сохранением архетипа
 const useArchetypeStorage = () => {
@@ -48,20 +49,20 @@ const useArchetypeStorage = () => {
 };
 
 const Navigation = ({ currentScreen, onScreenChange }: any) => (
-  <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2">
+  <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 safe-area-inset-bottom">
     <div className="flex justify-around">
       {[
         { id: "balance", icon: "⚖️", label: "Баланс" },
         { id: "plans", icon: "🎯", label: "Планы" },
         { id: "tasks", icon: "✅", label: "Задачи" },
         { id: "analysis", icon: "📊", label: "Анализ" },
-        { id: "pomodoro", icon: "🍅", label: "Таймер" }, // ← ДОБАВЛЕНО
+        { id: "pomodoro", icon: "🍅", label: "Таймер" },
         { id: "settings", icon: "⚙️", label: "Настройки" },
       ].map((screen) => (
         <button
           key={screen.id}
           onClick={() => onScreenChange(screen.id)}
-          className={`flex flex-col items-center px-3 py-2 rounded-lg min-w-[60px] ${
+          className={`flex flex-col items-center px-3 py-2 rounded-lg min-w-[60px] transition-colors ${
             currentScreen === screen.id
               ? "bg-blue-500 text-white"
               : "text-gray-600 hover:text-blue-500"
@@ -81,7 +82,7 @@ type AppScreen =
   | "tasks"
   | "analysis"
   | "pomodoro"
-  | "settings"; // ← ОБНОВЛЕНО
+  | "settings";
 
 export function App() {
   const [currentScreen, setCurrentScreen] = useState<AppScreen>("balance");
@@ -89,7 +90,25 @@ export function App() {
   const { spheres, updateSphereValue } = useBalanceWheel();
   const { goals, addGoal, toggleStep, deleteGoal } = useGoalsSystem();
 
-  // ДОБАВЛЯЕМ СЮДА логику приветствия
+  // ДОБАВЛЕНО: Регистрация Service Worker
+  const swStatus = useServiceWorker();
+
+  // ДОБАВЛЕНО: Индикатор статуса Service Worker (только для разработки)
+  const getSwStatusMessage = () => {
+    switch (swStatus) {
+      case "loading":
+        return "🔄 Загрузка...";
+      case "registered":
+        return "✅ Оффлайн режим";
+      case "error":
+        return "⚠️ Ошибка SW";
+      case "unsupported":
+        return "ℹ️ Только онлайн";
+      default:
+        return "";
+    }
+  };
+
   const [showWelcome, setShowWelcome] = useState(true);
 
   // Показываем приветствие только при первом посещении
@@ -125,7 +144,6 @@ export function App() {
     return <ArchetypeSelector onArchetypeSelect={saveArchetype} />;
   }
 
-  // Остальные функции...
   const handleSphereSelect = (sphere: LifeSphere) => {
     setSelectedSphere(sphere);
     setCurrentScreen("plans");
@@ -188,7 +206,7 @@ export function App() {
             <RestCove tasks={allTasks} spheres={spheres} />
           </div>
         );
-      case "pomodoro": // ← ДОБАВЛЕНО
+      case "pomodoro":
         return (
           <div className="flex justify-center">
             <PomodoroTimer />
@@ -208,16 +226,27 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <main className="container mx-auto px-4 py-8 pb-20">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 safe-area-inset">
+      <main className="container mx-auto px-4 py-8 pb-24">
+        {" "}
+        {/* Увеличил padding-bottom для навигации */}
         <div className="flex justify-between items-center mb-6 p-4 bg-white rounded-lg shadow-sm">
-          <h1 className="text-2xl font-bold text-gray-800">Opening Horizons</h1>
+          <div className="flex items-center space-x-4">
+            <h1 className="text-2xl font-bold text-gray-800">
+              Opening Horizons
+            </h1>
+            {/* ДОБАВЛЕНО: Индикатор статуса Service Worker */}
+            {process.env.NODE_ENV === "development" && (
+              <span className="text-xs px-2 py-1 bg-gray-100 rounded-full text-gray-600">
+                {getSwStatusMessage()}
+              </span>
+            )}
+          </div>
           <ArchetypeBadge
             archetype={currentArchetype}
             onArchetypeChange={clearArchetype}
           />
         </div>
-
         {renderScreen()}
       </main>
       <Navigation
