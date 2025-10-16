@@ -13,8 +13,7 @@ import { ArchetypeSelector } from "./features/archetype-planning/ui/ArchetypeSel
 import { WelcomeMessage } from "./components/WelcomeMessage";
 import { PomodoroTimer } from "./features/pomodoro-timer/ui/PomodoroTimer";
 import { useState, useEffect } from "react";
-import { useServiceWorker } from "./hooks/useServiceWorker";
-import { useFirebaseTasks } from "./hooks/useFirebaseTasks";
+import { useServiceWorker } from "./hooks/useServiceWorker"; // ← ДОБАВЛЕНО
 
 // Хук для работы с сохранением архетипа
 const useArchetypeStorage = () => {
@@ -94,18 +93,6 @@ export function App() {
   // ДОБАВЛЕНО: Регистрация Service Worker
   const swStatus = useServiceWorker();
 
-  // ДОБАВЛЕНО: Firebase задачи
-  const userId = "demo-user"; // Временный ID, позже заменим на реальную авторизацию
-  const {
-    tasks: firebaseTasks,
-    loading: tasksLoading,
-    error: tasksError,
-    addTask: firebaseAddTask,
-    updateTask: firebaseUpdateTask,
-    deleteTask: firebaseDeleteTask,
-    toggleTask: firebaseToggleTask,
-  } = useFirebaseTasks(userId);
-
   // ДОБАВЛЕНО: Индикатор статуса Service Worker (только для разработки)
   const getSwStatusMessage = () => {
     switch (swStatus) {
@@ -144,6 +131,9 @@ export function App() {
     clearArchetype,
   } = useArchetypeStorage();
 
+  // Единое состояние для всех задач
+  const [allTasks, setAllTasks] = useState<Task[]>([]);
+
   // ПЕРВОЕ что проверяем - приветствие
   if (showWelcome) {
     return <WelcomeMessage onDismiss={handleWelcomeDismiss} />;
@@ -159,54 +149,23 @@ export function App() {
     setCurrentScreen("plans");
   };
 
-  const handleAddTask = async (task: Omit<Task, "id">) => {
-    try {
-      // Убеждаемся что нет undefined полей
-      const safeTask = {
-        title: task.title || "",
-        description: task.description || "",
-        completed: task.completed || false,
-        sphere: task.sphere || "general",
-        priority: task.priority || "medium",
-        userId: userId,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-
-      await firebaseAddTask(safeTask);
-    } catch (error) {
-      console.error("Error adding task:", error);
-    }
+  const handleAddTask = (task: Task) => {
+    setAllTasks((prev) => [...prev, task]);
   };
 
-  const handleToggleTask = async (taskId: string) => {
-    try {
-      const task = firebaseTasks.find((t) => t.id === taskId);
-      if (task) {
-        await firebaseToggleTask(taskId, !task.completed);
-      }
-    } catch (error) {
-      console.error("Error toggling task:", error);
-    }
+  const handleToggleTask = (taskId: string) => {
+    setAllTasks((prev) =>
+      prev.map((task) =>
+        task.id === taskId ? { ...task, completed: !task.completed } : task
+      )
+    );
   };
 
-  const handleDeleteTask = async (taskId: string) => {
-    try {
-      await firebaseDeleteTask(taskId);
-    } catch (error) {
-      console.error("Error deleting task:", error);
-    }
+  const handleDeleteTask = (taskId: string) => {
+    setAllTasks((prev) => prev.filter((task) => task.id !== taskId));
   };
 
   const renderScreen = () => {
-    if (tasksLoading) {
-      return (
-        <div className="flex justify-center items-center py-8">
-          <div className="text-gray-500">Загрузка задач...</div>
-        </div>
-      );
-    }
-
     switch (currentScreen) {
       case "balance":
         return (
@@ -223,7 +182,7 @@ export function App() {
             {selectedSphere && (
               <DailyPlanning
                 selectedSphere={selectedSphere}
-                tasks={firebaseTasks}
+                tasks={allTasks}
                 onAddTask={handleAddTask}
                 onToggleTask={handleToggleTask}
                 onDeleteTask={handleDeleteTask}
@@ -234,7 +193,7 @@ export function App() {
       case "tasks":
         return (
           <TodayTasks
-            tasks={firebaseTasks}
+            tasks={allTasks}
             spheres={spheres}
             onToggleTask={handleToggleTask}
             onDeleteTask={handleDeleteTask}
@@ -243,8 +202,8 @@ export function App() {
       case "analysis":
         return (
           <div className="space-y-6">
-            <StatsDashboard tasks={firebaseTasks} spheres={spheres} />
-            <RestCove tasks={firebaseTasks} spheres={spheres} />
+            <StatsDashboard tasks={allTasks} spheres={spheres} />
+            <RestCove tasks={allTasks} spheres={spheres} />
           </div>
         );
       case "pomodoro":
@@ -269,6 +228,8 @@ export function App() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 safe-area-inset">
       <main className="container mx-auto px-4 py-8 pb-24">
+        {" "}
+        {/* Увеличил padding-bottom для навигации */}
         <div className="flex justify-between items-center mb-6 p-4 bg-white rounded-lg shadow-sm">
           <div className="flex items-center space-x-4">
             <h1 className="text-2xl font-bold text-gray-800">
@@ -280,19 +241,12 @@ export function App() {
                 {getSwStatusMessage()}
               </span>
             )}
-            {/* ДОБАВЛЕНО: Индикатор Firebase */}
-            {tasksError && (
-              <span className="text-xs px-2 py-1 bg-red-100 rounded-full text-red-600">
-                Ошибка синхронизации
-              </span>
-            )}
           </div>
           <ArchetypeBadge
             archetype={currentArchetype}
             onArchetypeChange={clearArchetype}
           />
         </div>
-
         {renderScreen()}
       </main>
       <Navigation

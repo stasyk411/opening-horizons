@@ -10,6 +10,7 @@
     "celebrate": "echo '🎉 ПОЗДРАВЛЯЕМ! Уровень Strong Middle+ developer достигнут! 🚀' && echo '🍅 Pomodoro система готова! 🎯' && echo '💾 Код защищен на GitHub! 🛡️'"
   },
   "dependencies": {
+    "firebase": "^12.4.0",
     "idb": "^8.0.3",
     "lucide-react": "^0.288.0",
     "react": "^18.2.0",
