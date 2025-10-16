@@ -3,12 +3,12 @@ import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyAMvZph_lYxKDMUm6w2pzWQogAUKwjFdBE",
-  authDomain: "opening-horizons-app.firebaseapp.com",
-  projectId: "opening-horizons-app",
-  storageBucket: "opening-horizons-app.firebasestorage.app",
-  messagingSenderId: "157904727603",
-  appId: "1:157904727603:web:d246040568453ec7f1bd46"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
 // Initialize Firebase
