@@ -1,10 +1,10 @@
 ﻿import { useState, useEffect } from "react";
 import { Task } from "../shared/types";
-import { 
-  addTask, 
-  updateTask, 
-  deleteTask, 
-  subscribeToUserTasks 
+import {
+  addTask,
+  updateTask,
+  deleteTask,
+  subscribeToUserTasks,
 } from "../lib/firebase/tasksService";
 
 export const useFirebaseTasks = (userId: string) => {
@@ -17,7 +17,7 @@ export const useFirebaseTasks = (userId: string) => {
     if (!userId) return;
 
     setLoading(true);
-    
+
     const unsubscribe = subscribeToUserTasks(userId, (firebaseTasks) => {
       setTasks(firebaseTasks);
       setLoading(false);
@@ -69,7 +69,14 @@ export const useFirebaseTasks = (userId: string) => {
   const handleToggleTask = async (taskId: string, completed: boolean) => {
     await handleUpdateTask(taskId, { completed });
   };
-
+  // ДОБАВЬ ПЕРЕД return { tasks, loading, error, ... }:
+  console.log("📱 Mobile Debug: Firebase hook initialized");
+  console.log("📱 Mobile Debug: User ID:", userId);
+  console.log(
+    "📱 Mobile Debug: Firebase config loaded:",
+    !!import.meta.env.VITE_FIREBASE_API_KEY
+  );
+  console.log("📱 Mobile Debug: Current tasks count:", tasks.length);
   return {
     tasks,
     loading,
@@ -77,6 +84,6 @@ export const useFirebaseTasks = (userId: string) => {
     addTask: handleAddTask,
     updateTask: handleUpdateTask,
     deleteTask: handleDeleteTask,
-    toggleTask: handleToggleTask
+    toggleTask: handleToggleTask,
   };
 };
