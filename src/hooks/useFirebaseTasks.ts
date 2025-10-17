@@ -74,7 +74,7 @@ export const useFirebaseTasks = (userId: string) => {
   console.log("📱 Mobile Debug: User ID:", userId);
   console.log(
     "📱 Mobile Debug: Firebase config loaded:",
-    !!import.meta.env.VITE_FIREBASE_API_KEY
+    !!(import.meta as any).env.VITE_FIREBASE_API_KEY
   );
   console.log("📱 Mobile Debug: Current tasks count:", tasks.length);
   return {
