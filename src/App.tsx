@@ -23,26 +23,23 @@ const FirebaseStatus = ({
   tasks: any[];
   userId: string;
 }) => {
-  // Принудительно показываем всегда в продакшене для диагностики
-  const isProduction =
-    typeof window !== "undefined" &&
-    window.location.hostname.includes("netlify.app");
+  const isConnected = tasks.length > 0;
 
   return (
     <div
-      className={`fixed bottom-20 right-4 p-3 rounded-lg text-sm shadow-lg z-50 ${
-        tasks.length > 0 ? "bg-green-500 text-white" : "bg-red-500 text-white"
+      className={`fixed bottom-4 right-4 p-4 rounded-lg text-sm shadow-lg z-50 border-2 ${
+        isConnected
+          ? "bg-green-500 text-white border-green-600"
+          : "bg-red-500 text-white border-red-600"
       }`}
+      style={{ zIndex: 9999 }}
     >
-      <div>🔥 Firebase Status</div>
-      <div>Status: {tasks.length > 0 ? "✅ CONNECTED" : "❌ DISCONNECTED"}</div>
-      <div>Tasks: {tasks.length}</div>
-      <div>User: {userId || "anonymous"}</div>
-      <div>Env: {isProduction ? "PRODUCTION" : "DEVELOPMENT"}</div>
-      <div>
-        Host:{" "}
-        {typeof window !== "undefined" ? window.location.hostname : "unknown"}
+      <div className="font-bold text-center">🔥 FIREBASE STATUS</div>
+      <div className="text-center font-mono">
+        {isConnected ? "✅ CONNECTED" : "❌ DISCONNECTED"}
       </div>
+      <div>Tasks: {tasks.length}</div>
+      <div>User: {userId}</div>
     </div>
   );
 };
@@ -258,7 +255,7 @@ export function App() {
         description: task.description || "",
         completed: task.completed || false,
         sphere: task.sphere || "general",
-        category: task.sphere || "general", // ← ДОБАВИТЬ ЭТУ СТРОКУ
+        category: task.sphere || "general",
         priority: task.priority || "medium",
         userId: userId,
         createdAt: new Date(),
@@ -294,9 +291,9 @@ export function App() {
   const compatibleSpheres = spheres.map((sphere) => ({
     id: sphere.id,
     name: sphere.name,
-    value: 5, // значение по умолчанию
+    value: sphere.value || 5,
     color: sphere.color || "#cccccc",
-    icon: sphere.icon || "⭐", // ← ДОБАВЬ ЭТУ СТРОКУ
+    icon: sphere.icon || "⭐",
   }));
 
   const renderScreen = () => {
@@ -336,7 +333,7 @@ export function App() {
         return (
           <TodayTasks
             tasks={firebaseTasks}
-            spheres={compatibleSpheres} // ИСПРАВЛЕНО: используем compatibleSpheres
+            spheres={compatibleSpheres}
             onToggleTask={handleToggleTask}
             onDeleteTask={handleDeleteTask}
           />
@@ -344,10 +341,8 @@ export function App() {
       case "analysis":
         return (
           <div className="space-y-6">
-            <StatsDashboard tasks={firebaseTasks} spheres={compatibleSpheres} />{" "}
-            // ИСПРАВЛЕНО
-            <RestCove tasks={firebaseTasks} spheres={compatibleSpheres} /> //
-            ИСПРАВЛЕНО
+            <StatsDashboard tasks={firebaseTasks} spheres={compatibleSpheres} />
+            <RestCove tasks={firebaseTasks} spheres={compatibleSpheres} />
           </div>
         );
       case "pomodoro":
@@ -377,13 +372,11 @@ export function App() {
             <h1 className="text-2xl font-bold text-gray-800">
               Opening Horizons
             </h1>
-            {/* ДОБАВЛЕНО: Индикатор статуса Service Worker */}
             {process.env.NODE_ENV === "development" && (
               <span className="text-xs px-2 py-1 bg-gray-100 rounded-full text-gray-600">
                 {getSwStatusMessage()}
               </span>
             )}
-            {/* ДОБАВЛЕНО: Индикатор Firebase */}
             {tasksError && (
               <span className="text-xs px-2 py-1 bg-red-100 rounded-full text-red-600">
                 Ошибка синхронизации
