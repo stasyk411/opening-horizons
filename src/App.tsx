@@ -83,7 +83,7 @@ const useArchetypeStorage = () => {
 // ИСПРАВЛЕНО: Компонент ArchetypeSelector
 const ArchetypeSelector: React.FC<{
   onArchetypeSelect: (archetype: Archetype) => void;
-}> = ({ onArchetypeChange }) => {
+}> = ({ onArchetypeSelect }) => {
   const archetypes = {
     fox: {
       icon: "🦊",
@@ -115,7 +115,7 @@ const ArchetypeSelector: React.FC<{
           {Object.entries(archetypes).map(([key, archetype]) => (
             <button
               key={key}
-              onClick={() => onArchetypeChange(key as Archetype)}
+              onClick={() => onArchetypeSelect(key as Archetype)}
               className={`w-full p-4 rounded-lg border-2 transition-all hover:scale-105 ${archetype.color} border-transparent hover:border-current`}
             >
               <div className="flex items-center space-x-3">
@@ -237,12 +237,12 @@ export function App() {
 
   // ВТОРОЕ что проверяем - архетип
   if (!currentArchetype) {
-    return <ArchetypeSelector onArchetypeChange={saveArchetype} />;
+    return <ArchetypeSelector onArchetypeSelect={saveArchetype} />;
   }
 
   // ИСПРАВЛЕНО: Типы для BalanceWheel
   const handleSphereChange = (sphereId: string, newValue: number) => {
-    updateSphereValue(sphereId as unknown as LifeSphere, newValue);
+    updateSphereValue(sphereId, newValue);
   };
 
   const handleSphereSelect = (sphere: LifeSphere) => {
@@ -258,6 +258,7 @@ export function App() {
         description: task.description || "",
         completed: task.completed || false,
         sphere: task.sphere || "general",
+        category: task.sphere || "general", // ← ДОБАВИТЬ ЭТУ СТРОКУ
         priority: task.priority || "medium",
         userId: userId,
         createdAt: new Date(),
@@ -288,6 +289,15 @@ export function App() {
       console.error("Error deleting task:", error);
     }
   };
+
+  // ИСПРАВЛЕНО: Создаем совместимые spheres
+  const compatibleSpheres = spheres.map((sphere) => ({
+    id: sphere.id,
+    name: sphere.name,
+    value: 5, // значение по умолчанию
+    color: sphere.color || "#cccccc",
+    icon: sphere.icon || "⭐", // ← ДОБАВЬ ЭТУ СТРОКУ
+  }));
 
   const renderScreen = () => {
     if (tasksLoading) {
@@ -326,7 +336,7 @@ export function App() {
         return (
           <TodayTasks
             tasks={firebaseTasks}
-            spheres={spheres}
+            spheres={compatibleSpheres} // ИСПРАВЛЕНО: используем compatibleSpheres
             onToggleTask={handleToggleTask}
             onDeleteTask={handleDeleteTask}
           />
@@ -334,8 +344,10 @@ export function App() {
       case "analysis":
         return (
           <div className="space-y-6">
-            <StatsDashboard tasks={firebaseTasks} spheres={spheres} />
-            <RestCove tasks={firebaseTasks} spheres={spheres} />
+            <StatsDashboard tasks={firebaseTasks} spheres={compatibleSpheres} />{" "}
+            // ИСПРАВЛЕНО
+            <RestCove tasks={firebaseTasks} spheres={compatibleSpheres} /> //
+            ИСПРАВЛЕНО
           </div>
         );
       case "pomodoro":

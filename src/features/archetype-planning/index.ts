@@ -1,3 +1,2 @@
-export { ArchetypeSelector } from "./ui/ArchetypeSelector";
+export { ArchetypeBadge } from "./ui/ArchetypeBadge";
 export { DayPlanner } from "./ui/DayPlanner";
-export { useArchetypePlanning } from "./model/useArchetypePlanning";

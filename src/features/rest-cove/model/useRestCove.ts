@@ -7,7 +7,7 @@ export const useRestCove = (tasks: Task[], spheres: LifeSphere[]) => {
   // Невыполненные задачи за сегодня
   const uncompletedTasks = useMemo(() => {
     const today = new Date().toISOString().split("T")[0];
-    return tasks.filter((task) => !task.completed && task.date === today);
+    return tasks.filter((task) => !task.completed);
   }, [tasks]);
 
   // Перенести задачу на завтра

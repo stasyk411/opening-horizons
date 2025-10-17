@@ -7,7 +7,7 @@ import { TaskList } from "./TaskList";
 interface DailyPlanningProps {
   selectedSphere: LifeSphere;
   tasks: Task[];
-  onAddTask: (task: Task) => void;
+  onAddTask: (task: Omit<Task, "id">) => void; // ← ИСПРАВЛЕНО: Omit<Task, "id">
   onToggleTask: (taskId: string) => void;
   onDeleteTask: (taskId: string) => void;
 }

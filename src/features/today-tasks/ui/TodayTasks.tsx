@@ -1,5 +1,5 @@
 import React from "react";
-import { Task, LifeSphere } from "../../../shared/types";
+import { Task } from "../../../shared/types";
 
 interface TodayTasksProps {
   tasks: Task[];
@@ -101,8 +101,8 @@ export const TodayTasks: React.FC<TodayTasksProps> = ({
 };
 
 // Вспомогательные функции
-const getSphereColor = (sphere: LifeSphere) => {
-  const colors: Record<LifeSphere, string> = {
+const getSphereColor = (sphere: string) => {
+  const colors: Record<string, string> = {
     health: "bg-green-100 text-green-800",
     career: "bg-blue-100 text-blue-800",
     finance: "bg-yellow-100 text-yellow-800",
@@ -116,8 +116,8 @@ const getSphereColor = (sphere: LifeSphere) => {
   return colors[sphere] || colors.general;
 };
 
-const getSphereName = (sphere: LifeSphere, spheres: any[]) => {
-  const sphereMap: Record<LifeSphere, string> = {
+const getSphereName = (sphere: string, spheres: any[]) => {
+  const sphereMap: Record<string, string> = {
     health: "Здоровье",
     career: "Карьера",
     finance: "Финансы",

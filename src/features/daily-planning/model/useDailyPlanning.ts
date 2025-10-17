@@ -5,7 +5,7 @@ import { generateId } from "../../../shared/lib/id-generator";
 interface UseDailyPlanningProps {
   selectedSphere: LifeSphere | null;
   tasks: Task[];
-  onAddTask: (task: Task) => void;
+  onAddTask: (task: Omit<Task, "id">) => void;
   onToggleTask: (taskId: string) => void;
   onDeleteTask: (taskId: string) => void;
 }
@@ -22,17 +22,19 @@ export const useDailyPlanning = ({
   const addTask = () => {
     if (!newTaskTitle.trim() || !selectedSphere) return;
 
-    const newTask: Task = {
-      id: generateId(), // ← ИСПРАВЛЕНО: используем наш генератор
+    const newTaskData = {
       title: newTaskTitle,
+      description: "",
       completed: false,
-      priority: "medium",
+      sphere: selectedSphere.id,
       category: selectedSphere.id,
-      date: new Date().toISOString().split("T")[0],
-      createdAt: new Date().toISOString(), // ← ДОБАВЛЕНО: поле createdAt
+      priority: "medium" as const,
+      userId: "demo-user",
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
 
-    onAddTask(newTask);
+    onAddTask(newTaskData);
     setNewTaskTitle("");
   };
 
