@@ -16,7 +16,7 @@ import { useState, useEffect } from "react";
 import { useServiceWorker } from "./hooks/useServiceWorker";
 import { useFirebaseTasks } from "./hooks/useFirebaseTasks";
 
-// ДОБАВЛЕНО: Компонент для диагностики Firebase
+// ДОБАВЛЕНО: Улучшенный компонент для диагностики Firebase
 const FirebaseStatus = ({
   tasks,
   userId,
@@ -24,13 +24,26 @@ const FirebaseStatus = ({
   tasks: any[];
   userId: string;
 }) => {
+  // Принудительно показываем всегда в продакшене для диагностики
+  const isProduction =
+    typeof window !== "undefined" &&
+    window.location.hostname.includes("netlify.app");
+
   return (
-    <div className="fixed bottom-20 right-4 bg-blue-500 text-white p-3 rounded-lg text-sm shadow-lg z-50">
-      <div>
-        Firebase: {tasks.length > 0 ? "✅ Connected" : "❌ Disconnected"}
-      </div>
+    <div
+      className={`fixed bottom-20 right-4 p-3 rounded-lg text-sm shadow-lg z-50 ${
+        tasks.length > 0 ? "bg-green-500 text-white" : "bg-red-500 text-white"
+      }`}
+    >
+      <div>🔥 Firebase Status</div>
+      <div>Status: {tasks.length > 0 ? "✅ CONNECTED" : "❌ DISCONNECTED"}</div>
       <div>Tasks: {tasks.length}</div>
       <div>User: {userId || "anonymous"}</div>
+      <div>Env: {isProduction ? "PRODUCTION" : "DEVELOPMENT"}</div>
+      <div>
+        Host:{" "}
+        {typeof window !== "undefined" ? window.location.hostname : "unknown"}
+      </div>
     </div>
   );
 };
@@ -315,7 +328,7 @@ export function App() {
         {renderScreen()}
       </main>
 
-      {/* ДОБАВЛЕНО: Диагностический компонент Firebase */}
+      {/* ДОБАВЛЕНО: Диагностический компонент Firebase - ВСЕГДА ВИДИМ */}
       <FirebaseStatus tasks={firebaseTasks} userId={userId} />
 
       <Navigation
