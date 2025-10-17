@@ -9,7 +9,6 @@ import { TodayTasks } from "./features/today-tasks";
 import { DayPlanner } from "./features/archetype-planning";
 import { GoalsList, useGoalsSystem } from "./features/goals-system";
 import { ArchetypeBadge } from "./features/archetype-planning/ui/ArchetypeBadge";
-import { ArchetypeSelector } from "./features/archetype-planning/ui/ArchetypeSelector";
 import { WelcomeMessage } from "./components/WelcomeMessage";
 import { PomodoroTimer } from "./features/pomodoro-timer/ui/PomodoroTimer";
 import { useState, useEffect } from "react";
@@ -79,6 +78,61 @@ const useArchetypeStorage = () => {
     saveArchetype,
     clearArchetype,
   };
+};
+
+// ИСПРАВЛЕНО: Компонент ArchetypeSelector
+const ArchetypeSelector: React.FC<{
+  onArchetypeSelect: (archetype: Archetype) => void;
+}> = ({ onArchetypeChange }) => {
+  const archetypes = {
+    fox: {
+      icon: "🦊",
+      label: "Лиса",
+      color: "bg-orange-100 text-orange-800",
+      description: "Ранняя пташка",
+    },
+    dolphin: {
+      icon: "🐬",
+      label: "Дельфин",
+      color: "bg-blue-100 text-blue-800",
+      description: "Гибкий график",
+    },
+    owl: {
+      icon: "🦉",
+      label: "Сова",
+      color: "bg-purple-100 text-purple-800",
+      description: "Ночной режим",
+    },
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
+        <h1 className="text-2xl font-bold text-center mb-6">
+          Выбери свой стиль дня
+        </h1>
+        <div className="space-y-4">
+          {Object.entries(archetypes).map(([key, archetype]) => (
+            <button
+              key={key}
+              onClick={() => onArchetypeChange(key as Archetype)}
+              className={`w-full p-4 rounded-lg border-2 transition-all hover:scale-105 ${archetype.color} border-transparent hover:border-current`}
+            >
+              <div className="flex items-center space-x-3">
+                <span className="text-2xl">{archetype.icon}</span>
+                <div className="text-left">
+                  <div className="font-bold">{archetype.label}</div>
+                  <div className="text-sm opacity-75">
+                    {archetype.description}
+                  </div>
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 };
 
 const Navigation = ({ currentScreen, onScreenChange }: any) => (
@@ -183,8 +237,13 @@ export function App() {
 
   // ВТОРОЕ что проверяем - архетип
   if (!currentArchetype) {
-    return <ArchetypeSelector onArchetypeSelect={saveArchetype} />;
+    return <ArchetypeSelector onArchetypeChange={saveArchetype} />;
   }
+
+  // ИСПРАВЛЕНО: Типы для BalanceWheel
+  const handleSphereChange = (sphereId: string, newValue: number) => {
+    updateSphereValue(sphereId as unknown as LifeSphere, newValue);
+  };
 
   const handleSphereSelect = (sphere: LifeSphere) => {
     setSelectedSphere(sphere);
@@ -244,7 +303,7 @@ export function App() {
         return (
           <BalanceWheel
             spheres={spheres}
-            onSphereChange={updateSphereValue}
+            onSphereChange={handleSphereChange}
             onSphereSelect={handleSphereSelect}
           />
         );
@@ -291,7 +350,7 @@ export function App() {
         return (
           <BalanceWheel
             spheres={spheres}
-            onSphereChange={updateSphereValue}
+            onSphereChange={handleSphereChange}
             onSphereSelect={handleSphereSelect}
           />
         );

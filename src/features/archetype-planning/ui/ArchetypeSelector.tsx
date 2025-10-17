@@ -1,99 +1,78 @@
-import { useState } from "react";
+import React from "react";
 import { Archetype } from "../../../shared/types/archetypes";
-import { ARCHETYPES } from "../../../shared/lib/archetype-configs";
 
-interface ArchetypeSelectorProps {
-  onArchetypeSelect: (archetype: Archetype) => void;
+interface ArchetypeBadgeProps {
+  archetype: Archetype | null;
+  onArchetypeChange: (archetype: Archetype) => void;
 }
 
-export const ArchetypeSelector: React.FC<ArchetypeSelectorProps> = ({
-  onArchetypeSelect,
+export const ArchetypeBadge: React.FC<ArchetypeBadgeProps> = ({
+  archetype,
+  onArchetypeChange,
 }) => {
-  const [selectedArchetype, setSelectedArchetype] = useState<Archetype | null>(
-    null
-  );
-
-  const handleArchetypeSelect = (archetype: Archetype) => {
-    setSelectedArchetype(archetype);
+  const archetypes = {
+    fox: {
+      icon: "🦊",
+      label: "Лиса",
+      color: "bg-orange-100 text-orange-800",
+      description: "Ранняя пташка",
+    },
+    dolphin: {
+      icon: "🐬",
+      label: "Дельфин",
+      color: "bg-blue-100 text-blue-800",
+      description: "Гибкий график",
+    },
+    owl: {
+      icon: "🦉",
+      label: "Сова",
+      color: "bg-purple-100 text-purple-800",
+      description: "Ночной режим",
+    },
   };
 
-  const handleConfirm = () => {
-    if (selectedArchetype) {
-      onArchetypeSelect(selectedArchetype);
-    }
-  };
+  // Если архетип не выбран - показываем только селектор
+  if (!archetype) {
+    return (
+      <div className="flex items-center gap-2 p-2 bg-gray-100 rounded-lg text-sm">
+        <span>Выбери стиль дня →</span>
+        <select
+          onChange={(e) => onArchetypeChange(e.target.value as Archetype)}
+          className="border rounded px-2 py-1"
+          defaultValue=""
+        >
+          <option value="" disabled>
+            Стиль...
+          </option>
+          <option value="fox">🦊 Лиса</option>
+          <option value="dolphin">🐬 Дельфин</option>
+          <option value="owl">🦉 Сова</option>
+        </select>
+      </div>
+    );
+  }
+
+  const current = archetypes[archetype];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-4">
-      <div className="max-w-md mx-auto pt-8">
-        {/* Заголовок */}
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">
-            Доброе утро!
-          </h1>
-          <p className="text-gray-600">Как вы себя чувствуете сегодня?</p>
-        </div>
-
-        {/* Выбор архетипа */}
-        <div className="space-y-4 mb-8">
-          {Object.entries(ARCHETYPES).map(([key, archetype]: [string, any]) => (
-            <button
-              key={key}
-              onClick={() => handleArchetypeSelect(key as Archetype)}
-              className={`w-full p-4 rounded-xl border-2 transition-all duration-200 ${
-                selectedArchetype === key
-                  ? "border-blue-500 bg-blue-50 shadow-sm"
-                  : "border-gray-200 bg-white hover:border-blue-300 hover:shadow-sm"
-              }`}
-            >
-              <div className="flex items-center space-x-4">
-                <span className="text-3xl">{archetype.emoji}</span>
-                <div className="text-left flex-1">
-                  <div className="font-semibold text-gray-800">
-                    {archetype.title}
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    {archetype.description}
-                  </div>
-                </div>
-                {selectedArchetype === key && (
-                  <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                    <div className="w-2 h-2 bg-white rounded-full"></div>
-                  </div>
-                )}
-              </div>
-            </button>
-          ))}
-        </div>
-
-        {/* Рекомендации при выборе */}
-        {selectedArchetype && (
-          <div className="animate-fade-in">
-            <div className="bg-white rounded-xl p-4 shadow-sm mb-4">
-              <h3 className="font-semibold text-gray-800 mb-3">
-                Рекомендации на сегодня:
-              </h3>
-              <div className="space-y-2 text-sm">
-                {Object.values(ARCHETYPES[selectedArchetype].energyWindows).map(
-                  (window: any, index: number) => (
-                    <div key={index} className="flex items-center space-x-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0"></div>
-                      <span className="text-gray-700">{window}</span>
-                    </div>
-                  )
-                )}
-              </div>
-            </div>
-
-            <button
-              onClick={handleConfirm}
-              className="w-full bg-blue-500 text-white py-3 rounded-xl font-semibold hover:bg-blue-600 transition-colors duration-200 shadow-sm"
-            >
-              Начать планирование →
-            </button>
-          </div>
-        )}
+    <div className="flex items-center gap-3">
+      <div
+        className={`flex items-center gap-2 px-3 py-1 rounded-full ${current.color} border`}
+      >
+        <span className="text-sm">{current.icon}</span>
+        <span className="text-sm font-medium">{current.label}</span>
+        <span className="text-xs opacity-75">({current.description})</span>
       </div>
+
+      <select
+        value={archetype}
+        onChange={(e) => onArchetypeChange(e.target.value as Archetype)}
+        className="text-sm border rounded px-2 py-1"
+      >
+        <option value="fox">🦊 Лиса</option>
+        <option value="dolphin">🐬 Дельфин</option>
+        <option value="owl">🦉 Сова</option>
+      </select>
     </div>
   );
 };

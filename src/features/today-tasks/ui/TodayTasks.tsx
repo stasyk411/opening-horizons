@@ -1,12 +1,9 @@
 import React from "react";
 import { Task, LifeSphere } from "../../../shared/types";
-import { useTodayTasks } from "../model/useTodayTasks";
-import { TaskFilters } from "./TaskFilters";
-import { TaskItem } from "./TaskItem";
 
 interface TodayTasksProps {
   tasks: Task[];
-  spheres: LifeSphere[];
+  spheres: any[];
   onToggleTask: (taskId: string) => void;
   onDeleteTask: (taskId: string) => void;
 }
@@ -17,82 +14,130 @@ export const TodayTasks: React.FC<TodayTasksProps> = ({
   onToggleTask,
   onDeleteTask,
 }) => {
-  const {
-    filteredTasks,
-    stats,
-    selectedFilter,
-    setSelectedFilter,
-    selectedPriority,
-    setSelectedPriority,
-    selectedSphere,
-    setSelectedSphere,
-  } = useTodayTasks({ tasks, spheres });
-
-  const getSphereById = (sphereId: string) => {
-    return spheres.find((sphere) => sphere.id === sphereId);
-  };
+  const todayTasks = tasks.filter((task) => {
+    const taskDate = new Date(task.createdAt);
+    const today = new Date();
+    return taskDate.toDateString() === today.toDateString();
+  });
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      {/* Заголовок и статистика */}
-      <div className="mb-8 text-center">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">
-          📋 Задачи на сегодня
-        </h2>
+    <div className="bg-white rounded-lg shadow-sm p-6">
+      <h2 className="text-xl font-bold text-gray-800 mb-4">
+        Задачи на сегодня
+      </h2>
 
-        <div className="grid grid-cols-3 gap-4 max-w-md mx-auto">
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-blue-600">
-              {stats.total}
-            </div>
-            <div className="text-sm text-blue-800">Всего</div>
-          </div>
-          <div className="bg-green-50 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-green-600">
-              {stats.active}
-            </div>
-            <div className="text-sm text-green-800">Активных</div>
-          </div>
-          <div className="bg-purple-50 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-purple-600">
-              {stats.completed}
-            </div>
-            <div className="text-sm text-purple-800">Выполнено</div>
-          </div>
+      {todayTasks.length === 0 ? (
+        <div className="text-center py-8 text-gray-500">
+          На сегодня задач нет
         </div>
-      </div>
-
-      {/* Фильтры */}
-      <TaskFilters
-        selectedFilter={selectedFilter}
-        onFilterChange={setSelectedFilter}
-        selectedPriority={selectedPriority}
-        onPriorityChange={setSelectedPriority}
-        selectedSphere={selectedSphere}
-        onSphereChange={setSelectedSphere}
-        spheres={spheres}
-      />
-
-      {/* Список задач */}
-      <div className="space-y-3">
-        {filteredTasks.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-            {tasks.length === 0
-              ? "На сегодня задач нет. Добавьте задачи в планировании!"
-              : "Задачи не найдены по выбранным фильтрам"}
-          </div>
-        ) : (
-          filteredTasks.map((task) => (
-            <TaskItem
+      ) : (
+        <div className="space-y-3">
+          {todayTasks.map((task) => (
+            <div
               key={task.id}
-              task={task}
-              sphere={getSphereById(task.category || "")}
-              onToggle={onToggleTask}
-              onDelete={onDeleteTask}
-            />
-          ))
-        )}
-      </div>
+              className={`flex items-center justify-between p-3 border rounded-lg ${
+                task.completed
+                  ? "bg-green-50 border-green-200"
+                  : "bg-white border-gray-200"
+              }`}
+            >
+              <div className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  checked={task.completed}
+                  onChange={() => onToggleTask(task.id)}
+                  className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                />
+                <div>
+                  <div
+                    className={`font-medium ${
+                      task.completed
+                        ? "line-through text-gray-500"
+                        : "text-gray-800"
+                    }`}
+                  >
+                    {task.title}
+                  </div>
+                  {task.description && (
+                    <div className="text-sm text-gray-600">
+                      {task.description}
+                    </div>
+                  )}
+                  <div className="flex items-center space-x-2 mt-1">
+                    <span
+                      className={`px-2 py-1 text-xs rounded-full ${getSphereColor(
+                        task.sphere
+                      )}`}
+                    >
+                      {getSphereName(task.sphere, spheres)}
+                    </span>
+                    <span
+                      className={`px-2 py-1 text-xs rounded-full ${getPriorityColor(
+                        task.priority
+                      )}`}
+                    >
+                      {task.priority === "high"
+                        ? "🔥 Высокий"
+                        : task.priority === "medium"
+                        ? "⚡ Средний"
+                        : "💤 Низкий"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => onDeleteTask(task.id)}
+                className="text-red-500 hover:text-red-700 p-1 rounded"
+              >
+                🗑️
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
+};
+
+// Вспомогательные функции
+const getSphereColor = (sphere: LifeSphere) => {
+  const colors: Record<LifeSphere, string> = {
+    health: "bg-green-100 text-green-800",
+    career: "bg-blue-100 text-blue-800",
+    finance: "bg-yellow-100 text-yellow-800",
+    education: "bg-purple-100 text-purple-800",
+    relationships: "bg-pink-100 text-pink-800",
+    hobbies: "bg-indigo-100 text-indigo-800",
+    spirituality: "bg-teal-100 text-teal-800",
+    environment: "bg-orange-100 text-orange-800",
+    general: "bg-gray-100 text-gray-800",
+  };
+  return colors[sphere] || colors.general;
+};
+
+const getSphereName = (sphere: LifeSphere, spheres: any[]) => {
+  const sphereMap: Record<LifeSphere, string> = {
+    health: "Здоровье",
+    career: "Карьера",
+    finance: "Финансы",
+    education: "Образование",
+    relationships: "Отношения",
+    hobbies: "Хобби",
+    spirituality: "Духовность",
+    environment: "Окружение",
+    general: "Общее",
+  };
+
+  const foundSphere = spheres.find((s) => s.id === sphere);
+  return foundSphere?.name || sphereMap[sphere] || sphere;
+};
+
+const getPriorityColor = (priority: string) => {
+  const colors = {
+    high: "bg-red-100 text-red-800",
+    medium: "bg-yellow-100 text-yellow-800",
+    low: "bg-green-100 text-green-800",
+  };
+  return colors[priority as keyof typeof colors] || colors.medium;
 };
