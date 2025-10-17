@@ -16,6 +16,25 @@ import { useState, useEffect } from "react";
 import { useServiceWorker } from "./hooks/useServiceWorker";
 import { useFirebaseTasks } from "./hooks/useFirebaseTasks";
 
+// ДОБАВЛЕНО: Компонент для диагностики Firebase
+const FirebaseStatus = ({
+  tasks,
+  userId,
+}: {
+  tasks: any[];
+  userId: string;
+}) => {
+  return (
+    <div className="fixed bottom-20 right-4 bg-blue-500 text-white p-3 rounded-lg text-sm shadow-lg z-50">
+      <div>
+        Firebase: {tasks.length > 0 ? "✅ Connected" : "❌ Disconnected"}
+      </div>
+      <div>Tasks: {tasks.length}</div>
+      <div>User: {userId || "anonymous"}</div>
+    </div>
+  );
+};
+
 // Хук для работы с сохранением архетипа
 const useArchetypeStorage = () => {
   const [archetype, setArchetype] = useState<Archetype | null>(null);
@@ -295,6 +314,10 @@ export function App() {
 
         {renderScreen()}
       </main>
+
+      {/* ДОБАВЛЕНО: Диагностический компонент Firebase */}
+      <FirebaseStatus tasks={firebaseTasks} userId={userId} />
+
       <Navigation
         currentScreen={currentScreen}
         onScreenChange={setCurrentScreen}
