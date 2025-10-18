@@ -2,7 +2,7 @@
 class App {
   constructor() {
     this.features = {};
-    this.isNewArchitecture = false;
+    this.currentVersion = "react"; // По умолчанию React
   }
 
   async init() {
@@ -10,7 +10,7 @@ class App {
     await this.initFeatures();
     this.addArchitectureToggle();
     console.log(
-      "✅ Feature-Based архитектура готова! Ctrl+Shift+A для переключения"
+      "✅ Feature-Based архитектура готова! Ctrl+F1 и Ctrl+F2 для переключения"
     );
   }
 
@@ -25,25 +25,49 @@ class App {
 
   addArchitectureToggle() {
     document.addEventListener("keydown", (e) => {
-      if (e.ctrlKey && e.shiftKey && e.key === "A") {
-        this.toggleArchitecture();
+      if (e.ctrlKey && e.key === "F1") {
+        e.preventDefault();
+        this.toggleArchitecture("feature-based");
+      }
+      if (e.ctrlKey && e.key === "F2") {
+        e.preventDefault();
+        this.toggleArchitecture("minimalist");
       }
     });
   }
 
-  toggleArchitecture() {
-    this.isNewArchitecture = !this.isNewArchitecture;
-    const oldApp = document.getElementById("root");
-    const newApp = document.getElementById("feature-app");
+  toggleArchitecture(version) {
+    // Безопасное скрытие элементов (если они существуют)
+    this.safeHide("root");
+    this.safeHide("feature-app");
+    this.safeHide("minimalist-app");
 
-    if (this.isNewArchitecture) {
-      oldApp.style.display = "none";
-      newApp.style.display = "block";
-      console.log("🎯 Включена НОВАЯ архитектура");
+    // Показываем выбранную версию
+    if (version === "feature-based") {
+      this.safeShow("feature-app");
+      console.log("🎯 Включена FEATURE-BASED архитектура");
+    } else if (version === "minimalist") {
+      this.safeShow("minimalist-app");
+      console.log("🎨 Включена MINIMALIST архитектура");
     } else {
-      oldApp.style.display = "block";
-      newApp.style.display = "none";
+      this.safeShow("root");
       console.log("🏠 Включена СТАРАЯ архитектура");
+    }
+
+    this.currentVersion = version;
+  }
+
+  safeHide(elementId) {
+    const element = document.getElementById(elementId);
+    if (element) {
+      element.style.display = "none";
+    }
+  }
+
+  safeShow(elementId) {
+    const element = document.getElementById(elementId);
+    if (element) {
+      element.style.display = "block";
     }
   }
 }
