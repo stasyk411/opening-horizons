@@ -1,0 +1,474 @@
+/* features.css - Стили для Feature-Based архитектуры */
+
+/* Контейнеры фич */
+[data-feature] {
+  padding: 20px;
+  min-height: 400px;
+}
+
+/* Навигация */
+.navigation {
+  display: flex;
+  gap: 10px;
+  padding: 15px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+}
+
+.navigation button {
+  padding: 10px 16px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.navigation button:hover {
+  background: #4f46e5;
+  color: white;
+  border-color: #4f46e5;
+}
+
+/* Задачи */
+.tasks-feature {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.task-list {
+  margin: 20px 0;
+}
+
+.task-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.task-title {
+  flex: 1;
+  font-weight: 500;
+}
+
+.complete-btn {
+  padding: 6px 12px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.add-task-btn {
+  padding: 12px 24px;
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+/* Pomodoro */
+.pomodoro-feature {
+  text-align: center;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.timer-display {
+  font-size: 48px;
+  font-weight: bold;
+  color: #4f46e5;
+  margin: 20px 0;
+  font-family: "Courier New", monospace;
+}
+
+.timer-controls {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.timer-controls button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.start-btn {
+  background: #10b981;
+  color: white;
+}
+.pause-btn {
+  background: #f59e0b;
+  color: white;
+}
+.reset-btn {
+  background: #ef4444;
+  color: white;
+}
+
+.mode-selector {
+  display: flex;
+  gap: 5px;
+  background: #f8fafc;
+  padding: 5px;
+  border-radius: 20px;
+  margin: 20px 0;
+}
+
+.mode-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  background: none;
+  border-radius: 16px;
+  cursor: pointer;
+}
+
+.mode-btn.active {
+  background: #4f46e5;
+  color: white;
+}
+
+/* Баланс */
+.balance-feature {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.balance-overview {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.balance-value {
+  font-size: 32px;
+  font-weight: bold;
+  color: #4f46e5;
+  margin-bottom: 10px;
+}
+
+.balance-label {
+  color: #64748b;
+  font-size: 14px;
+}
+
+.progress-bar {
+  background: #f1f5f9;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+
+.progress-bar.mini {
+  height: 4px;
+  flex: 1;
+  margin: 0 10px 0 0;
+}
+
+.progress-fill {
+  background: #10b981;
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+/* Цвета прогресса для сфер */
+.progress-fill.health {
+  background: #10b981;
+}
+.progress-fill.career {
+  background: #3b82f6;
+}
+.progress-fill.relationships {
+  background: #ec4899;
+}
+.progress-fill.personal {
+  background: #f59e0b;
+}
+
+.sphere-item {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.sphere-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.sphere-name {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.sphere-stats {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.sphere-progress {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.progress-text {
+  font-size: 12px;
+  color: #64748b;
+  min-width: 40px;
+}
+
+.sphere-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.sphere-actions button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.sphere-actions .add-task-btn {
+  background: #4f46e5;
+  color: white;
+}
+
+.sphere-actions .view-tasks-btn {
+  background: #f8fafc;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+/* Настройки */
+.settings-feature {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.settings-section {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.settings-section h3 {
+  margin-bottom: 16px;
+  color: #1e293b;
+}
+
+.setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.setting-item:last-child {
+  border-bottom: none;
+}
+
+.setting-item label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+/* Minimalist Version Styles */
+.minimal-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.minimal-header {
+  text-align: center;
+  color: white;
+  margin-bottom: 30px;
+}
+
+.minimal-header h1 {
+  font-size: 32px;
+  font-weight: 300;
+  margin-bottom: 8px;
+}
+
+.minimal-header p {
+  opacity: 0.9;
+  font-size: 16px;
+}
+
+.minimal-content {
+  max-width: 400px;
+  margin: 0 auto 80px;
+}
+
+.minimal-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.minimal-card h3 {
+  color: #1a1a1a;
+  margin-bottom: 16px;
+  font-weight: 500;
+  font-size: 18px;
+}
+
+/* Task Input */
+.task-input {
+  display: flex;
+  gap: 10px;
+}
+
+.task-field {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.add-btn {
+  padding: 12px 16px;
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+/* Focus Timer */
+.focus-timer {
+  text-align: center;
+}
+
+.timer-display {
+  font-size: 32px;
+  font-weight: bold;
+  color: #4f46e5;
+  margin-bottom: 16px;
+  font-family: "Courier New", monospace;
+}
+
+.timer-btn {
+  padding: 10px 24px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+/* Balance Preview */
+.balance-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.balance-item:last-child {
+  margin-bottom: 0;
+}
+
+.balance-item span {
+  color: #1a1a1a;
+  font-size: 14px;
+}
+
+.progress-mini {
+  width: 80px;
+  height: 4px;
+  background: #f1f5f9;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-mini .progress-fill {
+  height: 100%;
+  background: #4f46e5;
+  border-radius: 2px;
+}
+
+/* Navigation */
+.minimal-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  display: flex;
+  padding: 12px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.nav-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  font-size: 20px;
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.nav-btn.active {
+  background: rgba(79, 70, 229, 0.1);
+  color: #4f46e5;
+}
+
+.nav-btn:hover {
+  background: rgba(79, 70, 229, 0.05);
+}
+
+/* Общие стили */
+.empty-state {
+  text-align: center;
+  color: #64748b;
+  padding: 40px 20px;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+button:active {
+  transform: translateY(0);
+}
