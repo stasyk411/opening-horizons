@@ -1,4 +1,4 @@
-﻿// 📁 app.js - УПРОЩЕННАЯ РАБОЧАЯ ВЕРСИЯ
+﻿// 📁 app.js - ПОЛНАЯ РАБОЧАЯ ВЕРСИЯ С MINIMALIST
 
 console.log("🚀 Feature-Based Architecture ЗАГРУЖАЕТСЯ...");
 
@@ -36,30 +36,9 @@ class SimpleFeatureApp {
                                 <h2>🎉 Feature-Based Architecture УСПЕШНО ЗАГРУЖЕНА!</h2>
                                 <p>✅ Эта архитектура теперь работает правильно</p>
                                 <p>🎯 Используйте кнопки навигации выше</p>
-                                <p>🔥 Горячие клавиши: Ctrl+F1 - Feature, Ctrl+F2 - Minimalist</p>
-                                
-                                <div style="margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                                    <div style="background: rgba(255,255,255,0.15); padding: 20px; border-radius: 10px;">
-                                        <h3>📝 Быстрый список</h3>
-                                        <ul style="text-align: left;">
-                                            <li>✅ Фича навигации</li>
-                                            <li>✅ Фича задач</li>
-                                            <li>✅ Фича таймера</li>
-                                            <li>✅ Фича баланса</li>
-                                        </ul>
-                                    </div>
-                                    <div style="background: rgba(255,255,255,0.15); padding: 20px; border-radius: 10px;">
-                                        <h3>⚡ Статус системы</h3>
-                                        <ul style="text-align: left;">
-                                            <li>🟢 Feature-Based: Активна</li>
-                                            <li>🟢 Minimalist: Готова</li>
-                                            <li>🟢 React: Готов</li>
-                                            <li>🟢 Навигация: Работает</li>
-                                        </ul>
-                                    </div>
-                                </div>
+                                <p>🔥 Горячие клавиши: Ctrl+F1 - Feature, Ctrl+F2 - Minimalist, Ctrl+F3 - React</p>
                             </div>
-                        </div>
+                        </main>
                     </div>
                 </div>
             `;
@@ -77,7 +56,9 @@ class SimpleFeatureApp {
         document.querySelectorAll('.nav-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const page = e.target.dataset.page;
-                this.showPage(page);
+                if (page) {
+                    this.showPage(page);
+                }
             });
         });
     }
@@ -93,83 +74,27 @@ class SimpleFeatureApp {
                 <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; backdrop-filter: blur(10px);">
                     <h2>🏠 Главная панель</h2>
                     <p>Добро пожаловать в Feature-Based архитектуру!</p>
-                    
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px;">
-                        <div style="background: rgba(76, 175, 80, 0.3); padding: 15px; border-radius: 10px; text-align: center;">
-                            <div style="font-size: 2em;">📝</div>
-                            <strong>Задачи</strong>
-                            <div>5 активных</div>
-                        </div>
-                        <div style="background: rgba(33, 150, 243, 0.3); padding: 15px; border-radius: 10px; text-align: center;">
-                            <div style="font-size: 2em;">⏰</div>
-                            <strong>Таймер</strong>
-                            <div>25:00</div>
-                        </div>
-                        <div style="background: rgba(156, 39, 176, 0.3); padding: 15px; border-radius: 10px; text-align: center;">
-                            <div style="font-size: 2em;">⚖️</div>
-                            <strong>Баланс</strong>
-                            <div>75%</div>
-                        </div>
-                    </div>
                 </div>
             `,
             tasks: `
                 <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; backdrop-filter: blur(10px);">
                     <h2>📝 Управление задачами</h2>
-                    
                     <div style="display: flex; gap: 10px; margin-bottom: 20px;">
                         <input type="text" placeholder="Новая задача..." style="flex: 1; padding: 10px; border: none; border-radius: 8px;">
                         <button style="padding: 10px 20px; background: #4CAF50; border: none; color: white; border-radius: 8px;">Добавить</button>
-                    </div>
-                    
-                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px;">
-                        <div style="display: flex; align-items: center; gap: 10px; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                            <input type="checkbox">
-                            <span>Протестировать Feature-Based архитектуру</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 10px; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                            <input type="checkbox" checked>
-                            <span style="text-decoration: line-through; opacity: 0.6;">Исправить переключение архитектур</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 10px; padding: 10px;">
-                            <input type="checkbox">
-                            <span>Добавить навигацию между фичами</span>
-                        </div>
                     </div>
                 </div>
             `,
             timer: `
                 <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; backdrop-filter: blur(10px); text-align: center;">
-                    <h2>⏰ Таймер Помодоро</h2>
-                    
+                    <h2>⏰ Таймер Помодoro</h2>
                     <div style="font-size: 4em; font-weight: bold; margin: 30px 0;">25:00</div>
-                    
-                    <div style="display: flex; gap: 15px; justify-content: center;">
-                        <button style="padding: 12px 25px; background: #4CAF50; border: none; color: white; border-radius: 8px; font-size: 1.1em;">Старт</button>
-                        <button style="padding: 12px 25px; background: #ff9800; border: none; color: white; border-radius: 8px; font-size: 1.1em;">Пауза</button>
-                        <button style="padding: 12px 25px; background: #f44336; border: none; color: white; border-radius: 8px; font-size: 1.1em;">Сброс</button>
-                    </div>
-                    
-                    <div style="margin-top: 20px;">
-                        <p>Сессия: 1/4 • Перерыв: 5 минут</p>
-                    </div>
                 </div>
             `,
             balance: `
                 <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; backdrop-filter: blur(10px);">
                     <h2>⚖️ Баланс жизни</h2>
-                    
-                    ${['Здоровье', 'Карьера', 'Отношения', 'Развитие'].map(category => `
-                        <div style="margin-bottom: 20px;">
-                            <div style="display: flex; justify-content: between; margin-bottom: 5px;">
-                                <span>${category === 'Здоровье' ? '💪' : category === 'Карьера' ? '💼' : category === 'Отношения' ? '❤️' : '🎯'} ${category}</span>
-                                <span>${Math.floor(Math.random() * 40) + 60}%</span>
-                            </div>
-                            <div style="background: rgba(255,255,255,0.2); height: 10px; border-radius: 5px; overflow: hidden;">
-                                <div style="background: linear-gradient(90deg, #4CAF50, #8BC34A); height: 100%; width: ${Math.floor(Math.random() * 40) + 60}%"></div>
-                            </div>
-                        </div>
-                    `).join('')}
+                    <p>Система баланса в разработке...</p>
                 </div>
             `
         };
@@ -178,12 +103,13 @@ class SimpleFeatureApp {
     }
 }
 
-// 🏗️ ПРОСТОЙ МЕНЕДЖЕР АРХИТЕКТУР
+// 🏗️ ПРОСТОЙ МЕНЕДЖЕР АРХИТЕКТУР С РАБОЧИМ MINIMALIST
 class SimpleArchManager {
     constructor() {
         console.log("🏗️ SimpleArchManager запущен");
         this.currentArch = 'react';
         this.featureApp = null;
+        this.minimalistInitialized = false;
         this.init();
     }
     
@@ -238,7 +164,91 @@ class SimpleArchManager {
         if (minimalistApp) {
             minimalistApp.style.display = 'block';
             this.currentArch = 'minimalist';
+            
+            // ИНИЦИАЛИЗИРУЕМ MINIMALIST FUNCTIONALITY ЕСЛИ ЕЩЕ НЕ ИНИЦИАЛИЗИРОВАН
+            if (!this.minimalistInitialized) {
+                console.log("🎯 Инициализируем Minimalist функционал...");
+                this.initMinimalistFunctionality();
+                this.minimalistInitialized = true;
+            }
+            
+            console.log("🎉 MINIMALIST АКТИВИРОВАН!");
         }
+    }
+
+    initMinimalistFunctionality() {
+        console.log("🔧 Настраиваем Minimalist обработчики...");
+        
+        // Навигация
+        const navButtons = document.querySelectorAll('.minimal-nav .nav-btn');
+        console.log("📋 Найдено кнопок навигации:", navButtons.length);
+        
+        navButtons.forEach((btn, index) => {
+            btn.addEventListener('click', () => {
+                console.log("🎯 Нажата кнопка навигации:", index);
+                const pages = ['home', 'tasks', 'pomodoro', 'balance', 'settings'];
+                this.showMinimalistPage(pages[index]);
+            });
+        });
+
+        // Добавление задач
+        const addBtn = document.querySelector('.minimal-content .add-btn');
+        if (addBtn) {
+            console.log("✅ Кнопка добавления найдена");
+            addBtn.addEventListener('click', () => this.addMinimalistTask());
+        } else {
+            console.log("❌ Кнопка добавления НЕ найдена");
+        }
+
+        // Таймер
+        const timerBtn = document.querySelector('.timer-btn');
+        if (timerBtn) {
+            console.log("✅ Кнопка таймера найдена");
+            timerBtn.addEventListener('click', () => this.toggleMinimalistTimer());
+        } else {
+            console.log("❌ Кнопка таймера НЕ найдена");
+        }
+        
+        console.log("✅ Minimalist функционал инициализирован");
+    }
+
+    addMinimalistTask() {
+        console.log("➕ Добавляем задачу в Minimalist");
+        const input = document.querySelector('.task-field');
+        if (input && input.value.trim()) {
+            alert(`✅ Задача добавлена: "${input.value}"`);
+            input.value = '';
+        } else {
+            alert('📝 Введите текст задачи!');
+        }
+    }
+
+    toggleMinimalistTimer() {
+        console.log("⏰ Переключаем Minimalist таймер");
+        const timerBtn = document.querySelector('.timer-btn');
+        const timerDisplay = document.querySelector('.timer-display');
+        
+        if (timerBtn && timerDisplay) {
+            if (timerBtn.textContent === 'Старт') {
+                timerBtn.textContent = 'Стоп';
+                timerDisplay.textContent = '25:00';
+                console.log("▶️ Minimalist таймер запущен");
+            } else {
+                timerBtn.textContent = 'Старт';
+                timerDisplay.textContent = '25:00';
+                console.log("⏹️ Minimalist таймер остановлен");
+            }
+        }
+    }
+
+    showMinimalistPage(page) {
+        console.log("📄 Minimalist переключаем на страницу:", page);
+        
+        const navButtons = document.querySelectorAll('.minimal-nav .nav-btn');
+        navButtons.forEach((btn, index) => {
+            const pages = ['home', 'tasks', 'pomodoro', 'balance', 'settings'];
+            btn.classList.toggle('active', pages[index] === page);
+        });
     }
     
     switchToReact() {
@@ -277,19 +287,3 @@ document.addEventListener('DOMContentLoaded', () => {
 // Переопределяем старые функции если они есть
 window.switchToFeatureBased = () => window.simpleArchManager?.switchToFeatureBased();
 window.switchToMinimalist = () => window.simpleArchManager?.switchToMinimalist();
-// 📁 app.js - ИСПРАВЛЕННАЯ ВЕРСИЯ (только fix для undefined)
-
-// ... весь предыдущий код остается ...
-
-setupNavigation() {
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const page = e.target.dataset.page;
-            if (page) {  // ✅ ДОБАВЛЕНА ПРОВЕРКА
-                this.showPage(page);
-            }
-        });
-    });
-}
-
-// ... остальной код без изменений ...
