@@ -14,22 +14,83 @@
     <link rel="apple-touch-icon" href="/icon-192.png" />
 
     <title>Opening Horizons</title>
+    
+    <!-- Стили для Feature-Based архитектуры -->
+    <link rel="stylesheet" href="features.css">
   </head>
   <body>
     <div id="root"></div>
-
+    
     <!-- НОВАЯ FEATURE-BASED АРХИТЕКТУРА (пока скрыта) -->
-    <div id="feature-app" style="display: none">
-      <div data-feature="navigation"></div>
-      <div data-feature="tasks"></div>
-      <div data-feature="pomodoro"></div>
-      <div data-feature="balance"></div>
-      <div data-feature="settings"></div>
+    <div id="feature-app" style="display: none;">
+        <div data-feature="navigation"></div>
+        <div data-feature="tasks"></div>
+        <div data-feature="pomodoro"></div>
+        <div data-feature="balance"></div>
+        <div data-feature="settings"></div>
+    </div>
+
+    <!-- MINIMALIST АРХИТЕКТУРА (пока скрыта) -->
+    <div id="minimalist-app" style="display: none">
+      <div class="minimal-container">
+        <header class="minimal-header">
+          <h1>🌊 Horizon</h1>
+          <p>Простота и эффективность</p>
+        </header>
+
+        <main class="minimal-content">
+          <div class="minimal-card">
+            <h3>📝 Быстрые задачи</h3>
+            <div class="task-input">
+              <input
+                type="text"
+                placeholder="Что нужно сделать?"
+                class="task-field"
+              />
+              <button class="add-btn">+</button>
+            </div>
+          </div>
+
+          <div class="minimal-card">
+            <h3>⏱️ Фокус</h3>
+            <div class="focus-timer">
+              <div class="timer-display">25:00</div>
+              <button class="timer-btn">Старт</button>
+            </div>
+          </div>
+
+          <div class="minimal-card">
+            <h3>⚖️ Баланс</h3>
+            <div class="balance-preview">
+              <div class="balance-item">
+                <span>💪 Здоровье</span>
+                <div class="progress-mini">
+                  <div class="progress-fill" style="width: 75%"></div>
+                </div>
+              </div>
+              <div class="balance-item">
+                <span>💼 Карьера</span>
+                <div class="progress-mini">
+                  <div class="progress-fill" style="width: 60%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <nav class="minimal-nav">
+          <button class="nav-btn active">🏠</button>
+          <button class="nav-btn">✅</button>
+          <button class="nav-btn">🍅</button>
+          <button class="nav-btn">⚖️</button>
+          <button class="nav-btn">⚙️</button>
+        </nav>
+      </div>
     </div>
 
     <!-- Подключаем новую архитектуру -->
     <script type="module" src="app.js"></script>
-
+    
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
