@@ -37,24 +37,27 @@ class App {
   }
 
   toggleArchitecture(version) {
-    // Безопасное скрытие элементов (если они существуют)
-    this.safeHide("root");
-    this.safeHide("feature-app");
-    this.safeHide("minimalist-app");
-
-    // Показываем выбранную версию
-    if (version === "feature-based") {
-      this.safeShow("feature-app");
-      console.log("🎯 Включена FEATURE-BASED архитектура");
-    } else if (version === "minimalist") {
-      this.safeShow("minimalist-app");
-      console.log("🎨 Включена MINIMALIST архитектура");
-    } else {
+    // Если нажата та же архитектура - возвращаемся к React
+    if (this.currentVersion === version) {
       this.safeShow("root");
+      this.safeHide("feature-app");
+      this.safeHide("minimalist-app");
       console.log("🏠 Включена СТАРАЯ архитектура");
+      this.currentVersion = "react";
+    } else {
+      // Включаем новую архитектуру
+      this.safeHide("root");
+      if (version === "feature-based") {
+        this.safeShow("feature-app");
+        this.safeHide("minimalist-app");
+        console.log("🎯 Включена FEATURE-BASED архитектура");
+      } else if (version === "minimalist") {
+        this.safeHide("feature-app");
+        this.safeShow("minimalist-app");
+        console.log("🎨 Включена MINIMALIST архитектура");
+      }
+      this.currentVersion = version;
     }
-
-    this.currentVersion = version;
   }
 
   safeHide(elementId) {
