@@ -17,6 +17,19 @@
   </head>
   <body>
     <div id="root"></div>
+
+    <!-- НОВАЯ FEATURE-BASED АРХИТЕКТУРА (пока скрыта) -->
+    <div id="feature-app" style="display: none">
+      <div data-feature="navigation"></div>
+      <div data-feature="tasks"></div>
+      <div data-feature="pomodoro"></div>
+      <div data-feature="balance"></div>
+      <div data-feature="settings"></div>
+    </div>
+
+    <!-- Подключаем новую архитектуру -->
+    <script type="module" src="app.js"></script>
+
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
