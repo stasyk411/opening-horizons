@@ -1,0 +1,24 @@
+﻿--- a/src/App.tsx
++++ b/src/App.tsx
+@@ -1,4 +1,5 @@
+ import React, { useState, useEffect } from "react";
++import { EmergencyErrorBoundary } from './components/System/EmergencyErrorBoundary';
+ 
+ // Типы
+ interface Task {
+@@ -2146,6 +2147,7 @@
+   );
+ 
+   return (
++    <EmergencyErrorBoundary>
+     <div
+       style={{
+         minHeight: "100vh",
+@@ -2301,6 +2303,7 @@
+         {currentTab === "settings" && <SettingsTab />}
+       </main>
+     </div>
++    </EmergencyErrorBoundary>
+   );
+ };
+ 

@@ -1,4 +1,5 @@
-﻿import React, { useState, useEffect } from "react";
+﻿// src/App.tsx - ИСПРАВЛЕННАЯ ВЕРСИЯ
+import React, { useState, useEffect } from "react";
 import { EmergencyErrorBoundary } from "./components/System/EmergencyErrorBoundary";
 
 // Типы
@@ -46,7 +47,7 @@ interface Settings {
   colorScheme: string;
 }
 
-// 🍅 Pomodoro Timer - ОТДЕЛЬНЫЙ КОМПОНЕНТ
+// ?? Pomodoro Timer - ОТДЕЛЬНЫЙ КОМПОНЕНТ
 const PomodoroTimer: React.FC = () => {
   const [timeLeft, setTimeLeft] = useState(25 * 60);
   const [isRunning, setIsRunning] = useState(false);
@@ -61,7 +62,7 @@ const PomodoroTimer: React.FC = () => {
           if (time <= 1) {
             setIsRunning(false);
             alert(
-              `🎉 ${mode === "work" ? "Рабочая сессия" : "Перерыв"} завершена!`
+              `?? ${mode === "work" ? "Рабочая сессия" : "Перерыв"} завершена!`
             );
             const newMode = mode === "work" ? "break" : "work";
             setMode(newMode);
@@ -99,7 +100,7 @@ const PomodoroTimer: React.FC = () => {
         }}
       >
         <span style={{ fontWeight: "bold", fontSize: "14px" }}>
-          🍅 {mode === "work" ? "Работа" : "Перерыв"}
+          ?? {mode === "work" ? "Работа" : "Перерыв"}
         </span>
         <div
           style={{
@@ -132,7 +133,7 @@ const PomodoroTimer: React.FC = () => {
             fontSize: "12px",
           }}
         >
-          ▶️
+          ??
         </button>
         <button
           onClick={() => setIsRunning(false)}
@@ -146,7 +147,7 @@ const PomodoroTimer: React.FC = () => {
             fontSize: "12px",
           }}
         >
-          ⏸️
+          ??
         </button>
         <button
           onClick={() => {
@@ -163,7 +164,7 @@ const PomodoroTimer: React.FC = () => {
             fontSize: "12px",
           }}
         >
-          🔄
+          ??
         </button>
         <button
           onClick={() => {
@@ -182,14 +183,14 @@ const PomodoroTimer: React.FC = () => {
             fontSize: "12px",
           }}
         >
-          ⚡
+          ?
         </button>
       </div>
     </div>
   );
 };
 
-// 🎯 Главный компонент Life Wheel
+// ?? Главный компонент Life Wheel
 const LifeWheelApp: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<
     "planning" | "goals" | "reflection" | "settings"
@@ -271,7 +272,7 @@ const LifeWheelApp: React.FC = () => {
     return spheres[sphere] || sphere;
   };
 
-  // 🕒 ИСПРАВЛЕННАЯ ФУНКЦИЯ ФОРМАТИРОВАНИЯ ВРЕМЕНИ
+  // ?? ИСПРАВЛЕННАЯ ФУНКЦИЯ ФОРМАТИРОВАНИЯ ВРЕМЕНИ
   const formatTimeInput = (value: string): string => {
     // Удаляем все нецифровые символы
     let numbers = value.replace(/\D/g, "");
@@ -342,10 +343,10 @@ const LifeWheelApp: React.FC = () => {
         >
           {task.startTime && task.endTime && (
             <span>
-              🕐 {task.startTime}-{task.endTime}
+              ?? {task.startTime}-{task.endTime}
             </span>
           )}
-          <span>📌 {getSphereName(task.sphere)}</span>
+          <span>?? {getSphereName(task.sphere)}</span>
         </div>
       </div>
       <button
@@ -358,12 +359,12 @@ const LifeWheelApp: React.FC = () => {
           padding: "5px",
         }}
       >
-        🗑️
+        ???
       </button>
     </div>
   );
 
-  // 📅 Компонент планирования
+  // ?? Компонент планирования
   const PlanningTab = () => {
     const [taskText, setTaskText] = useState("");
     const [taskSphere, setTaskSphere] = useState("health");
@@ -406,7 +407,7 @@ const LifeWheelApp: React.FC = () => {
       setStartTime("");
       setEndTime("");
 
-      alert("✅ Задача добавлена!");
+      alert("? Задача добавлена!");
     };
 
     const toggleTaskCompletion = (taskId: number) => {
@@ -468,19 +469,19 @@ const LifeWheelApp: React.FC = () => {
               {
                 key: "productive",
                 name: "ПРОДУКТИВНЫЙ",
-                icon: "📈",
+                icon: "??",
                 desc: "Сфокусируйтесь на важных задачах",
               },
               {
                 key: "balanced",
                 name: "СБАЛАНСИРОВАННЫЙ",
-                icon: "⚖️",
+                icon: "??",
                 desc: "Равномерное распределение энергии",
               },
               {
                 key: "recovery",
                 name: "ВОССТАНАВЛИВАЮЩИЙ",
-                icon: "🔄",
+                icon: "??",
                 desc: "День для отдыха и восстановления",
               },
             ].map((arch) => (
@@ -573,7 +574,7 @@ const LifeWheelApp: React.FC = () => {
                 whiteSpace: "nowrap",
               }}
             >
-              ➕ Добавить
+              ? Добавить
             </button>
             <button
               onClick={() => addTask(false)}
@@ -588,7 +589,7 @@ const LifeWheelApp: React.FC = () => {
                 whiteSpace: "nowrap",
               }}
             >
-              ⏳ Без даты
+              ? Без даты
             </button>
           </div>
         </div>
@@ -734,7 +735,7 @@ const LifeWheelApp: React.FC = () => {
         >
           <div>
             <h3 style={{ fontSize: isMobile ? "1.1em" : "1.3em" }}>
-              📋 Сегодня ({todayTasks.length})
+              ?? Сегодня ({todayTasks.length})
             </h3>
             <div style={{ maxHeight: "400px", overflowY: "auto" }}>
               {todayTasks.map((task) => (
@@ -764,7 +765,7 @@ const LifeWheelApp: React.FC = () => {
 
           <div>
             <h3 style={{ fontSize: isMobile ? "1.1em" : "1.3em" }}>
-              📅 Будущие ({futureTasks.length})
+              ?? Будущие ({futureTasks.length})
             </h3>
             <div style={{ maxHeight: "400px", overflowY: "auto" }}>
               {futureTasks.map((task) => (
@@ -794,7 +795,7 @@ const LifeWheelApp: React.FC = () => {
 
           <div>
             <h3 style={{ fontSize: isMobile ? "1.1em" : "1.3em" }}>
-              ⏳ Без даты ({noDateTasks.length})
+              ? Без даты ({noDateTasks.length})
             </h3>
             <div style={{ maxHeight: "400px", overflowY: "auto" }}>
               {noDateTasks.map((task) => (
@@ -826,7 +827,7 @@ const LifeWheelApp: React.FC = () => {
     );
   };
 
-  // 🎯 Компонент целей
+  // ?? Компонент целей
   const GoalsTab = () => {
     const [goalText, setGoalText] = useState("");
 
@@ -845,7 +846,7 @@ const LifeWheelApp: React.FC = () => {
 
       saveGoals([...goals, newGoal]);
       setGoalText("");
-      alert("✅ Цель добавлена!");
+      alert("? Цель добавлена!");
     };
 
     const deleteGoal = (goalId: number) => {
@@ -886,7 +887,7 @@ const LifeWheelApp: React.FC = () => {
       setStepText("");
       setShowStepForm(false);
       setCurrentGoalId(null);
-      alert("✅ Шаг добавлен!");
+      alert("? Шаг добавлен!");
     };
 
     const toggleStep = (goalId: number, stepId: number) => {
@@ -1018,7 +1019,7 @@ const LifeWheelApp: React.FC = () => {
                           whiteSpace: "nowrap",
                         }}
                       >
-                        ➕ Шаг
+                        ? Шаг
                       </button>
                       <button
                         onClick={() => deleteGoal(goal.id)}
@@ -1033,7 +1034,7 @@ const LifeWheelApp: React.FC = () => {
                           whiteSpace: "nowrap",
                         }}
                       >
-                        🗑️ Удалить
+                        ??? Удалить
                       </button>
                     </div>
                   </div>
@@ -1124,7 +1125,7 @@ const LifeWheelApp: React.FC = () => {
                               color: "#FF4500",
                             }}
                           >
-                            🗑️
+                            ???
                           </button>
                         </div>
                       ))}
@@ -1182,7 +1183,7 @@ const LifeWheelApp: React.FC = () => {
                 whiteSpace: "nowrap",
               }}
             >
-              🎯 Добавить цель
+              ?? Добавить цель
             </button>
           </div>
         </div>
@@ -1239,7 +1240,7 @@ const LifeWheelApp: React.FC = () => {
                     fontSize: "14px",
                   }}
                 >
-                  ➕ Добавить
+                  ? Добавить
                 </button>
                 <button
                   onClick={() => {
@@ -1257,7 +1258,7 @@ const LifeWheelApp: React.FC = () => {
                     fontSize: "14px",
                   }}
                 >
-                  ❌ Отмена
+                  ? Отмена
                 </button>
               </div>
             </div>
@@ -1267,7 +1268,7 @@ const LifeWheelApp: React.FC = () => {
     );
   };
 
-  // 🌙 Компонент вечернего анализа
+  // ?? Компонент вечернего анализа
   const ReflectionTab = () => {
     const [answers, setAnswers] = useState({
       question1: "",
@@ -1299,7 +1300,7 @@ const LifeWheelApp: React.FC = () => {
         question4: "",
         question5: "",
       });
-      alert("✅ Анализ сохранен!");
+      alert("? Анализ сохранен!");
     };
 
     const deleteReflection = (reflectionId: number) => {
@@ -1504,7 +1505,7 @@ const LifeWheelApp: React.FC = () => {
               width: isMobile ? "100%" : "auto",
             }}
           >
-            💾 Сохранить анализ
+            ?? Сохранить анализ
           </button>
         </div>
 
@@ -1517,7 +1518,7 @@ const LifeWheelApp: React.FC = () => {
               color: "white",
             }}
           >
-            📊 История анализов
+            ?? История анализов
           </h3>
 
           {reflections.length === 0 ? (
@@ -1593,7 +1594,7 @@ const LifeWheelApp: React.FC = () => {
                           fontSize: "12px",
                         }}
                       >
-                        🗑️
+                        ???
                       </button>
                     </div>
                     <div style={{ color: "#e0e0e0", fontSize: "13px" }}>
@@ -1617,7 +1618,7 @@ const LifeWheelApp: React.FC = () => {
     );
   };
 
-  // ⚙️ Компонент настроек
+  // ?? Компонент настроек
   const SettingsTab = () => {
     const [importData, setImportData] = useState("");
 
@@ -1640,7 +1641,7 @@ const LifeWheelApp: React.FC = () => {
       }.json`;
       link.click();
 
-      alert("✅ Данные экспортированы!");
+      alert("? Данные экспортированы!");
     };
 
     const handleImport = () => {
@@ -1653,9 +1654,9 @@ const LifeWheelApp: React.FC = () => {
         if (data.settings) saveSettings(data.settings);
 
         setImportData("");
-        alert("✅ Данные импортированы!");
+        alert("? Данные импортированы!");
       } catch (error) {
-        alert("❌ Ошибка при импорте: неверный формат JSON");
+        alert("? Ошибка при импорте: неверный формат JSON");
       }
     };
 
@@ -1672,7 +1673,7 @@ const LifeWheelApp: React.FC = () => {
         setTasks([]);
         setGoals([]);
         setReflections([]);
-        alert("✅ Данные сброшены!");
+        alert("? Данные сброшены!");
       }
     };
 
@@ -1855,7 +1856,7 @@ const LifeWheelApp: React.FC = () => {
                   width: "100%",
                 }}
               >
-                {showPomodoro ? "❌ Скрыть Pomodoro" : "🍅 Показать Pomodoro"}
+                {showPomodoro ? "? Скрыть Pomodoro" : "?? Показать Pomodoro"}
               </button>
             </div>
           </div>
@@ -1888,7 +1889,7 @@ const LifeWheelApp: React.FC = () => {
                   fontSize: "14px",
                 }}
               >
-                📤 Экспорт данных
+                ?? Экспорт данных
               </button>
 
               <div>
@@ -1931,7 +1932,7 @@ const LifeWheelApp: React.FC = () => {
                     width: "100%",
                   }}
                 >
-                  📥 Импорт данных
+                  ?? Импорт данных
                 </button>
               </div>
 
@@ -1947,7 +1948,7 @@ const LifeWheelApp: React.FC = () => {
                   fontSize: "14px",
                 }}
               >
-                🔄 Сбросить все данные
+                ?? Сбросить все данные
               </button>
             </div>
           </div>
@@ -1970,184 +1971,183 @@ const LifeWheelApp: React.FC = () => {
   };
 
   return (
-    <EmergencyErrorBoundary>
-      <div
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        color: "white",
+      }}
+    >
+      {/* Хедер */}
+      <header
         style={{
-          minHeight: "100vh",
-          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-          color: "white",
+          background: "rgba(255,255,255,0.1)",
+          backdropFilter: "blur(10px)",
+          padding: isMobile ? "15px" : "20px",
+          borderBottom: "1px solid rgba(255,255,255,0.2)",
         }}
       >
-        {/* Хедер */}
-        <header
+        <div
           style={{
-            background: "rgba(255,255,255,0.1)",
-            backdropFilter: "blur(10px)",
-            padding: isMobile ? "15px" : "20px",
-            borderBottom: "1px solid rgba(255,255,255,0.2)",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: isMobile ? "flex-start" : "center",
+            maxWidth: "1200px",
+            margin: "0 auto",
+            flexDirection: isMobile ? "column" : "row",
+            gap: isMobile ? "15px" : "0",
           }}
         >
           <div
             style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: isMobile ? "flex-start" : "center",
-              maxWidth: "1200px",
-              margin: "0 auto",
-              flexDirection: isMobile ? "column" : "row",
-              gap: isMobile ? "15px" : "0",
+              textAlign: isMobile ? "center" : "left",
+              flex: 1,
             }}
           >
-            <div
+            <h1
               style={{
-                textAlign: isMobile ? "center" : "left",
-                flex: 1,
+                margin: 0,
+                fontSize: isMobile ? "1.8em" : "2.5em",
+                lineHeight: "1.2",
               }}
             >
-              <h1
-                style={{
-                  margin: 0,
-                  fontSize: isMobile ? "1.8em" : "2.5em",
-                  lineHeight: "1.2",
-                }}
-              >
-                🎯 Колесо Жизни
-              </h1>
-              <p
-                style={{
-                  margin: 0,
-                  opacity: 0.9,
-                  fontSize: isMobile ? "14px" : "16px",
-                }}
-              >
-                Баланс, планирование и рефлексия для гармоничной жизни
-              </p>
-            </div>
-            <div
+              ?? Колесо Жизни
+            </h1>
+            <p
               style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "10px",
+                margin: 0,
+                opacity: 0.9,
+                fontSize: isMobile ? "14px" : "16px",
               }}
             >
-              <button
-                onClick={() => window.location.reload()}
-                style={{
-                  padding: "10px 15px",
-                  background: "#6A0DAD",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                }}
-              >
-                🔙 К архитектурам
-              </button>
-              <button
-                onClick={() => setShowPomodoro(!showPomodoro)}
-                style={{
-                  padding: "8px 12px",
-                  background: "#8A2BE2",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "6px",
-                  cursor: "pointer",
-                  fontSize: "12px",
-                }}
-              >
-                {showPomodoro ? "❌ Скрыть" : "🍅 Pomodoro"}
-              </button>
-            </div>
+              Баланс, планирование и рефлексия для гармоничной жизни
+            </p>
           </div>
-        </header>
-
-        {/* Pomodoro в хедере */}
-        {showPomodoro && (
           <div
             style={{
-              background: "rgba(255,255,255,0.1)",
-              padding: "10px",
               display: "flex",
-              justifyContent: "center",
-              backdropFilter: "blur(10px)",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "10px",
             }}
           >
-            <PomodoroTimer />
+            <button
+              onClick={() => window.location.reload()}
+              style={{
+                padding: "10px 15px",
+                background: "#6A0DAD",
+                color: "white",
+                border: "none",
+                borderRadius: "8px",
+                cursor: "pointer",
+                fontSize: "14px",
+              }}
+            >
+              ?? К архитектурам
+            </button>
+            <button
+              onClick={() => setShowPomodoro(!showPomodoro)}
+              style={{
+                padding: "8px 12px",
+                background: "#8A2BE2",
+                color: "white",
+                border: "none",
+                borderRadius: "6px",
+                cursor: "pointer",
+                fontSize: "12px",
+              }}
+            >
+              {showPomodoro ? "? Скрыть" : "?? Pomodoro"}
+            </button>
           </div>
-        )}
+        </div>
+      </header>
 
-        {/* Навигация */}
-        <nav
+      {/* Pomodoro в хедере */}
+      {showPomodoro && (
+        <div
           style={{
             background: "rgba(255,255,255,0.1)",
+            padding: "10px",
+            display: "flex",
+            justifyContent: "center",
             backdropFilter: "blur(10px)",
-            padding: isMobile ? "0 10px" : "0 20px",
-            borderBottom: "1px solid rgba(255,255,255,0.2)",
+          }}
+        >
+          <PomodoroTimer />
+        </div>
+      )}
+
+      {/* Навигация */}
+      <nav
+        style={{
+          background: "rgba(255,255,255,0.1)",
+          backdropFilter: "blur(10px)",
+          padding: isMobile ? "0 10px" : "0 20px",
+          borderBottom: "1px solid rgba(255,255,255,0.2)",
+          overflowX: isMobile ? "auto" : "visible",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            maxWidth: "1200px",
+            margin: "0 auto",
+            flexWrap: isMobile ? "nowrap" : "wrap",
             overflowX: isMobile ? "auto" : "visible",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              maxWidth: "1200px",
-              margin: "0 auto",
-              flexWrap: isMobile ? "nowrap" : "wrap",
-              overflowX: isMobile ? "auto" : "visible",
-            }}
-          >
-            {(
-              [
-                { key: "planning", label: "📅 Планирование" },
-                { key: "goals", label: "🎯 Цели" },
-                { key: "reflection", label: "🌙 Анализ" },
-                { key: "settings", label: "⚙️ Настройки" },
-              ] as const
-            ).map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => setCurrentTab(tab.key)}
-                style={{
-                  padding: isMobile ? "12px 16px" : "15px 25px",
-                  background:
-                    currentTab === tab.key
-                      ? "rgba(255,255,255,0.2)"
-                      : "transparent",
-                  border: "none",
-                  color: "white",
-                  cursor: "pointer",
-                  fontSize: isMobile ? "14px" : "16px",
-                  borderBottom:
-                    currentTab === tab.key ? "2px solid white" : "none",
-                  whiteSpace: "nowrap",
-                  flexShrink: 0,
-                }}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        </nav>
+          {(
+            [
+              { key: "planning", label: "?? Планирование" },
+              { key: "goals", label: "?? Цели" },
+              { key: "reflection", label: "?? Анализ" },
+              { key: "settings", label: "?? Настройки" },
+            ] as const
+          ).map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setCurrentTab(tab.key)}
+              style={{
+                padding: isMobile ? "12px 16px" : "15px 25px",
+                background:
+                  currentTab === tab.key
+                    ? "rgba(255,255,255,0.2)"
+                    : "transparent",
+                border: "none",
+                color: "white",
+                cursor: "pointer",
+                fontSize: isMobile ? "14px" : "16px",
+                borderBottom:
+                  currentTab === tab.key ? "2px solid white" : "none",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </nav>
 
-        {/* Основной контент */}
-        <main
-          style={{
-            maxWidth: "1200px",
-            margin: "0 auto",
-            padding: isMobile ? "10px" : "20px",
-            minHeight: "calc(100vh - 200px)",
-            overflowX: "hidden",
-          }}
-        >
-          {currentTab === "planning" && <PlanningTab />}
-          {currentTab === "goals" && <GoalsTab />}
-          {currentTab === "reflection" && <ReflectionTab />}
-          {currentTab === "settings" && <SettingsTab />}
-        </main>
-      </div>
-    </EmergencyErrorBoundary>
+      {/* Основной контент */}
+      <main
+        style={{
+          maxWidth: "1200px",
+          margin: "0 auto",
+          padding: isMobile ? "10px" : "20px",
+          minHeight: "calc(100vh - 200px)",
+          overflowX: "hidden",
+        }}
+      >
+        {currentTab === "planning" && <PlanningTab />}
+        {currentTab === "goals" && <GoalsTab />}
+        {currentTab === "reflection" && <ReflectionTab />}
+        {currentTab === "settings" && <SettingsTab />}
+      </main>
+    </div>
   );
 };
 
 export default LifeWheelApp;
+

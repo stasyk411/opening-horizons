@@ -1,15 +1,19 @@
-import React from "react";
+import React, { Component, ErrorInfo, ReactNode } from "react";
 
 interface ErrorBoundaryState {
   hasError: boolean;
   error?: Error;
 }
 
-export class EmergencyErrorBoundary extends React.Component<
-  { children: React.ReactNode },
+interface ErrorBoundaryProps {
+  children: ReactNode;
+}
+
+export class EmergencyErrorBoundary extends Component<
+  ErrorBoundaryProps,
   ErrorBoundaryState
 > {
-  constructor(props: { children: React.ReactNode }) {
+  constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false };
   }
@@ -32,7 +36,7 @@ export class EmergencyErrorBoundary extends React.Component<
     }
   };
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     this.backupData();
     console.error("App Crashed:", error, errorInfo);
   }
