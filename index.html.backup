@@ -1,0 +1,57 @@
+﻿<!-- MINIMALIST АРХИТЕКТУРА (пока скрыта) -->
+<div id="minimalist-app" style="display: none">
+  <div class="minimal-container">
+    <header class="minimal-header">
+      <h1>🌊 Horizon</h1>
+      <p>Простота и эффективность</p>
+    </header>
+
+    <main class="minimal-content">
+      <div class="minimal-card">
+        <h3>📝 Быстрые задачи</h3>
+        <div class="task-input">
+          <input
+            type="text"
+            placeholder="Что нужно сделать?"
+            class="task-field"
+          />
+          <button class="add-btn">+</button>
+        </div>
+      </div>
+
+      <div class="minimal-card">
+        <h3>⏱️ Фокус</h3>
+        <div class="focus-timer">
+          <div class="timer-display">25:00</div>
+          <button class="timer-btn">Старт</button>
+        </div>
+      </div>
+
+      <div class="minimal-card">
+        <h3>⚖️ Баланс</h3>
+        <div class="balance-preview">
+          <div class="balance-item">
+            <span>💪 Здоровье</span>
+            <div class="progress-mini">
+              <div class="progress-fill" style="width: 75%"></div>
+            </div>
+          </div>
+          <div class="balance-item">
+            <span>💼 Карьера</span>
+            <div class="progress-mini">
+              <div class="progress-fill" style="width: 60%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <nav class="minimal-nav">
+      <button class="nav-btn active">🏠</button>
+      <button class="nav-btn">✅</button>
+      <button class="nav-btn">🍅</button>
+      <button class="nav-btn">⚖️</button>
+      <button class="nav-btn">⚙️</button>
+    </nav>
+  </div>
+</div>

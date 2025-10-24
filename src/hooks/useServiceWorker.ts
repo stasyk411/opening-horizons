@@ -6,6 +6,11 @@ export const useServiceWorker = () => {
   >("loading");
 
   useEffect(() => {
+    // ВРЕМЕННО ОТКЛЮЧЕНО ДЛЯ РАЗРАБОТКИ АРХИТЕКТУР
+    console.log("⚡ Service Worker временно отключен для разработки");
+    setSwStatus("unsupported");
+
+    /*
     // Проверяем поддержку Service Worker
     if (!("serviceWorker" in navigator)) {
       console.log("❌ Service Worker не поддерживается");
@@ -45,6 +50,7 @@ export const useServiceWorker = () => {
     return () => {
       window.removeEventListener("load", registerSW);
     };
+    */
   }, []);
 
   return swStatus;

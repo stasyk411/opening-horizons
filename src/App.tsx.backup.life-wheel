@@ -1,0 +1,545 @@
+﻿// src/App.tsx - ПОЛНЫЙ LIFE WHEEL + POMODORO
+import React, { useState, useEffect } from "react";
+import "./index.css";
+
+// Типы для TypeScript
+interface Task {
+  id: number;
+  text: string;
+  sphere: string;
+  startTime?: string;
+  endTime?: string;
+  date?: string;
+  completed: boolean;
+  createdAt: string;
+}
+
+interface Goal {
+  id: number;
+  text: string;
+  steps: GoalStep[];
+  createdAt: string;
+  achievedAt?: string;
+}
+
+interface GoalStep {
+  text: string;
+  completed: boolean;
+}
+
+interface Reflection {
+  id: number;
+  date: string;
+  question1: string;
+  question2: string;
+  question3: string;
+  question4: string;
+  question5: string;
+  archetype: string;
+  createdAt: string;
+}
+
+interface Settings {
+  archetype: string;
+  darkTheme: boolean;
+  notifications: boolean;
+  autoSave: boolean;
+  colorScheme: string;
+}
+
+// 🍅 Pomodoro Timer Component
+const PomodoroTimer: React.FC = () => {
+  const [timeLeft, setTimeLeft] = useState(25 * 60);
+  const [isRunning, setIsRunning] = useState(false);
+  const [mode, setMode] = useState<"work" | "break">("work");
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+
+    if (isRunning && timeLeft > 0) {
+      interval = setInterval(() => {
+        setTimeLeft((time) => {
+          if (time <= 1) {
+            setIsRunning(false);
+            alert(
+              `🎉 ${mode === "work" ? "Рабочая сессия" : "Перерыв"} завершена!`
+            );
+            const newMode = mode === "work" ? "break" : "work";
+            setMode(newMode);
+            return newMode === "work" ? 25 * 60 : 5 * 60;
+          }
+          return time - 1;
+        });
+      }, 1000);
+    }
+
+    return () => clearInterval(interval);
+  }, [isRunning, timeLeft, mode]);
+
+  const minutes = Math.floor(timeLeft / 60);
+  const seconds = timeLeft % 60;
+
+  return (
+    <div className="pomodoro-widget">
+      <div className="pomodoro-header">
+        <span>🍅 {mode === "work" ? "Работа" : "Перерыв"}</span>
+        <div className="time-display">
+          {minutes.toString().padStart(2, "0")}:
+          {seconds.toString().padStart(2, "0")}
+        </div>
+      </div>
+      <div className="pomodoro-controls">
+        <button onClick={() => setIsRunning(true)}>▶️</button>
+        <button onClick={() => setIsRunning(false)}>⏸️</button>
+        <button
+          onClick={() => {
+            setIsRunning(false);
+            setTimeLeft(mode === "work" ? 25 * 60 : 5 * 60);
+          }}
+        >
+          🔄
+        </button>
+        <button
+          onClick={() => {
+            setIsRunning(false);
+            const newMode = mode === "work" ? "break" : "work";
+            setMode(newMode);
+            setTimeLeft(newMode === "work" ? 25 * 60 : 5 * 60);
+          }}
+        >
+          ⚡
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// 🎯 Главный компонент Life Wheel
+const LifeWheelApp: React.FC = () => {
+  const [currentTab, setCurrentTab] = useState<
+    "planning" | "goals" | "reflection" | "settings"
+  >("planning");
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [goals, setGoals] = useState<Goal[]>([]);
+  const [reflections, setReflections] = useState<Reflection[]>([]);
+  const [settings, setSettings] = useState<Settings>({
+    archetype: "balanced",
+    darkTheme: false,
+    notifications: true,
+    autoSave: true,
+    colorScheme: "purple",
+  });
+
+  // Загрузка данных при монтировании
+  useEffect(() => {
+    loadAllData();
+  }, []);
+
+  const loadAllData = () => {
+    const savedTasks = localStorage.getItem("life-wheel-tasks");
+    const savedGoals = localStorage.getItem("life-wheel-goals");
+    const savedReflections = localStorage.getItem("life-wheel-reflections");
+    const savedSettings = localStorage.getItem("life-wheel-settings");
+
+    if (savedTasks) setTasks(JSON.parse(savedTasks));
+    if (savedGoals) setGoals(JSON.parse(savedGoals));
+    if (savedReflections) setReflections(JSON.parse(savedReflections));
+    if (savedSettings)
+      setSettings({ ...settings, ...JSON.parse(savedSettings) });
+  };
+
+  const saveTasks = (newTasks: Task[]) => {
+    setTasks(newTasks);
+    localStorage.setItem("life-wheel-tasks", JSON.stringify(newTasks));
+  };
+
+  const saveGoals = (newGoals: Goal[]) => {
+    setGoals(newGoals);
+    localStorage.setItem("life-wheel-goals", JSON.stringify(newGoals));
+  };
+
+  const saveReflections = (newReflections: Reflection[]) => {
+    setReflections(newReflections);
+    localStorage.setItem(
+      "life-wheel-reflections",
+      JSON.stringify(newReflections)
+    );
+  };
+
+  const saveSettings = (newSettings: Settings) => {
+    setSettings(newSettings);
+    localStorage.setItem("life-wheel-settings", JSON.stringify(newSettings));
+  };
+
+  // 📅 Компонент планирования
+  const PlanningTab = () => {
+    const [taskText, setTaskText] = useState("");
+    const [taskSphere, setTaskSphere] = useState("health");
+    const [startTime, setStartTime] = useState("");
+    const [endTime, setEndTime] = useState("");
+    const [taskDate, setTaskDate] = useState(
+      new Date().toISOString().split("T")[0]
+    );
+
+    const addTask = () => {
+      if (!taskText.trim()) {
+        alert("Введите текст задачи!");
+        return;
+      }
+
+      const newTask: Task = {
+        id: Date.now(),
+        text: taskText,
+        sphere: taskSphere,
+        startTime: startTime || undefined,
+        endTime: endTime || undefined,
+        date: taskDate,
+        completed: false,
+        createdAt: new Date().toISOString(),
+      };
+
+      saveTasks([...tasks, newTask]);
+      setTaskText("");
+      setStartTime("");
+      setEndTime("");
+    };
+
+    const toggleTaskCompletion = (taskId: number) => {
+      const updatedTasks = tasks.map((task) =>
+        task.id === taskId ? { ...task, completed: !task.completed } : task
+      );
+      saveTasks(updatedTasks);
+    };
+
+    const deleteTask = (taskId: number) => {
+      if (confirm("Удалить задачу?")) {
+        const updatedTasks = tasks.filter((task) => task.id !== taskId);
+        saveTasks(updatedTasks);
+      }
+    };
+
+    const today = new Date().toISOString().split("T")[0];
+    const todayTasks = tasks.filter(
+      (task) => task.date === today && !task.completed
+    );
+    const futureTasks = tasks.filter(
+      (task) => task.date && task.date > today && !task.completed
+    );
+
+    return (
+      <div className="tab-content active">
+        <h2 className="section-title">Планирование Дня</h2>
+
+        <div className="archetype-section">
+          <h3>Выберите тип дня</h3>
+          <div className="archetype-selector">
+            {["productive", "balanced", "recovery"].map((arch) => (
+              <div
+                key={arch}
+                className={`archetype-option ${
+                  settings.archetype === arch ? "active" : ""
+                }`}
+                onClick={() => saveSettings({ ...settings, archetype: arch })}
+              >
+                <span className="archetype-icon">
+                  {arch === "productive"
+                    ? "📈"
+                    : arch === "balanced"
+                    ? "⚖️"
+                    : "🔄"}
+                </span>
+                <div className="archetype-name">
+                  {arch === "productive"
+                    ? "ПРОДУКТИВНЫЙ"
+                    : arch === "balanced"
+                    ? "СБАЛАНСИРОВАННЫЙ"
+                    : "ВОССТАНАВЛИВАЮЩИЙ"}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="task-form">
+          <input
+            type="text"
+            className="task-input"
+            value={taskText}
+            onChange={(e) => setTaskText(e.target.value)}
+            placeholder="Опишите вашу задачу..."
+          />
+          <button className="btn" onClick={addTask}>
+            <span>➕</span> Добавить
+          </button>
+        </div>
+
+        <div className="task-options">
+          <div className="option-group">
+            <div className="option-label">Сфера жизни</div>
+            <select
+              className="option-select"
+              value={taskSphere}
+              onChange={(e) => setTaskSphere(e.target.value)}
+            >
+              <option value="health">Здоровье</option>
+              <option value="career">Карьера</option>
+              <option value="family">Семья</option>
+              <option value="finance">Финансы</option>
+              <option value="development">Развитие</option>
+              <option value="hobby">Хобби</option>
+            </select>
+          </div>
+
+          <div className="option-group">
+            <div className="option-label">Время выполнения</div>
+            <div className="time-input-group">
+              <input
+                type="text"
+                className="time-input"
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
+                placeholder="09:00"
+                maxLength={5}
+              />
+              <span className="time-separator">—</span>
+              <input
+                type="text"
+                className="time-input"
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
+                placeholder="10:30"
+                maxLength={5}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="date-selector">
+          <label>Дата выполнения:</label>
+          <input
+            type="date"
+            className="date-input"
+            value={taskDate}
+            onChange={(e) => setTaskDate(e.target.value)}
+          />
+        </div>
+
+        <div className="tasks-categories">
+          <div className="tasks-category">
+            <h3>📋 Задачи на сегодня ({todayTasks.length})</h3>
+            <div className="task-list">
+              {todayTasks.map((task) => (
+                <TaskItem
+                  key={task.id}
+                  task={task}
+                  onToggle={toggleTaskCompletion}
+                  onDelete={deleteTask}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="tasks-category">
+            <h3>📅 Будущие задачи ({futureTasks.length})</h3>
+            <div className="task-list">
+              {futureTasks.map((task) => (
+                <TaskItem
+                  key={task.id}
+                  task={task}
+                  onToggle={toggleTaskCompletion}
+                  onDelete={deleteTask}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // 🎯 Компонент целей
+  const GoalsTab = () => {
+    const [goalText, setGoalText] = useState("");
+
+    const addGoal = () => {
+      if (!goalText.trim()) {
+        alert("Введите текст цели!");
+        return;
+      }
+
+      const newGoal: Goal = {
+        id: Date.now(),
+        text: goalText,
+        steps: [],
+        createdAt: new Date().toISOString(),
+      };
+
+      saveGoals([...goals, newGoal]);
+      setGoalText("");
+    };
+
+    const deleteGoal = (goalId: number) => {
+      if (confirm("Удалить цель?")) {
+        const updatedGoals = goals.filter((goal) => goal.id !== goalId);
+        saveGoals(updatedGoals);
+      }
+    };
+
+    return (
+      <div className="tab-content">
+        <h2 className="section-title">Мои Цели</h2>
+
+        <div className="goals-container">
+          {goals.map((goal) => (
+            <GoalCard key={goal.id} goal={goal} onDelete={deleteGoal} />
+          ))}
+        </div>
+
+        <div style={{ marginTop: "30px" }}>
+          <h3>Добавить новую цель</h3>
+          <div className="task-form">
+            <input
+              type="text"
+              className="task-input"
+              value={goalText}
+              onChange={(e) => setGoalText(e.target.value)}
+              placeholder="Опишите вашу цель..."
+            />
+            <button className="btn" onClick={addGoal}>
+              <span>🎯</span> Добавить цель
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Компонент задачи
+  const TaskItem: React.FC<{
+    task: Task;
+    onToggle: (id: number) => void;
+    onDelete: (id: number) => void;
+  }> = ({ task, onToggle, onDelete }) => (
+    <div className={`task-item ${task.completed ? "completed" : ""}`}>
+      <input
+        type="checkbox"
+        className="task-checkbox"
+        checked={task.completed}
+        onChange={() => onToggle(task.id)}
+      />
+      <div className="task-content">
+        <div className="task-text">{task.text}</div>
+        <div className="task-meta">
+          {task.startTime && task.endTime && (
+            <div className="task-time">
+              {task.startTime} - {task.endTime}
+            </div>
+          )}
+          <div className="task-sphere">{getSphereName(task.sphere)}</div>
+        </div>
+      </div>
+      <button
+        className="action-btn delete-task-btn"
+        onClick={() => onDelete(task.id)}
+      >
+        🗑️
+      </button>
+    </div>
+  );
+
+  // Компонент цели
+  const GoalCard: React.FC<{
+    goal: Goal;
+    onDelete: (id: number) => void;
+  }> = ({ goal, onDelete }) => {
+    const completedSteps = goal.steps.filter((step) => step.completed).length;
+    const totalSteps = goal.steps.length;
+    const progress = totalSteps > 0 ? (completedSteps / totalSteps) * 100 : 0;
+
+    return (
+      <div className="goal-card">
+        <div className="goal-title">{goal.text}</div>
+        <div className="goal-progress">
+          <div className="progress-bar">
+            <div
+              className="progress-fill"
+              style={{ width: `${progress}%` }}
+            ></div>
+          </div>
+          <div className="progress-text">
+            {completedSteps} из {totalSteps} шагов
+          </div>
+        </div>
+        <button
+          className="btn btn-outline delete-goal-btn"
+          onClick={() => onDelete(goal.id)}
+          style={{ marginTop: "10px" }}
+        >
+          <span>🗑️</span> Удалить цель
+        </button>
+      </div>
+    );
+  };
+
+  // Вспомогательная функция
+  const getSphereName = (sphere: string) => {
+    const spheres: { [key: string]: string } = {
+      health: "Здоровье",
+      career: "Карьера",
+      family: "Семья",
+      finance: "Финансы",
+      development: "Развитие",
+      hobby: "Хобби",
+    };
+    return spheres[sphere] || sphere;
+  };
+
+  return (
+    <div className="life-wheel-app">
+      <header className="life-wheel-header">
+        <div className="header-main">
+          <h1>🎯 Колесо Жизни</h1>
+          <p className="subtitle">
+            Баланс, планирование и рефлексия для гармоничной жизни
+          </p>
+        </div>
+        <PomodoroTimer />
+      </header>
+
+      <nav className="nav-tabs">
+        <button
+          className={`tab-btn ${currentTab === "planning" ? "active" : ""}`}
+          onClick={() => setCurrentTab("planning")}
+        >
+          <span>📅</span> Планирование Дня
+        </button>
+        <button
+          className={`tab-btn ${currentTab === "goals" ? "active" : ""}`}
+          onClick={() => setCurrentTab("goals")}
+        >
+          <span>🎯</span> Цели
+        </button>
+        <button
+          className={`tab-btn ${currentTab === "reflection" ? "active" : ""}`}
+          onClick={() => setCurrentTab("reflection")}
+        >
+          <span>🌙</span> Вечерний Анализ
+        </button>
+        <button
+          className={`tab-btn ${currentTab === "settings" ? "active" : ""}`}
+          onClick={() => setCurrentTab("settings")}
+        >
+          <span>⚙️</span> Настройки
+        </button>
+      </nav>
+
+      <main>
+        {currentTab === "planning" && <PlanningTab />}
+        {currentTab === "goals" && <GoalsTab />}
+        {/* Добавь остальные вкладки по аналогии */}
+      </main>
+    </div>
+  );
+};
+
+export default LifeWheelApp;
