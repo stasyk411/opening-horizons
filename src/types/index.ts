@@ -1,23 +1,43 @@
-// Создай файл: src/shared/types/index.ts
-
-// Базовые типы для приложения
-export interface Task {
-  id: string;
-  title: string;
-  completed: boolean;
-  priority: "low" | "medium" | "high";
-  category?: string;
+﻿interface Task {
+  id: number;
+  text: string;
+  sphere: string;
+  startTime?: string;
+  endTime?: string;
   date?: string;
+  completed: boolean;
+  createdAt: string;
 }
 
-export interface UserSettings {
-  theme: "light" | "dark";
-  notifications: boolean;
+interface Goal {
+  id: number;
+  text: string;
+  steps: GoalStep[];
+  createdAt: string;
 }
-export interface LifeSphere {
-  id: string;
-  name: string;
-  color: string;
-  value: number;
-  icon?: string;
+
+interface GoalStep {
+  id: number;
+  text: string;
+  completed: boolean;
+}
+
+interface Reflection {
+  id: number;
+  date: string;
+  question1: string;
+  question2: string;
+  question3: string;
+  question4: string;
+  question5: string;
+  archetype: string;
+  createdAt: string;
+}
+
+interface Settings {
+  archetype: string;
+  darkTheme: boolean;
+  notifications: boolean;
+  autoSave: boolean;
+  colorScheme: string;
 }
