@@ -1,6 +1,8 @@
 ﻿import React, { useState, useEffect } from "react";
 import { EmergencyErrorBoundary } from "./components/System/EmergencyErrorBoundary";
 import { PlanningTab } from './features/daily-planning';
+import { GoalsTab } from './features/goals-system';
+import { ReflectionTab } from './features/archetype-planning';
 import { SettingsTab } from './features/settings';
 import { PomodoroTimer } from './features/pomodoro-timer';
 import { LifeWheelApp as LifeWheelAppFromFeatures } from './features/balance-wheel';
@@ -404,7 +406,7 @@ const LifeWheelApp: React.FC = () => {
           }}
         >
           {currentTab === "planning" && <PlanningTab tasks={tasks} setTasks={setTasks} isMobile={isMobile} settings={settings} />}
-          {currentTab === "goals" && <GoalsTab />}
+          {currentTab === "goals" && <GoalsTab isMobile={isMobile} settings={settings} goals={goals} setGoals={setGoals} />}
           {currentTab === "reflection" && <ReflectionTab />}
           {currentTab === "settings" && <SettingsTab />}
         </main>
@@ -414,4 +416,6 @@ const LifeWheelApp: React.FC = () => {
 };
 
 export default LifeWheelApp;
+
+
 

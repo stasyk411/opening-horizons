@@ -1,5 +1,7 @@
 ﻿import React from 'react';
-import { GoalsList, GoalForm, useGoalsSystem } from './index';
+import { GoalsList } from './GoalsList';
+import { GoalForm } from './GoalForm';
+import { useGoalsSystem } from '../model/useGoalsSystem';
 
 interface GoalsTabProps {
   isMobile: boolean;
@@ -56,3 +58,4 @@ export const GoalsTab: React.FC<GoalsTabProps> = ({ isMobile, settings, goals, s
     </div>
   );
 };
+
