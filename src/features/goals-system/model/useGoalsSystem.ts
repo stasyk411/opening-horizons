@@ -1,68 +1,97 @@
-import { useState } from "react";
-import { Goal, GoalStep, CreateGoalData } from "../../../shared/types/goals";
+﻿import { useState, useEffect } from 'react';
 
-export const useGoalsSystem = () => {
-  const [goals, setGoals] = useState<Goal[]>([]);
+export interface GoalStep {
+  id: number;
+  text: string;
+  completed: boolean;
+}
 
-  const addGoal = (goalData: CreateGoalData) => {
-    const newGoal: Goal = {
-      ...goalData,
-      id: Date.now().toString(),
-      progress: 0,
-      createdAt: new Date(),
-      isCompleted: false,
-      steps: goalData.steps.map((step, index) => ({
-        ...step,
-        id: `${Date.now()}-step-${index}`,
-        completed: false,
-      })),
+export interface Goal {
+  id: number;
+  text: string;
+  steps: GoalStep[];
+  createdAt: string;
+}
+
+export const useGoalsSystem = (externalGoals?: Goal[], externalSetGoals?: (goals: Goal[]) => void) => {
+  const [goals, setGoals] = useState<Goal[]>(externalGoals || []);
+  const [newGoal, setNewGoal] = useState({ text: '', category: 'personal' });
+  const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
+
+  // Синхронизация с внешним состоянием
+  useEffect(() => {
+    if (externalGoals) {
+      setGoals(externalGoals);
+    }
+  }, [externalGoals]);
+
+  const addGoal = () => {
+    if (!newGoal.text.trim()) {
+      alert('Введите текст цели!');
+      return;
+    }
+
+    const goal: Goal = {
+      id: Date.now(),
+      text: newGoal.text,
+      steps: [],
+      createdAt: new Date().toISOString(),
     };
-    setGoals((prev) => [...prev, newGoal]);
+
+    const updatedGoals = [...goals, goal];
+    
+    if (externalSetGoals) {
+      externalSetGoals(updatedGoals);
+    } else {
+      setGoals(updatedGoals);
+    }
+    
+    setNewGoal({ text: '', category: 'personal' });
   };
 
-  const toggleStep = (goalId: string, stepId: string) => {
-    setGoals((prev) =>
-      prev.map((goal) => {
-        if (goal.id === goalId) {
-          const updatedSteps = goal.steps.map((step) =>
-            step.id === stepId ? { ...step, completed: !step.completed } : step
-          );
+  const deleteGoal = (goalId: number) => {
+    const updatedGoals = goals.filter(goal => goal.id !== goalId);
+    
+    if (externalSetGoals) {
+      externalSetGoals(updatedGoals);
+    } else {
+      setGoals(updatedGoals);
+    }
+  };
 
-          const completedSteps = updatedSteps.filter(
-            (step) => step.completed
-          ).length;
-          const progress = Math.round(
-            (completedSteps / updatedSteps.length) * 100
-          );
-          const isCompleted = progress === 100;
+  const toggleGoal = (goalId: number) => {
+    // Implementation for toggling goal completion
+  };
 
-          return {
-            ...goal,
-            steps: updatedSteps,
-            progress,
-            isCompleted,
-          };
-        }
-        return goal;
-      })
+  const editGoal = (goal: Goal) => {
+    setEditingGoal(goal);
+  };
+
+  const saveGoal = (updatedGoal: Goal) => {
+    const updatedGoals = goals.map(goal => 
+      goal.id === updatedGoal.id ? updatedGoal : goal
     );
-  };
-
-  const deleteGoal = (goalId: string) => {
-    setGoals((prev) => prev.filter((goal) => goal.id !== goalId));
-  };
-
-  const updateGoal = (goalId: string, updates: Partial<Goal>) => {
-    setGoals((prev) =>
-      prev.map((goal) => (goal.id === goalId ? { ...goal, ...updates } : goal))
-    );
+    
+    if (externalSetGoals) {
+      externalSetGoals(updatedGoals);
+    } else {
+      setGoals(updatedGoals);
+    }
+    
+    setEditingGoal(null);
   };
 
   return {
     goals,
+    setGoals,
+    newGoal,
+    setNewGoal,
     addGoal,
-    toggleStep,
     deleteGoal,
-    updateGoal,
+    toggleGoal,
+    editGoal,
+    editingGoal,
+    setEditingGoal,
+    saveGoal,
   };
 };
