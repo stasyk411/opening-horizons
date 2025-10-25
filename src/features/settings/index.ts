@@ -1,1 +1,1 @@
-﻿export { SettingsTab } from './components/SettingsTab';
+﻿export { SettingsTab } from './SettingsTab';

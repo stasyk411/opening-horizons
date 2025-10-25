@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect } from "react";
 import { EmergencyErrorBoundary } from "./components/System/EmergencyErrorBoundary";
-import { PlanningTab } from './features/daily-planning/ui';
+import { PlanningTab } from './features/daily-planning';
 import { SettingsTab } from './features/settings';
 import { PomodoroTimer } from './features/pomodoro-timer';
 import { LifeWheelApp as LifeWheelAppFromFeatures } from './features/balance-wheel';
@@ -414,3 +414,4 @@ const LifeWheelApp: React.FC = () => {
 };
 
 export default LifeWheelApp;
+
