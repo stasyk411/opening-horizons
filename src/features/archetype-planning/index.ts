@@ -1,2 +1,1 @@
-export { ArchetypeBadge } from "./ui/ArchetypeBadge";
-export { DayPlanner } from "./ui/DayPlanner";
+﻿export { ReflectionTab } from './components/ReflectionTab';
