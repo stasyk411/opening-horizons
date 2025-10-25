@@ -1,43 +1,128 @@
-﻿interface Task {
-  id: number;
-  text: string;
-  sphere: string;
-  startTime?: string;
-  endTime?: string;
-  date?: string;
-  completed: boolean;
-  createdAt: string;
-}
+﻿export interface Task {
 
-interface Goal {
-  id: number;
-  text: string;
-  steps: GoalStep[];
-  createdAt: string;
-}
 
-interface GoalStep {
-  id: number;
-  text: string;
-  completed: boolean;
-}
+export {};  id: number;
 
-interface Reflection {
-  id: number;
-  date: string;
-  question1: string;
-  question2: string;
-  question3: string;
-  question4: string;
-  question5: string;
-  archetype: string;
-  createdAt: string;
-}
 
-interface Settings {
-  archetype: string;
-  darkTheme: boolean;
-  notifications: boolean;
-  autoSave: boolean;
-  colorScheme: string;
-}
+export {};  text: string;
+
+
+export {};  sphere: string;
+
+
+export {};  startTime?: string;
+
+
+export {};  endTime?: string;
+
+
+export {};  date?: string;
+
+
+export {};  completed: boolean;
+
+
+export {};  createdAt: string;
+
+
+export {};}
+
+
+export {};
+
+
+export {};export interface Goal {
+
+
+export {};  id: number;
+
+
+export {};  text: string;
+
+
+export {};  steps: GoalStep[];
+
+
+export {};  createdAt: string;
+
+
+export {};}
+
+
+export {};
+
+
+export {};export export interface GoalStep {
+
+
+export {};  id: number;
+
+
+export {};  text: string;
+
+
+export {};  completed: boolean;
+
+
+export {};}
+
+
+export {};
+
+
+export {};export interface Reflection {
+
+
+export {};  id: number;
+
+
+export {};  date: string;
+
+
+export {};  question1: string;
+
+
+export {};  question2: string;
+
+
+export {};  question3: string;
+
+
+export {};  question4: string;
+
+
+export {};  question5: string;
+
+
+export {};  archetype: string;
+
+
+export {};  createdAt: string;
+
+
+export {};}
+
+
+export {};
+
+
+export {};export interface Settings {
+
+
+export {};  archetype: string;
+
+
+export {};  darkTheme: boolean;
+
+
+export {};  notifications: boolean;
+
+
+export {};  autoSave: boolean;
+
+
+export {};  colorScheme: string;
+
+
+export {};}
+
