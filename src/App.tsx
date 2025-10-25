@@ -407,7 +407,7 @@ const LifeWheelApp: React.FC = () => {
         >
           {currentTab === "planning" && <PlanningTab tasks={tasks} setTasks={setTasks} isMobile={isMobile} settings={settings} />}
           {currentTab === "goals" && <GoalsTab isMobile={isMobile} settings={settings} goals={goals} setGoals={setGoals} />}
-          {currentTab === "reflection" && <ReflectionTab />}
+          {currentTab === "reflection" && <ReflectionTab reflections={reflections} saveReflections={saveReflections} settings={settings} isMobile={isMobile} />}
           {currentTab === "settings" && <SettingsTab />}
         </main>
       </div>
@@ -416,6 +416,7 @@ const LifeWheelApp: React.FC = () => {
 };
 
 export default LifeWheelApp;
+
 
 
 
