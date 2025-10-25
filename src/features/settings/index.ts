@@ -1,2 +1,1 @@
-﻿import SettingsTab from './SettingsTab';
-export { SettingsTab };
+﻿export { SettingsTab } from './SettingsTab';
