@@ -1,2 +1,3 @@
-export { BalanceWheel } from "./ui/BalanceWheel";
-export { useBalanceWheel } from "./model/useBalanceWheel";
+﻿export { BalanceWheel } from './ui/BalanceWheel';
+export { LifeWheelApp } from './ui/LifeWheelApp';
+export { useBalanceWheel } from './model/useBalanceWheel';

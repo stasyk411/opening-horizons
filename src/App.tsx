@@ -1,6 +1,7 @@
 ﻿import React, { useState, useEffect } from "react";
 import { EmergencyErrorBoundary } from "./components/System/EmergencyErrorBoundary";
 import { PlanningTab } from './features/daily-planning/ui';
+import { LifeWheelApp as LifeWheelAppFromFeatures } from './features/balance-wheel';
 
 // Типы
 interface Task {
