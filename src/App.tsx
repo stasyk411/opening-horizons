@@ -1,7 +1,8 @@
-п»їimport React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { EmergencyErrorBoundary } from "./components/System/EmergencyErrorBoundary";
+import { PlanningTab } from './features/daily-planning/ui';
 
-// РўРёРїС‹
+// Типы
 interface Task {
   id: number;
   text: string;
@@ -46,7 +47,7 @@ interface Settings {
   colorScheme: string;
 }
 
-// рџЌ… Pomodoro Timer - РћРўР”Р•Р›Р¬РќР«Р™ РљРћРњРџРћРќР•РќРў
+// ?? Pomodoro Timer - ОТДЕЛЬНЫЙ КОМПОНЕНТ
 const PomodoroTimer: React.FC = () => {
   const [timeLeft, setTimeLeft] = useState(25 * 60);
   const [isRunning, setIsRunning] = useState(false);
@@ -61,7 +62,7 @@ const PomodoroTimer: React.FC = () => {
           if (time <= 1) {
             setIsRunning(false);
             alert(
-              `рџЋ‰ ${mode === "work" ? "Р Р°Р±РѕС‡Р°СЏ СЃРµСЃСЃРёСЏ" : "РџРµСЂРµСЂС‹РІ"} Р·Р°РІРµСЂС€РµРЅР°!`
+              `?? ${mode === "work" ? "Рабочая сессия" : "Перерыв"} завершена!`
             );
             const newMode = mode === "work" ? "break" : "work";
             setMode(newMode);
@@ -99,7 +100,7 @@ const PomodoroTimer: React.FC = () => {
         }}
       >
         <span style={{ fontWeight: "bold", fontSize: "14px" }}>
-          рџЌ… {mode === "work" ? "Р Р°Р±РѕС‚Р°" : "РџРµСЂРµСЂС‹РІ"}
+          ?? {mode === "work" ? "Работа" : "Перерыв"}
         </span>
         <div
           style={{
@@ -132,7 +133,7 @@ const PomodoroTimer: React.FC = () => {
             fontSize: "12px",
           }}
         >
-          в–¶пёЏ
+          ??
         </button>
         <button
           onClick={() => setIsRunning(false)}
@@ -146,7 +147,7 @@ const PomodoroTimer: React.FC = () => {
             fontSize: "12px",
           }}
         >
-          вЏёпёЏ
+          ??
         </button>
         <button
           onClick={() => {
@@ -163,7 +164,7 @@ const PomodoroTimer: React.FC = () => {
             fontSize: "12px",
           }}
         >
-          рџ”„
+          ??
         </button>
         <button
           onClick={() => {
@@ -182,14 +183,14 @@ const PomodoroTimer: React.FC = () => {
             fontSize: "12px",
           }}
         >
-          вљЎ
+          ?
         </button>
       </div>
     </div>
   );
 };
 
-// рџЋЇ Р“Р»Р°РІРЅС‹Р№ РєРѕРјРїРѕРЅРµРЅС‚ Life Wheel
+// ?? Главный компонент Life Wheel
 const LifeWheelApp: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<
     "planning" | "goals" | "reflection" | "settings"
@@ -210,7 +211,7 @@ const LifeWheelApp: React.FC = () => {
   const [showStepForm, setShowStepForm] = useState(false);
   const [showPomodoro, setShowPomodoro] = useState(false);
 
-  // РћРїСЂРµРґРµР»РµРЅРёРµ РјРѕР±РёР»СЊРЅРѕРіРѕ СѓСЃС‚СЂРѕР№СЃС‚РІР°
+  // Определение мобильного устройства
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
@@ -220,7 +221,7 @@ const LifeWheelApp: React.FC = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Р—Р°РіСЂСѓР·РєР° РґР°РЅРЅС‹С…
+  // Загрузка данных
   useEffect(() => {
     const savedTasks = localStorage.getItem("life-wheel-tasks");
     const savedGoals = localStorage.getItem("life-wheel-goals");
@@ -234,7 +235,7 @@ const LifeWheelApp: React.FC = () => {
       setSettings({ ...settings, ...JSON.parse(savedSettings) });
   }, []);
 
-  // РЎРѕС…СЂР°РЅРµРЅРёРµ РґР°РЅРЅС‹С…
+  // Сохранение данных
   const saveTasks = (newTasks: Task[]) => {
     setTasks(newTasks);
     localStorage.setItem("life-wheel-tasks", JSON.stringify(newTasks));
@@ -258,30 +259,30 @@ const LifeWheelApp: React.FC = () => {
     localStorage.setItem("life-wheel-settings", JSON.stringify(newSettings));
   };
 
-  // Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ С„СѓРЅРєС†РёРё
+  // Вспомогательные функции
   const getSphereName = (sphere: string) => {
     const spheres: { [key: string]: string } = {
-      health: "Р—РґРѕСЂРѕРІСЊРµ",
-      career: "РљР°СЂСЊРµСЂР°",
-      family: "РЎРµРјСЊСЏ",
-      finance: "Р¤РёРЅР°РЅСЃС‹",
-      development: "Р Р°Р·РІРёС‚РёРµ",
-      hobby: "РҐРѕР±Р±Рё",
+      health: "Здоровье",
+      career: "Карьера",
+      family: "Семья",
+      finance: "Финансы",
+      development: "Развитие",
+      hobby: "Хобби",
     };
     return spheres[sphere] || sphere;
   };
 
-  // рџ•’ РРЎРџР РђР’Р›Р•РќРќРђРЇ Р¤РЈРќРљР¦РРЇ Р¤РћР РњРђРўРР РћР’РђРќРРЇ Р’Р Р•РњР•РќР
+  // ?? ИСПРАВЛЕННАЯ ФУНКЦИЯ ФОРМАТИРОВАНИЯ ВРЕМЕНИ
   const formatTimeInput = (value: string): string => {
-    // РЈРґР°Р»СЏРµРј РІСЃРµ РЅРµС†РёС„СЂРѕРІС‹Рµ СЃРёРјРІРѕР»С‹
+    // Удаляем все нецифровые символы
     let numbers = value.replace(/\D/g, "");
 
-    // РћРіСЂР°РЅРёС‡РёРІР°РµРј РґР»РёРЅСѓ
+    // Ограничиваем длину
     if (numbers.length > 4) {
       numbers = numbers.substring(0, 4);
     }
 
-    // Р¤РѕСЂРјР°С‚РёСЂСѓРµРј РІ Р§Р§:РњРњ
+    // Форматируем в ЧЧ:ММ
     if (numbers.length <= 2) {
       return numbers;
     } else {
@@ -295,7 +296,7 @@ const LifeWheelApp: React.FC = () => {
     return timeRegex.test(time);
   };
 
-  // РљРѕРјРїРѕРЅРµРЅС‚ Р·Р°РґР°С‡Рё
+  // Компонент задачи
   const TaskItem: React.FC<{
     task: Task;
     onToggle: (id: number) => void;
@@ -342,10 +343,10 @@ const LifeWheelApp: React.FC = () => {
         >
           {task.startTime && task.endTime && (
             <span>
-              рџ•ђ {task.startTime}-{task.endTime}
+              ?? {task.startTime}-{task.endTime}
             </span>
           )}
-          <span>рџ“Њ {getSphereName(task.sphere)}</span>
+          <span>?? {getSphereName(task.sphere)}</span>
         </div>
       </div>
       <button
@@ -358,481 +359,18 @@ const LifeWheelApp: React.FC = () => {
           padding: "5px",
         }}
       >
-        рџ—‘пёЏ
+        ???
       </button>
     </div>
   );
 
-  // рџ“… РљРѕРјРїРѕРЅРµРЅС‚ РїР»Р°РЅРёСЂРѕРІР°РЅРёСЏ
-  const PlanningTab = () => {
-    const [taskText, setTaskText] = useState("");
-    const [taskSphere, setTaskSphere] = useState("health");
-    const [startTime, setStartTime] = useState("");
-    const [endTime, setEndTime] = useState("");
-    const [taskDate, setTaskDate] = useState(
-      new Date().toISOString().split("T")[0]
-    );
-
-    const addTask = (withDate: boolean = true) => {
-      if (!taskText.trim()) {
-        alert("Р’РІРµРґРёС‚Рµ С‚РµРєСЃС‚ Р·Р°РґР°С‡Рё!");
-        return;
-      }
-
-      // РРЎРџР РђР’Р›Р•РќРђ Р’РђР›РР”РђР¦РРЇ Р’Р Р•РњР•РќР
-      if (startTime && !validateTime(startTime)) {
-        alert("РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РІРІРµРґРёС‚Рµ РєРѕСЂСЂРµРєС‚РЅРѕРµ РІСЂРµРјСЏ РЅР°С‡Р°Р»Р° РІ С„РѕСЂРјР°С‚Рµ Р§Р§:MM");
-        return;
-      }
-
-      if (endTime && !validateTime(endTime)) {
-        alert("РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РІРІРµРґРёС‚Рµ РєРѕСЂСЂРµРєС‚РЅРѕРµ РІСЂРµРјСЏ РѕРєРѕРЅС‡Р°РЅРёСЏ РІ С„РѕСЂРјР°С‚Рµ Р§Р§:MM");
-        return;
-      }
-
-      const newTask: Task = {
-        id: Date.now(),
-        text: taskText,
-        sphere: taskSphere,
-        startTime: startTime || undefined,
-        endTime: endTime || undefined,
-        date: withDate ? taskDate : undefined,
-        completed: false,
-        createdAt: new Date().toISOString(),
-      };
-
-      saveTasks([...tasks, newTask]);
-      setTaskText("");
-      setStartTime("");
-      setEndTime("");
-
-      alert("вњ… Р—Р°РґР°С‡Р° РґРѕР±Р°РІР»РµРЅР°!");
-    };
-
-    const toggleTaskCompletion = (taskId: number) => {
-      const updatedTasks = tasks.map((task) =>
-        task.id === taskId ? { ...task, completed: !task.completed } : task
-      );
-      saveTasks(updatedTasks);
-    };
-
-    const deleteTask = (taskId: number) => {
-      if (confirm("РЈРґР°Р»РёС‚СЊ Р·Р°РґР°С‡Сѓ?")) {
-        const updatedTasks = tasks.filter((task) => task.id !== taskId);
-        saveTasks(updatedTasks);
-      }
-    };
-
-    const today = new Date().toISOString().split("T")[0];
-    const todayTasks = tasks.filter(
-      (task) => task.date === today && !task.completed
-    );
-    const futureTasks = tasks.filter(
-      (task) => task.date && task.date > today && !task.completed
-    );
-    const noDateTasks = tasks.filter((task) => !task.date && !task.completed);
-
-    return (
-      <div
-        style={{
-          padding: isMobile ? "15px" : "20px",
-          maxWidth: "100%",
-          overflowX: "hidden",
-        }}
-      >
-        <h2
-          style={{
-            color: "#8A2BE2",
-            marginBottom: "20px",
-            fontSize: isMobile ? "1.5em" : "2em",
-            textAlign: isMobile ? "center" : "left",
-          }}
-        >
-          РџР»Р°РЅРёСЂРѕРІР°РЅРёРµ Р”РЅСЏ
-        </h2>
-
-        {/* Р’С‹Р±РѕСЂ Р°СЂС…РµС‚РёРїР° */}
-        <div style={{ marginBottom: "30px" }}>
-          <h3 style={{ fontSize: isMobile ? "1.2em" : "1.5em" }}>
-            Р’С‹Р±РµСЂРёС‚Рµ С‚РёРї РґРЅСЏ
-          </h3>
-          <div
-            style={{
-              display: "flex",
-              gap: isMobile ? "8px" : "15px",
-              marginTop: "15px",
-              flexDirection: isMobile ? "column" : "row",
-            }}
-          >
-            {[
-              {
-                key: "productive",
-                name: "РџР РћР”РЈРљРўРР’РќР«Р™",
-                icon: "рџ“€",
-                desc: "РЎС„РѕРєСѓСЃРёСЂСѓР№С‚РµСЃСЊ РЅР° РІР°Р¶РЅС‹С… Р·Р°РґР°С‡Р°С…",
-              },
-              {
-                key: "balanced",
-                name: "РЎР‘РђР›РђРќРЎРР РћР’РђРќРќР«Р™",
-                icon: "вљ–пёЏ",
-                desc: "Р Р°РІРЅРѕРјРµСЂРЅРѕРµ СЂР°СЃРїСЂРµРґРµР»РµРЅРёРµ СЌРЅРµСЂРіРёРё",
-              },
-              {
-                key: "recovery",
-                name: "Р’РћРЎРЎРўРђРќРђР’Р›РР’РђР®Р©РР™",
-                icon: "рџ”„",
-                desc: "Р”РµРЅСЊ РґР»СЏ РѕС‚РґС‹С…Р° Рё РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ",
-              },
-            ].map((arch) => (
-              <div
-                key={arch.key}
-                onClick={() =>
-                  saveSettings({ ...settings, archetype: arch.key })
-                }
-                style={{
-                  flex: 1,
-                  padding: isMobile ? "15px" : "20px",
-                  background:
-                    settings.archetype === arch.key ? "#8A2BE2" : "#f8f8ff",
-                  color: settings.archetype === arch.key ? "white" : "#333",
-                  borderRadius: "12px",
-                  textAlign: "center",
-                  cursor: "pointer",
-                  border: "2px solid #8A2BE2",
-                  minHeight: isMobile ? "auto" : "120px",
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: isMobile ? "1.5em" : "2em",
-                    marginBottom: "8px",
-                  }}
-                >
-                  {arch.icon}
-                </div>
-                <div
-                  style={{
-                    fontWeight: "bold",
-                    marginBottom: "5px",
-                    fontSize: isMobile ? "12px" : "14px",
-                  }}
-                >
-                  {arch.name}
-                </div>
-                {!isMobile && (
-                  <div style={{ fontSize: "12px", opacity: 0.8 }}>
-                    {arch.desc}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Р¤РѕСЂРјР° РґРѕР±Р°РІР»РµРЅРёСЏ Р·Р°РґР°С‡Рё */}
-        <div
-          style={{
-            display: "flex",
-            gap: "10px",
-            marginBottom: "20px",
-            flexDirection: isMobile ? "column" : "row",
-          }}
-        >
-          <input
-            type="text"
-            value={taskText}
-            onChange={(e) => setTaskText(e.target.value)}
-            placeholder="РћРїРёС€РёС‚Рµ РІР°С€Сѓ Р·Р°РґР°С‡Сѓ..."
-            style={{
-              flex: 1,
-              padding: "12px",
-              border: "2px solid #8A2BE2",
-              borderRadius: "8px",
-              fontSize: "16px",
-              background: "white",
-              color: "#333",
-            }}
-          />
-          <div
-            style={{
-              display: "flex",
-              gap: "10px",
-              flexDirection: isMobile ? "row" : "column",
-            }}
-          >
-            <button
-              onClick={() => addTask(true)}
-              style={{
-                padding: "12px 16px",
-                background: "#8A2BE2",
-                color: "white",
-                border: "none",
-                borderRadius: "8px",
-                cursor: "pointer",
-                fontSize: "14px",
-                whiteSpace: "nowrap",
-              }}
-            >
-              вћ• Р”РѕР±Р°РІРёС‚СЊ
-            </button>
-            <button
-              onClick={() => addTask(false)}
-              style={{
-                padding: "12px 16px",
-                background: "#6A0DAD",
-                color: "white",
-                border: "none",
-                borderRadius: "8px",
-                cursor: "pointer",
-                fontSize: "14px",
-                whiteSpace: "nowrap",
-              }}
-            >
-              вЏі Р‘РµР· РґР°С‚С‹
-            </button>
-          </div>
-        </div>
-
-        {/* РћРїС†РёРё Р·Р°РґР°С‡Рё */}
-        <div
-          style={{
-            display: "grid",
-            gap: "15px",
-            marginBottom: "20px",
-            gridTemplateColumns: isMobile
-              ? "1fr"
-              : "repeat(auto-fit, minmax(200px, 1fr))",
-          }}
-        >
-          <div>
-            <div
-              style={{
-                fontWeight: "bold",
-                marginBottom: "5px",
-                fontSize: "14px",
-              }}
-            >
-              РЎС„РµСЂР° Р¶РёР·РЅРё
-            </div>
-            <select
-              value={taskSphere}
-              onChange={(e) => setTaskSphere(e.target.value)}
-              style={{
-                padding: "10px",
-                border: "2px solid #8A2BE2",
-                borderRadius: "6px",
-                width: "100%",
-                fontSize: "14px",
-                background: "white",
-                color: "#333",
-              }}
-            >
-              <option value="health">Р—РґРѕСЂРѕРІСЊРµ</option>
-              <option value="career">РљР°СЂСЊРµСЂР°</option>
-              <option value="family">РЎРµРјСЊСЏ</option>
-              <option value="finance">Р¤РёРЅР°РЅСЃС‹</option>
-              <option value="development">Р Р°Р·РІРёС‚РёРµ</option>
-              <option value="hobby">РҐРѕР±Р±Рё</option>
-            </select>
-          </div>
-
-          <div>
-            <div
-              style={{
-                fontWeight: "bold",
-                marginBottom: "5px",
-                fontSize: "14px",
-              }}
-            >
-              Р’СЂРµРјСЏ РІС‹РїРѕР»РЅРµРЅРёСЏ
-            </div>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "5px",
-                flexWrap: "wrap",
-              }}
-            >
-              <input
-                type="text"
-                value={startTime}
-                onChange={(e) => setStartTime(formatTimeInput(e.target.value))}
-                placeholder="09:00"
-                maxLength={5}
-                style={{
-                  padding: "10px",
-                  border: "2px solid #8A2BE2",
-                  borderRadius: "6px",
-                  width: isMobile ? "70px" : "80px",
-                  textAlign: "center",
-                  fontSize: "14px",
-                  background: "white",
-                  color: "#333",
-                }}
-              />
-              <span style={{ fontSize: "14px" }}>вЂ”</span>
-              <input
-                type="text"
-                value={endTime}
-                onChange={(e) => setEndTime(formatTimeInput(e.target.value))}
-                placeholder="10:30"
-                maxLength={5}
-                style={{
-                  padding: "10px",
-                  border: "2px solid #8A2BE2",
-                  borderRadius: "6px",
-                  width: isMobile ? "70px" : "80px",
-                  textAlign: "center",
-                  fontSize: "14px",
-                  background: "white",
-                  color: "#333",
-                }}
-              />
-            </div>
-            <div style={{ fontSize: "12px", color: "#666", marginTop: "5px" }}>
-              Р¤РѕСЂРјР°С‚: Р§Р§:MM (24-С‡Р°СЃРѕРІРѕР№)
-            </div>
-          </div>
-
-          <div>
-            <div
-              style={{
-                fontWeight: "bold",
-                marginBottom: "5px",
-                fontSize: "14px",
-              }}
-            >
-              Р”Р°С‚Р° РІС‹РїРѕР»РЅРµРЅРёСЏ
-            </div>
-            <input
-              type="date"
-              value={taskDate}
-              onChange={(e) => setTaskDate(e.target.value)}
-              style={{
-                padding: "10px",
-                border: "2px solid #8A2BE2",
-                borderRadius: "6px",
-                width: "100%",
-                fontSize: "14px",
-                background: "white",
-                color: "#333",
-              }}
-            />
-          </div>
-        </div>
-
-        {/* РЎРїРёСЃРєРё Р·Р°РґР°С‡ */}
-        <div
-          style={{
-            display: "grid",
-            gap: "20px",
-            gridTemplateColumns: isMobile
-              ? "1fr"
-              : "repeat(auto-fit, minmax(300px, 1fr))",
-          }}
-        >
-          <div>
-            <h3 style={{ fontSize: isMobile ? "1.1em" : "1.3em" }}>
-              рџ“‹ РЎРµРіРѕРґРЅСЏ ({todayTasks.length})
-            </h3>
-            <div style={{ maxHeight: "400px", overflowY: "auto" }}>
-              {todayTasks.map((task) => (
-                <TaskItem
-                  key={task.id}
-                  task={task}
-                  onToggle={toggleTaskCompletion}
-                  onDelete={deleteTask}
-                  isMobile={isMobile}
-                />
-              ))}
-              {todayTasks.length === 0 && (
-                <div
-                  style={{
-                    textAlign: "center",
-                    padding: "20px",
-                    color: "#666",
-                    background: "#f8f8ff",
-                    borderRadius: "8px",
-                  }}
-                >
-                  Р—Р°РґР°С‡Рё РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‚
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <h3 style={{ fontSize: isMobile ? "1.1em" : "1.3em" }}>
-              рџ“… Р‘СѓРґСѓС‰РёРµ ({futureTasks.length})
-            </h3>
-            <div style={{ maxHeight: "400px", overflowY: "auto" }}>
-              {futureTasks.map((task) => (
-                <TaskItem
-                  key={task.id}
-                  task={task}
-                  onToggle={toggleTaskCompletion}
-                  onDelete={deleteTask}
-                  isMobile={isMobile}
-                />
-              ))}
-              {futureTasks.length === 0 && (
-                <div
-                  style={{
-                    textAlign: "center",
-                    padding: "20px",
-                    color: "#666",
-                    background: "#f8f8ff",
-                    borderRadius: "8px",
-                  }}
-                >
-                  Р—Р°РґР°С‡Рё РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‚
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <h3 style={{ fontSize: isMobile ? "1.1em" : "1.3em" }}>
-              вЏі Р‘РµР· РґР°С‚С‹ ({noDateTasks.length})
-            </h3>
-            <div style={{ maxHeight: "400px", overflowY: "auto" }}>
-              {noDateTasks.map((task) => (
-                <TaskItem
-                  key={task.id}
-                  task={task}
-                  onToggle={toggleTaskCompletion}
-                  onDelete={deleteTask}
-                  isMobile={isMobile}
-                />
-              ))}
-              {noDateTasks.length === 0 && (
-                <div
-                  style={{
-                    textAlign: "center",
-                    padding: "20px",
-                    color: "#666",
-                    background: "#f8f8ff",
-                    borderRadius: "8px",
-                  }}
-                >
-                  Р—Р°РґР°С‡Рё РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‚
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // рџЋЇ РљРѕРјРїРѕРЅРµРЅС‚ С†РµР»РµР№
+  // ?? Компонент планирования
   const GoalsTab = () => {
     const [goalText, setGoalText] = useState("");
 
     const addGoal = () => {
       if (!goalText.trim()) {
-        alert("Р’РІРµРґРёС‚Рµ С‚РµРєСЃС‚ С†РµР»Рё!");
+        alert("Введите текст цели!");
         return;
       }
 
@@ -845,25 +383,25 @@ const LifeWheelApp: React.FC = () => {
 
       saveGoals([...goals, newGoal]);
       setGoalText("");
-      alert("вњ… Р¦РµР»СЊ РґРѕР±Р°РІР»РµРЅР°!");
+      alert("? Цель добавлена!");
     };
 
     const deleteGoal = (goalId: number) => {
-      if (confirm("РЈРґР°Р»РёС‚СЊ С†РµР»СЊ?")) {
+      if (confirm("Удалить цель?")) {
         const updatedGoals = goals.filter((goal) => goal.id !== goalId);
         saveGoals(updatedGoals);
       }
     };
 
-    // РРЎРџР РђР’Р›Р•РќРќРђРЇ Р¤РЈРќРљР¦РРЇ Р”РћР‘РђР’Р›Р•РќРРЇ РЁРђР“Рђ
+    // ИСПРАВЛЕННАЯ ФУНКЦИЯ ДОБАВЛЕНИЯ ШАГА
     const addStep = () => {
       if (!stepText.trim()) {
-        alert("Р’РІРµРґРёС‚Рµ С‚РµРєСЃС‚ С€Р°РіР°!");
+        alert("Введите текст шага!");
         return;
       }
 
       if (!currentGoalId) {
-        alert("РћС€РёР±РєР°: С†РµР»СЊ РЅРµ РІС‹Р±СЂР°РЅР°");
+        alert("Ошибка: цель не выбрана");
         return;
       }
 
@@ -886,7 +424,7 @@ const LifeWheelApp: React.FC = () => {
       setStepText("");
       setShowStepForm(false);
       setCurrentGoalId(null);
-      alert("вњ… РЁР°Рі РґРѕР±Р°РІР»РµРЅ!");
+      alert("? Шаг добавлен!");
     };
 
     const toggleStep = (goalId: number, stepId: number) => {
@@ -908,7 +446,7 @@ const LifeWheelApp: React.FC = () => {
     };
 
     const deleteStep = (goalId: number, stepId: number) => {
-      if (confirm("РЈРґР°Р»РёС‚СЊ С€Р°Рі?")) {
+      if (confirm("Удалить шаг?")) {
         const updatedGoals = goals.map((goal) => {
           if (goal.id === goalId) {
             return {
@@ -939,7 +477,7 @@ const LifeWheelApp: React.FC = () => {
             textAlign: isMobile ? "center" : "left",
           }}
         >
-          РњРѕРё Р¦РµР»Рё
+          Мои Цели
         </h2>
 
         <div style={{ marginBottom: "30px" }}>
@@ -953,7 +491,7 @@ const LifeWheelApp: React.FC = () => {
                 borderRadius: "12px",
               }}
             >
-              Р¦РµР»Рё РµС‰Рµ РЅРµ РґРѕР±Р°РІР»РµРЅС‹
+              Цели еще не добавлены
             </div>
           ) : (
             goals.map((goal) => {
@@ -1018,7 +556,7 @@ const LifeWheelApp: React.FC = () => {
                           whiteSpace: "nowrap",
                         }}
                       >
-                        вћ• РЁР°Рі
+                        ? Шаг
                       </button>
                       <button
                         onClick={() => deleteGoal(goal.id)}
@@ -1033,12 +571,12 @@ const LifeWheelApp: React.FC = () => {
                           whiteSpace: "nowrap",
                         }}
                       >
-                        рџ—‘пёЏ РЈРґР°Р»РёС‚СЊ
+                        ??? Удалить
                       </button>
                     </div>
                   </div>
 
-                  {/* РџСЂРѕРіСЂРµСЃСЃ Р±Р°СЂ */}
+                  {/* Прогресс бар */}
                   <div style={{ marginBottom: "15px" }}>
                     <div
                       style={{
@@ -1065,12 +603,12 @@ const LifeWheelApp: React.FC = () => {
                         textAlign: "center",
                       }}
                     >
-                      {completedSteps} РёР· {totalSteps} С€Р°РіРѕРІ (
+                      {completedSteps} из {totalSteps} шагов (
                       {Math.round(progress)}%)
                     </div>
                   </div>
 
-                  {/* РЎРїРёСЃРѕРє С€Р°РіРѕРІ */}
+                  {/* Список шагов */}
                   {goal.steps.length > 0 && (
                     <div style={{ marginTop: "15px" }}>
                       <div
@@ -1081,7 +619,7 @@ const LifeWheelApp: React.FC = () => {
                           fontWeight: "bold",
                         }}
                       >
-                        РЁР°РіРё:
+                        Шаги:
                       </div>
                       {goal.steps.map((step) => (
                         <div
@@ -1124,7 +662,7 @@ const LifeWheelApp: React.FC = () => {
                               color: "#FF4500",
                             }}
                           >
-                            рџ—‘пёЏ
+                            ???
                           </button>
                         </div>
                       ))}
@@ -1136,7 +674,7 @@ const LifeWheelApp: React.FC = () => {
           )}
         </div>
 
-        {/* Р¤РѕСЂРјР° РґРѕР±Р°РІР»РµРЅРёСЏ С†РµР»Рё */}
+        {/* Форма добавления цели */}
         <div>
           <h3
             style={{
@@ -1144,7 +682,7 @@ const LifeWheelApp: React.FC = () => {
               marginBottom: "15px",
             }}
           >
-            Р”РѕР±Р°РІРёС‚СЊ РЅРѕРІСѓСЋ С†РµР»СЊ
+            Добавить новую цель
           </h3>
           <div
             style={{
@@ -1158,7 +696,7 @@ const LifeWheelApp: React.FC = () => {
               type="text"
               value={goalText}
               onChange={(e) => setGoalText(e.target.value)}
-              placeholder="РћРїРёС€РёС‚Рµ РІР°С€Сѓ С†РµР»СЊ..."
+              placeholder="Опишите вашу цель..."
               style={{
                 flex: 1,
                 padding: "12px",
@@ -1182,12 +720,12 @@ const LifeWheelApp: React.FC = () => {
                 whiteSpace: "nowrap",
               }}
             >
-              рџЋЇ Р”РѕР±Р°РІРёС‚СЊ С†РµР»СЊ
+              ?? Добавить цель
             </button>
           </div>
         </div>
 
-        {/* Р¤РѕСЂРјР° РґРѕР±Р°РІР»РµРЅРёСЏ С€Р°РіР° */}
+        {/* Форма добавления шага */}
         {showStepForm && (
           <div
             style={{
@@ -1198,7 +736,7 @@ const LifeWheelApp: React.FC = () => {
               border: "2px solid #8A2BE2",
             }}
           >
-            <h4 style={{ marginBottom: "10px" }}>Р”РѕР±Р°РІРёС‚СЊ С€Р°Рі Рє С†РµР»Рё</h4>
+            <h4 style={{ marginBottom: "10px" }}>Добавить шаг к цели</h4>
             <div
               style={{
                 display: "flex",
@@ -1210,7 +748,7 @@ const LifeWheelApp: React.FC = () => {
                 type="text"
                 value={stepText}
                 onChange={(e) => setStepText(e.target.value)}
-                placeholder="РћРїРёС€РёС‚Рµ С€Р°Рі..."
+                placeholder="Опишите шаг..."
                 style={{
                   flex: 1,
                   padding: "10px",
@@ -1239,7 +777,7 @@ const LifeWheelApp: React.FC = () => {
                     fontSize: "14px",
                   }}
                 >
-                  вћ• Р”РѕР±Р°РІРёС‚СЊ
+                  ? Добавить
                 </button>
                 <button
                   onClick={() => {
@@ -1257,7 +795,7 @@ const LifeWheelApp: React.FC = () => {
                     fontSize: "14px",
                   }}
                 >
-                  вќЊ РћС‚РјРµРЅР°
+                  ? Отмена
                 </button>
               </div>
             </div>
@@ -1267,7 +805,7 @@ const LifeWheelApp: React.FC = () => {
     );
   };
 
-  // рџЊ™ РљРѕРјРїРѕРЅРµРЅС‚ РІРµС‡РµСЂРЅРµРіРѕ Р°РЅР°Р»РёР·Р°
+  // ?? Компонент вечернего анализа
   const ReflectionTab = () => {
     const [answers, setAnswers] = useState({
       question1: "",
@@ -1279,7 +817,7 @@ const LifeWheelApp: React.FC = () => {
 
     const saveReflection = () => {
       if (!answers.question1.trim()) {
-        alert("РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РѕС‚РІРµС‚СЊС‚Рµ С…РѕС‚СЏ Р±С‹ РЅР° РїРµСЂРІС‹Р№ РІРѕРїСЂРѕСЃ");
+        alert("Пожалуйста, ответьте хотя бы на первый вопрос");
         return;
       }
 
@@ -1299,11 +837,11 @@ const LifeWheelApp: React.FC = () => {
         question4: "",
         question5: "",
       });
-      alert("вњ… РђРЅР°Р»РёР· СЃРѕС…СЂР°РЅРµРЅ!");
+      alert("? Анализ сохранен!");
     };
 
     const deleteReflection = (reflectionId: number) => {
-      if (confirm("РЈРґР°Р»РёС‚СЊ Р°РЅР°Р»РёР·?")) {
+      if (confirm("Удалить анализ?")) {
         const updatedReflections = reflections.filter(
           (ref) => ref.id !== reflectionId
         );
@@ -1327,10 +865,10 @@ const LifeWheelApp: React.FC = () => {
             textAlign: isMobile ? "center" : "left",
           }}
         >
-          Р’РµС‡РµСЂРЅРёР№ РђРЅР°Р»РёР·
+          Вечерний Анализ
         </h2>
 
-        {/* Р¤РѕСЂРјР° Р°РЅР°Р»РёР·Р° */}
+        {/* Форма анализа */}
         <div
           style={{
             background: "rgba(255,255,255,0.1)",
@@ -1349,7 +887,7 @@ const LifeWheelApp: React.FC = () => {
                 fontSize: isMobile ? "14px" : "16px",
               }}
             >
-              1. Р§С‚Рѕ РїРѕР»СѓС‡РёР»РѕСЃСЊ РѕСЃРѕР±РµРЅРЅРѕ С…РѕСЂРѕС€Рѕ СЃРµРіРѕРґРЅСЏ?
+              1. Что получилось особенно хорошо сегодня?
             </div>
             <textarea
               value={answers.question1}
@@ -1379,7 +917,7 @@ const LifeWheelApp: React.FC = () => {
                 fontSize: isMobile ? "14px" : "16px",
               }}
             >
-              2. Р§С‚Рѕ Р±С‹ СЏ СЃРґРµР»Р°Р» РёРЅР°С‡Рµ, РµСЃР»Рё Р±С‹ РјРѕРі РІРµСЂРЅСѓС‚СЊСЃСЏ РЅР°Р·Р°Рґ?
+              2. Что бы я сделал иначе, если бы мог вернуться назад?
             </div>
             <textarea
               value={answers.question2}
@@ -1409,7 +947,7 @@ const LifeWheelApp: React.FC = () => {
                 fontSize: isMobile ? "14px" : "16px",
               }}
             >
-              3. РљР°РєРёРµ СѓСЂРѕРєРё СЏ РёР·РІР»РµРє РёР· СЃРµРіРѕРґРЅСЏС€РЅРµРіРѕ РґРЅСЏ?
+              3. Какие уроки я извлек из сегодняшнего дня?
             </div>
             <textarea
               value={answers.question3}
@@ -1439,7 +977,7 @@ const LifeWheelApp: React.FC = () => {
                 fontSize: isMobile ? "14px" : "16px",
               }}
             >
-              4. Р—Р° С‡С‚Рѕ СЏ Р±Р»Р°РіРѕРґР°СЂРµРЅ СЃРµРіРѕРґРЅСЏ?
+              4. За что я благодарен сегодня?
             </div>
             <textarea
               value={answers.question4}
@@ -1469,7 +1007,7 @@ const LifeWheelApp: React.FC = () => {
                 fontSize: isMobile ? "14px" : "16px",
               }}
             >
-              5. Р§С‚Рѕ СЏ РїР»Р°РЅРёСЂСѓСЋ СЃРґРµР»Р°С‚СЊ Р·Р°РІС‚СЂР° РґР»СЏ СѓР»СѓС‡С€РµРЅРёСЏ СЃРІРѕРµР№ Р¶РёР·РЅРё?
+              5. Что я планирую сделать завтра для улучшения своей жизни?
             </div>
             <textarea
               value={answers.question5}
@@ -1504,11 +1042,11 @@ const LifeWheelApp: React.FC = () => {
               width: isMobile ? "100%" : "auto",
             }}
           >
-            рџ’ѕ РЎРѕС…СЂР°РЅРёС‚СЊ Р°РЅР°Р»РёР·
+            ?? Сохранить анализ
           </button>
         </div>
 
-        {/* РСЃС‚РѕСЂРёСЏ Р°РЅР°Р»РёР·РѕРІ */}
+        {/* История анализов */}
         <div>
           <h3
             style={{
@@ -1517,7 +1055,7 @@ const LifeWheelApp: React.FC = () => {
               color: "white",
             }}
           >
-            рџ“Љ РСЃС‚РѕСЂРёСЏ Р°РЅР°Р»РёР·РѕРІ
+            ?? История анализов
           </h3>
 
           {reflections.length === 0 ? (
@@ -1531,7 +1069,7 @@ const LifeWheelApp: React.FC = () => {
                 backdropFilter: "blur(10px)",
               }}
             >
-              РђРЅР°Р»РёР·С‹ РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‚
+              Анализы отсутствуют
             </div>
           ) : (
             <div
@@ -1579,7 +1117,7 @@ const LifeWheelApp: React.FC = () => {
                           fontSize: "12px",
                         }}
                       >
-                        {reflection.archetype || "РќРµ СѓРєР°Р·Р°РЅ"}
+                        {reflection.archetype || "Не указан"}
                       </span>
                       <button
                         onClick={() => deleteReflection(reflection.id)}
@@ -1593,17 +1131,17 @@ const LifeWheelApp: React.FC = () => {
                           fontSize: "12px",
                         }}
                       >
-                        рџ—‘пёЏ
+                        ???
                       </button>
                     </div>
                     <div style={{ color: "#e0e0e0", fontSize: "13px" }}>
                       <div style={{ marginBottom: "5px" }}>
-                        <strong>Р§С‚Рѕ РїРѕР»СѓС‡РёР»РѕСЃСЊ:</strong>{" "}
+                        <strong>Что получилось:</strong>{" "}
                         {reflection.question1?.substring(0, 100)}...
                       </div>
                       {reflection.question2 && (
                         <div style={{ marginBottom: "5px" }}>
-                          <strong>Р§С‚Рѕ Р±С‹ РёР·РјРµРЅРёР»:</strong>{" "}
+                          <strong>Что бы изменил:</strong>{" "}
                           {reflection.question2?.substring(0, 80)}...
                         </div>
                       )}
@@ -1617,7 +1155,7 @@ const LifeWheelApp: React.FC = () => {
     );
   };
 
-  // вљ™пёЏ РљРѕРјРїРѕРЅРµРЅС‚ РЅР°СЃС‚СЂРѕРµРє
+  // ?? Компонент настроек
   const SettingsTab = () => {
     const [importData, setImportData] = useState("");
 
@@ -1640,7 +1178,7 @@ const LifeWheelApp: React.FC = () => {
       }.json`;
       link.click();
 
-      alert("вњ… Р”Р°РЅРЅС‹Рµ СЌРєСЃРїРѕСЂС‚РёСЂРѕРІР°РЅС‹!");
+      alert("? Данные экспортированы!");
     };
 
     const handleImport = () => {
@@ -1653,16 +1191,16 @@ const LifeWheelApp: React.FC = () => {
         if (data.settings) saveSettings(data.settings);
 
         setImportData("");
-        alert("вњ… Р”Р°РЅРЅС‹Рµ РёРјРїРѕСЂС‚РёСЂРѕРІР°РЅС‹!");
+        alert("? Данные импортированы!");
       } catch (error) {
-        alert("вќЊ РћС€РёР±РєР° РїСЂРё РёРјРїРѕСЂС‚Рµ: РЅРµРІРµСЂРЅС‹Р№ С„РѕСЂРјР°С‚ JSON");
+        alert("? Ошибка при импорте: неверный формат JSON");
       }
     };
 
     const resetData = () => {
       if (
         confirm(
-          "Р’С‹ СѓРІРµСЂРµРЅС‹, С‡С‚Рѕ С…РѕС‚РёС‚Рµ СЃР±СЂРѕСЃРёС‚СЊ Р’РЎР• РґР°РЅРЅС‹Рµ? Р­С‚Рѕ РґРµР№СЃС‚РІРёРµ РЅРµР»СЊР·СЏ РѕС‚РјРµРЅРёС‚СЊ."
+          "Вы уверены, что хотите сбросить ВСЕ данные? Это действие нельзя отменить."
         )
       ) {
         localStorage.removeItem("life-wheel-tasks");
@@ -1672,7 +1210,7 @@ const LifeWheelApp: React.FC = () => {
         setTasks([]);
         setGoals([]);
         setReflections([]);
-        alert("вњ… Р”Р°РЅРЅС‹Рµ СЃР±СЂРѕС€РµРЅС‹!");
+        alert("? Данные сброшены!");
       }
     };
 
@@ -1692,7 +1230,7 @@ const LifeWheelApp: React.FC = () => {
             textAlign: isMobile ? "center" : "left",
           }}
         >
-          РќР°СЃС‚СЂРѕР№РєРё
+          Настройки
         </h2>
 
         <div
@@ -1704,7 +1242,7 @@ const LifeWheelApp: React.FC = () => {
               : "repeat(auto-fit, minmax(300px, 1fr))",
           }}
         >
-          {/* Р’РЅРµС€РЅРёР№ РІРёРґ */}
+          {/* Внешний вид */}
           <div
             style={{
               background: "rgba(255,255,255,0.1)",
@@ -1714,7 +1252,7 @@ const LifeWheelApp: React.FC = () => {
             }}
           >
             <h3 style={{ color: "white", marginBottom: "15px" }}>
-              Р’РЅРµС€РЅРёР№ РІРёРґ
+              Внешний вид
             </h3>
 
             <div style={{ marginBottom: "15px" }}>
@@ -1727,7 +1265,7 @@ const LifeWheelApp: React.FC = () => {
                 }}
               >
                 <span style={{ color: "white", fontSize: "14px" }}>
-                  РўРµРјРЅР°СЏ С‚РµРјР°
+                  Темная тема
                 </span>
                 <label
                   style={{
@@ -1786,7 +1324,7 @@ const LifeWheelApp: React.FC = () => {
                 }}
               >
                 <span style={{ color: "white", fontSize: "14px" }}>
-                  РЈРІРµРґРѕРјР»РµРЅРёСЏ
+                  Уведомления
                 </span>
                 <label
                   style={{
@@ -1840,7 +1378,7 @@ const LifeWheelApp: React.FC = () => {
               </div>
             </div>
 
-            {/* РљРќРћРџРљРђ POMODORO */}
+            {/* КНОПКА POMODORO */}
             <div style={{ marginTop: "20px" }}>
               <button
                 onClick={() => setShowPomodoro(!showPomodoro)}
@@ -1855,12 +1393,12 @@ const LifeWheelApp: React.FC = () => {
                   width: "100%",
                 }}
               >
-                {showPomodoro ? "вќЊ РЎРєСЂС‹С‚СЊ Pomodoro" : "рџЌ… РџРѕРєР°Р·Р°С‚СЊ Pomodoro"}
+                {showPomodoro ? "? Скрыть Pomodoro" : "?? Показать Pomodoro"}
               </button>
             </div>
           </div>
 
-          {/* РЈРїСЂР°РІР»РµРЅРёРµ РґР°РЅРЅС‹РјРё */}
+          {/* Управление данными */}
           <div
             style={{
               background: "rgba(255,255,255,0.1)",
@@ -1870,7 +1408,7 @@ const LifeWheelApp: React.FC = () => {
             }}
           >
             <h3 style={{ color: "white", marginBottom: "15px" }}>
-              РЈРїСЂР°РІР»РµРЅРёРµ РґР°РЅРЅС‹РјРё
+              Управление данными
             </h3>
 
             <div
@@ -1888,7 +1426,7 @@ const LifeWheelApp: React.FC = () => {
                   fontSize: "14px",
                 }}
               >
-                рџ“¤ Р­РєСЃРїРѕСЂС‚ РґР°РЅРЅС‹С…
+                ?? Экспорт данных
               </button>
 
               <div>
@@ -1899,12 +1437,12 @@ const LifeWheelApp: React.FC = () => {
                     marginBottom: "5px",
                   }}
                 >
-                  РРјРїРѕСЂС‚ РґР°РЅРЅС‹С… (JSON):
+                  Импорт данных (JSON):
                 </div>
                 <textarea
                   value={importData}
                   onChange={(e) => setImportData(e.target.value)}
-                  placeholder="Р’СЃС‚Р°РІСЊС‚Рµ JSON РґР°РЅРЅС‹Рµ..."
+                  placeholder="Вставьте JSON данные..."
                   rows={3}
                   style={{
                     width: "100%",
@@ -1931,7 +1469,7 @@ const LifeWheelApp: React.FC = () => {
                     width: "100%",
                   }}
                 >
-                  рџ“Ґ РРјРїРѕСЂС‚ РґР°РЅРЅС‹С…
+                  ?? Импорт данных
                 </button>
               </div>
 
@@ -1947,7 +1485,7 @@ const LifeWheelApp: React.FC = () => {
                   fontSize: "14px",
                 }}
               >
-                рџ”„ РЎР±СЂРѕСЃРёС‚СЊ РІСЃРµ РґР°РЅРЅС‹Рµ
+                ?? Сбросить все данные
               </button>
             </div>
           </div>
@@ -1978,7 +1516,7 @@ const LifeWheelApp: React.FC = () => {
           color: "white",
         }}
       >
-        {/* РҐРµРґРµСЂ */}
+        {/* Хедер */}
         <header
           style={{
             background: "rgba(255,255,255,0.1)",
@@ -2011,7 +1549,7 @@ const LifeWheelApp: React.FC = () => {
                   lineHeight: "1.2",
                 }}
               >
-                рџЋЇ РљРѕР»РµСЃРѕ Р–РёР·РЅРё
+                ?? Колесо Жизни
               </h1>
               <p
                 style={{
@@ -2020,7 +1558,7 @@ const LifeWheelApp: React.FC = () => {
                   fontSize: isMobile ? "14px" : "16px",
                 }}
               >
-                Р‘Р°Р»Р°РЅСЃ, РїР»Р°РЅРёСЂРѕРІР°РЅРёРµ Рё СЂРµС„Р»РµРєСЃРёСЏ РґР»СЏ РіР°СЂРјРѕРЅРёС‡РЅРѕР№ Р¶РёР·РЅРё
+                Баланс, планирование и рефлексия для гармоничной жизни
               </p>
             </div>
             <div
@@ -2043,7 +1581,7 @@ const LifeWheelApp: React.FC = () => {
                   fontSize: "14px",
                 }}
               >
-                рџ”™ Рљ Р°СЂС…РёС‚РµРєС‚СѓСЂР°Рј
+                ?? К архитектурам
               </button>
               <button
                 onClick={() => setShowPomodoro(!showPomodoro)}
@@ -2057,13 +1595,13 @@ const LifeWheelApp: React.FC = () => {
                   fontSize: "12px",
                 }}
               >
-                {showPomodoro ? "вќЊ РЎРєСЂС‹С‚СЊ" : "рџЌ… Pomodoro"}
+                {showPomodoro ? "? Скрыть" : "?? Pomodoro"}
               </button>
             </div>
           </div>
         </header>
 
-        {/* Pomodoro РІ С…РµРґРµСЂРµ */}
+        {/* Pomodoro в хедере */}
         {showPomodoro && (
           <div
             style={{
@@ -2078,7 +1616,7 @@ const LifeWheelApp: React.FC = () => {
           </div>
         )}
 
-        {/* РќР°РІРёРіР°С†РёСЏ */}
+        {/* Навигация */}
         <nav
           style={{
             background: "rgba(255,255,255,0.1)",
@@ -2099,10 +1637,10 @@ const LifeWheelApp: React.FC = () => {
           >
             {(
               [
-                { key: "planning", label: "рџ“… РџР»Р°РЅРёСЂРѕРІР°РЅРёРµ" },
-                { key: "goals", label: "рџЋЇ Р¦РµР»Рё" },
-                { key: "reflection", label: "рџЊ™ РђРЅР°Р»РёР·" },
-                { key: "settings", label: "вљ™пёЏ РќР°СЃС‚СЂРѕР№РєРё" },
+                { key: "planning", label: "?? Планирование" },
+                { key: "goals", label: "?? Цели" },
+                { key: "reflection", label: "?? Анализ" },
+                { key: "settings", label: "?? Настройки" },
               ] as const
             ).map((tab) => (
               <button
@@ -2130,7 +1668,7 @@ const LifeWheelApp: React.FC = () => {
           </div>
         </nav>
 
-        {/* РћСЃРЅРѕРІРЅРѕР№ РєРѕРЅС‚РµРЅС‚ */}
+        {/* Основной контент */}
         <main
           style={{
             maxWidth: "1200px",
@@ -2140,7 +1678,7 @@ const LifeWheelApp: React.FC = () => {
             overflowX: "hidden",
           }}
         >
-          {currentTab === "planning" && <PlanningTab />}
+          {currentTab === "planning" && <PlanningTab tasks={tasks} setTasks={setTasks} isMobile={isMobile} settings={settings} />}
           {currentTab === "goals" && <GoalsTab />}
           {currentTab === "reflection" && <ReflectionTab />}
           {currentTab === "settings" && <SettingsTab />}
