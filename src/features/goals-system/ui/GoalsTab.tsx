@@ -1,61 +1,57 @@
 ﻿import React from 'react';
-import { GoalsList } from './GoalsList';
-import { GoalForm } from './GoalForm';
-import { useGoalsSystem } from '../model/useGoalsSystem';
+import { Goal } from '../../../types';
 
 interface GoalsTabProps {
   isMobile: boolean;
   settings: any;
-  goals: any[];
-  setGoals: (goals: any[]) => void;
+  goals: Goal[];
+  setGoals: (goals: Goal[]) => void;
 }
 
-export const GoalsTab: React.FC<GoalsTabProps> = ({ isMobile, settings, goals, setGoals }) => {
-  const {
-    newGoal,
-    setNewGoal,
-    addGoal,
-    deleteGoal,
-    toggleGoal,
-    editGoal,
-    editingGoal,
-    setEditingGoal,
-    saveGoal,
-  } = useGoalsSystem(goals, setGoals);
-
+const GoalsTab: React.FC<GoalsTabProps> = ({
+  isMobile,
+  settings,
+  goals,
+  setGoals
+}) => {
   return (
-    <div style={{ 
-      padding: '20px', 
-      maxWidth: '100%', 
-      overflowX: 'hidden' 
-    }}>
-      <h2 style={{ 
-        color: '#8a2be2', 
-        marginBottom: '20px', 
-        fontSize: '2em',
-        textAlign: 'left'
-      }}>
-        Цели
+    <div style={{ padding: isMobile ? '15px' : '20px' }}>
+      <h2 style={{ color: '#8A2BE2', marginBottom: '20px' }}>
+        🎯 Система целей
       </h2>
-      
-      <GoalForm 
-        newGoal={newGoal}
-        setNewGoal={setNewGoal}
-        addGoal={addGoal}
-        isMobile={isMobile}
-      />
-      
-      <GoalsList
-        goals={goals}
-        deleteGoal={deleteGoal}
-        toggleGoal={toggleGoal}
-        editGoal={editGoal}
-        editingGoal={editingGoal}
-        setEditingGoal={setEditingGoal}
-        saveGoal={saveGoal}
-        isMobile={isMobile}
-      />
+      <div style={{ 
+        background: 'rgba(255,255,255,0.1)', 
+        padding: '20px', 
+        borderRadius: '10px' 
+      }}>
+        <p>Цели: {goals.length}</p>
+        <p>Архетип: {settings.archetype}</p>
+        <div style={{ marginTop: '20px' }}>
+          <button
+            style={{
+              background: '#8A2BE2',
+              color: 'white',
+              padding: '10px 20px',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer'
+            }}
+            onClick={() => {
+              const newGoal: Goal = {
+                id: Date.now(),
+                text: 'Новая цель',
+                steps: [],
+                createdAt: new Date().toISOString()
+              };
+              setGoals([...goals, newGoal]);
+            }}
+          >
+            + Добавить цель
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
 
+export { GoalsTab };
