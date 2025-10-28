@@ -1,211 +1,261 @@
-import React, { useState } from "react";
-import { usePomodoroTimer } from "../model/usePomodoroTimer";
-import { PomodoroSettings } from "./PomodoroSettings";
+import React, { useState, useEffect, useCallback } from "react";
 
-export const PomodoroTimer: React.FC = () => {
-  const {
-    state,
-    startSession,
-    pauseSession,
-    resumeSession,
-    completeSession,
-    skipSession,
-    updateSettings,
-    formatTime,
-  } = usePomodoroTimer();
+interface PomodoroTimerProps {
+  isMobile: boolean;
+  settings: any;
+}
 
-  const [showSettings, setShowSettings] = useState(!state.currentSession);
+const PomodoroTimer: React.FC<PomodoroTimerProps> = ({
+  isMobile,
+  settings,
+}) => {
+  const [timeLeft, setTimeLeft] = useState<number>(25 * 60); // 25 минут в секундах
+  const [isActive, setIsActive] = useState<boolean>(false);
+  const [mode, setMode] = useState<"work" | "break">("work");
+  const [cycles, setCycles] = useState<number>(0);
 
-  const { currentSession, stats, completedPomodoros, settings } = state;
-
-  // Функции для работы с настройками
-  const handleSettingsChange = (newSettings: any) => {
-    updateSettings(newSettings);
+  // Стили из макета
+  const sectionTitleStyle = {
+    fontSize: isMobile ? "1.5rem" : "1.8rem",
+    marginBottom: "25px",
+    color: "#8A2BE2",
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
   };
 
-  const handleStartWithSettings = () => {
-    setShowSettings(false);
-    startSession("work");
+  const timerContainerStyle = {
+    background: "white",
+    borderRadius: "20px",
+    padding: isMobile ? "20px" : "30px",
+    boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+    textAlign: "center" as const,
   };
 
-  const handleShowSettings = () => {
-    setShowSettings(true);
+  const timerCircleStyle = {
+    width: isMobile ? "250px" : "300px",
+    height: isMobile ? "250px" : "300px",
+    borderRadius: "50%",
+    background:
+      mode === "work"
+        ? "linear-gradient(135deg, #FF6B6B, #FF8E8E)"
+        : "linear-gradient(135deg, #4ECDC4, #88D9D9)",
+    margin: "0 auto 30px",
+    display: "flex",
+    flexDirection: "column" as const,
+    alignItems: "center",
+    justifyContent: "center",
+    color: "white",
+    boxShadow: "0 15px 35px rgba(0,0,0,0.2)",
+    position: "relative" as const,
   };
 
-  // Если показываем настройки
-  if (showSettings) {
-    return (
-      <PomodoroSettings
-        settings={settings}
-        onSettingsChange={handleSettingsChange}
-        onStart={handleStartWithSettings}
-      />
-    );
-  }
-
-  // Остальной код компонента (как был ранее)...
-  const getPhaseName = (phase: string) => {
-    switch (phase) {
-      case "work":
-        return "Рабочий период";
-      case "shortBreak":
-        return "Короткий перерыв";
-      case "longBreak":
-        return "Длинный перерыв";
-      default:
-        return "Готов к работе";
-    }
+  const timeTextStyle = {
+    fontSize: isMobile ? "3rem" : "4rem",
+    fontWeight: "bold",
+    margin: 0,
   };
 
-  const getPhaseEmoji = (phase: string) => {
-    switch (phase) {
-      case "work":
-        return "🔴";
-      case "shortBreak":
-        return "🟢";
-      case "longBreak":
-        return "🟡";
-      default:
-        return "⚪";
-    }
+  const modeTextStyle = {
+    fontSize: "1.2rem",
+    margin: "10px 0 0 0",
+    opacity: 0.9,
   };
 
-  const getNextPhaseName = () => {
-    if (!currentSession) return "Рабочий период";
+  const btnStyle = {
+    padding: "15px 25px",
+    background: "linear-gradient(to right, #8A2BE2, #4B0082)",
+    color: "white",
+    border: "none",
+    borderRadius: "15px",
+    fontWeight: 600,
+    cursor: "pointer",
+    transition: "all 0.3s ease",
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    fontSize: "1rem",
+    margin: "0 10px",
+  };
 
-    if (currentSession.phase === "work") {
-      return completedPomodoros % 4 === 3
-        ? "Длинный перерыв"
-        : "Короткий перерыв";
+  const controlsStyle = {
+    display: "flex",
+    justifyContent: "center",
+    gap: "15px",
+    marginBottom: "30px",
+    flexWrap: "wrap" as const,
+  };
+
+  const statsStyle = {
+    display: "flex",
+    justifyContent: "space-around",
+    background: "#F8F8FF",
+    padding: "20px",
+    borderRadius: "15px",
+    marginTop: "30px",
+  };
+
+  const statItemStyle = {
+    textAlign: "center" as const,
+  };
+
+  const statValueStyle = {
+    fontSize: "2rem",
+    fontWeight: "bold",
+    color: "#8A2BE2",
+    margin: "0 0 5px 0",
+  };
+
+  const statLabelStyle = {
+    fontSize: "0.9rem",
+    color: "#696969",
+    margin: 0,
+  };
+
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs
+      .toString()
+      .padStart(2, "0")}`;
+  };
+
+  const resetTimer = useCallback(() => {
+    setIsActive(false);
+    setTimeLeft(mode === "work" ? 25 * 60 : 5 * 60);
+  }, [mode]);
+
+  const switchMode = useCallback(() => {
+    if (mode === "work") {
+      setMode("break");
+      setTimeLeft(5 * 60); // 5 минут перерыв
+      setCycles((prev) => prev + 1);
     } else {
-      return "Рабочий период";
+      setMode("work");
+      setTimeLeft(25 * 60); // 25 минут работы
     }
-  };
+    setIsActive(false);
+  }, [mode]);
 
-  if (!currentSession) {
-    return (
-      <div className="p-6 bg-white rounded-lg shadow-lg max-w-md mx-auto">
-        <div className="text-center">
-          <div className="text-6xl mb-4">🍅</div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">
-            Pomodoro Таймер
-          </h2>
-          <p className="text-gray-600 mb-6">Готов к работе!</p>
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
 
-          <div className="space-y-3 mb-6">
-            <div className="flex justify-between text-sm">
-              <span>✅ Завершено сегодня:</span>
-              <span className="font-semibold">{stats.completedToday}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span>🎯 Цель на день:</span>
-              <span className="font-semibold">{stats.dailyGoal}</span>
-            </div>
-          </div>
+    if (isActive && timeLeft > 0) {
+      interval = setInterval(() => {
+        setTimeLeft((time) => time - 1);
+      }, 1000);
+    } else if (isActive && timeLeft === 0) {
+      // Таймер завершен
+      switchMode();
+      // Можно добавить звуковое уведомление
+      if (settings.notifications) {
+        new Audio("/notification.mp3").play().catch(() => {
+          // Fallback для браузеров без поддержки audio
+          console.log("Таймер завершен!");
+        });
+      }
+    }
 
-          <button
-            onClick={handleShowSettings}
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg transition-colors mb-3"
-          >
-            ⚙️ Настроить таймер
-          </button>
-
-          <button
-            onClick={() => startSession("work")}
-            className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
-          >
-            ▶️ Быстрый старт
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  const progress =
-    ((currentSession.duration * 60 - currentSession.timeLeft) /
-      (currentSession.duration * 60)) *
-    100;
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isActive, timeLeft, switchMode, settings.notifications]);
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-lg max-w-md mx-auto">
-      <div className="text-center">
-        {/* Заголовок и статус */}
-        <div className="flex items-center justify-center gap-2 mb-4">
-          <span className="text-2xl">
-            {getPhaseEmoji(currentSession.phase)}
-          </span>
-          <h2 className="text-xl font-bold text-gray-800">
-            {getPhaseName(currentSession.phase)}
-          </h2>
-        </div>
+    <div style={timerContainerStyle}>
+      <h2 style={sectionTitleStyle}>🍅 Pomodoro Таймер</h2>
 
-        {/* Таймер */}
-        <div className="text-6xl font-mono font-bold text-gray-800 mb-4">
-          {formatTime(currentSession.timeLeft)}
-        </div>
+      <div style={timerCircleStyle}>
+        <h1 style={timeTextStyle}>{formatTime(timeLeft)}</h1>
+        <p style={modeTextStyle}>
+          {mode === "work" ? "⏰ Время работы" : "☕ Перерыв"}
+        </p>
+      </div>
 
-        {/* Прогресс бар */}
-        <div className="w-full bg-gray-200 rounded-full h-2 mb-6">
-          <div
-            className="bg-red-500 h-2 rounded-full transition-all duration-1000"
-            style={{ width: `${progress}%` }}
-          ></div>
-        </div>
-
-        {/* Статистика */}
-        <div className="grid grid-cols-2 gap-4 mb-6 text-sm">
-          <div className="text-center p-2 bg-gray-50 rounded">
-            <div className="font-semibold">✅ Завершено</div>
-            <div>
-              {stats.completedToday}/{stats.dailyGoal}
-            </div>
-          </div>
-          <div className="text-center p-2 bg-gray-50 rounded">
-            <div className="font-semibold">🎯 Следующее</div>
-            <div>{getNextPhaseName()}</div>
-          </div>
-        </div>
-
-        {/* Кнопки управления */}
-        <div className="flex gap-3 justify-center mb-3">
-          {currentSession.status === "running" ? (
-            <button
-              onClick={pauseSession}
-              className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-4 rounded-lg transition-colors"
-            >
-              ⏸️ Пауза
-            </button>
-          ) : (
-            <button
-              onClick={resumeSession}
-              className="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition-colors"
-            >
-              ▶️ Продолжить
-            </button>
-          )}
-
-          <button
-            onClick={skipSession}
-            className="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-lg transition-colors"
-          >
-            ⏭️ Пропустить
-          </button>
-        </div>
-
-        {/* Кнопка настроек */}
+      <div style={controlsStyle}>
         <button
-          onClick={handleShowSettings}
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors"
+          style={{
+            ...btnStyle,
+            background: isActive
+              ? "linear-gradient(to right, #FF6B6B, #FF8E8E)"
+              : "linear-gradient(to right, #32CD32, #90EE90)",
+          }}
+          onClick={() => setIsActive(!isActive)}
         >
-          ⚙️ Изменить настройки
+          <span>{isActive ? "⏸️" : "▶️"}</span>
+          {isActive ? "Пауза" : "Старт"}
         </button>
 
-        {/* Дополнительная информация */}
-        <div className="mt-4 text-xs text-gray-500">
-          <div>Режим: {currentSession.preset}</div>
-          <div>Длительность: {currentSession.duration} мин</div>
+        <button
+          style={{
+            ...btnStyle,
+            background: "linear-gradient(to right, #9370DB, #BA55D3)",
+          }}
+          onClick={resetTimer}
+        >
+          <span>🔄</span>
+          Сброс
+        </button>
+
+        <button
+          style={{
+            ...btnStyle,
+            background: "linear-gradient(to right, #4ECDC4, #88D9D9)",
+          }}
+          onClick={switchMode}
+        >
+          <span>⏭️</span>
+          Пропустить
+        </button>
+      </div>
+
+      {/* Статистика */}
+      <div style={statsStyle}>
+        <div style={statItemStyle}>
+          <div style={statValueStyle}>{cycles}</div>
+          <div style={statLabelStyle}>Завершенных циклов</div>
         </div>
+        <div style={statItemStyle}>
+          <div style={statValueStyle}>
+            {mode === "work" ? "25:00" : "05:00"}
+          </div>
+          <div style={statLabelStyle}>
+            {mode === "work" ? "Время работы" : "Время перерыва"}
+          </div>
+        </div>
+        <div style={statItemStyle}>
+          <div style={statValueStyle}>
+            {Math.floor(
+              (timeLeft / (mode === "work" ? 25 * 60 : 5 * 60)) * 100
+            )}
+            %
+          </div>
+          <div style={statLabelStyle}>Прогресс</div>
+        </div>
+      </div>
+
+      {/* Инструкция */}
+      <div
+        style={{
+          marginTop: "30px",
+          padding: "20px",
+          background: "#F8F8FF",
+          borderRadius: "15px",
+          textAlign: "left" as const,
+        }}
+      >
+        <h3 style={{ color: "#8A2BE2", marginBottom: "15px" }}>
+          🎯 Метод Pomodoro
+        </h3>
+        <ul style={{ margin: 0, paddingLeft: "20px", color: "#666" }}>
+          <li>25 минут работы → 5 минут перерыва</li>
+          <li>После 4 циклов - длинный перерыв (15-30 минут)</li>
+          <li>Фокусируйтесь на одной задаче за раз</li>
+          <li>Избегайте отвлечений во время работы</li>
+        </ul>
       </div>
     </div>
   );
 };
+
+export { PomodoroTimer };
