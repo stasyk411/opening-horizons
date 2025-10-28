@@ -6,7 +6,6 @@
   colorScheme: string;
 }
 
-// Остальные типы...
 export interface Task {
   id: string;
   title: string;
@@ -18,6 +17,11 @@ export interface Task {
   category?: string;
   createdAt: string;
   updatedAt?: string;
+  // ДОБАВЛЯЕМ НОВЫЕ ПОЛЯ:
+  startTime?: string;
+  endTime?: string;
+  repeat?: string;
+  alarm?: string;
 }
 
 export interface Goal {

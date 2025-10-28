@@ -90,15 +90,19 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
     width: "100%",
   };
 
+  // ИСПРАВЛЕННЫЙ СТИЛЬ ДЛЯ ВВОДА ТЕКСТА
   const taskInputStyle = {
     padding: isMobile ? "12px" : "15px",
-    border: "1px solid #F8F8FF",
+    border: "1px solid #E0E0E0",
     borderRadius: isMobile ? "12px" : "15px",
     fontSize: isMobile ? "14px" : "1rem",
-    background: "#F8F8FF",
+    background: "white",
     transition: "all 0.3s ease",
     width: "100%",
     boxSizing: "border-box" as const,
+    color: "#333", // ДОБАВЛЕНО: четкий цвет текста
+    outline: "none",
+    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
   };
 
   const btnStyle = {
@@ -140,14 +144,17 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
     color: "#696969",
   };
 
+  // ИСПРАВЛЕННЫЙ СТИЛЬ ДЛЯ SELECT И INPUT
   const optionSelectStyle = {
     padding: isMobile ? "10px" : "12px",
-    border: "1px solid #F8F8FF",
+    border: "1px solid #E0E0E0",
     borderRadius: isMobile ? "8px" : "10px",
     background: "white",
     fontSize: isMobile ? "14px" : "1rem",
     width: "100%",
     boxSizing: "border-box" as const,
+    color: "#333", // ДОБАВЛЕНО: четкий цвет текста
+    outline: "none",
   };
 
   const taskListStyle = {
@@ -175,6 +182,17 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
       return;
     }
 
+    // Правильно вычисляем timeEstimate
+    let calculatedTimeEstimate: number | undefined = undefined;
+    if (startTime && endTime) {
+      const startMinutes =
+        parseInt(startTime.split(":")[0]) * 60 +
+        parseInt(startTime.split(":")[1]);
+      const endMinutes =
+        parseInt(endTime.split(":")[0]) * 60 + parseInt(endTime.split(":")[1]);
+      calculatedTimeEstimate = endMinutes - startMinutes;
+    }
+
     const newTask: Task = {
       id: Date.now().toString(),
       title: taskInput.trim(),
@@ -182,9 +200,58 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
       completed: false,
       priority: "medium",
       date: selectedDate.toISOString().split("T")[0],
-      timeEstimate: startTime && endTime ? 60 : undefined, // Примерное время
+      timeEstimate: calculatedTimeEstimate,
       category: taskSphere,
       createdAt: new Date().toISOString(),
+      // ДОБАВЛЯЕМ НОВЫЕ ПОЛЯ:
+      startTime: startTime || undefined,
+      endTime: endTime || undefined,
+      repeat: taskRepeat || undefined,
+      alarm: taskAlarm || undefined,
+    };
+
+    setTasks([...tasks, newTask]);
+
+    // Сброс формы
+    setTaskInput("");
+    setStartTime("");
+    setEndTime("");
+    setTaskRepeat("");
+    setTaskAlarm("");
+  };
+
+  // ИСПРАВЛЕННАЯ ФУНКЦИЯ ДЛЯ ЗАДАЧ БЕЗ ДАТЫ
+  const handleAddTaskWithoutDate = () => {
+    if (!taskInput.trim()) {
+      alert("Пожалуйста, введите описание задачи");
+      return;
+    }
+
+    // Правильно вычисляем timeEstimate
+    let calculatedTimeEstimate: number | undefined = undefined;
+    if (startTime && endTime) {
+      const startMinutes =
+        parseInt(startTime.split(":")[0]) * 60 +
+        parseInt(startTime.split(":")[1]);
+      const endMinutes =
+        parseInt(endTime.split(":")[0]) * 60 + parseInt(endTime.split(":")[1]);
+      calculatedTimeEstimate = endMinutes - startMinutes;
+    }
+
+    const newTask: Task = {
+      id: Date.now().toString(),
+      title: taskInput.trim(),
+      description: "",
+      completed: false,
+      priority: "medium",
+      date: "", // Пустая строка для задач без даты
+      timeEstimate: calculatedTimeEstimate,
+      category: taskSphere,
+      createdAt: new Date().toISOString(),
+      startTime: startTime || undefined,
+      endTime: endTime || undefined,
+      repeat: taskRepeat || undefined,
+      alarm: taskAlarm || undefined,
     };
 
     setTasks([...tasks, newTask]);
@@ -236,7 +303,7 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
   };
 
   const getTasksWithoutDate = () => {
-    return tasks.filter((task) => !task.date);
+    return tasks.filter((task) => !task.date || task.date === "");
   };
 
   const todayTasks = getTodayTasks();
@@ -258,6 +325,19 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
     if (!time) return true;
     const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
     return timeRegex.test(time);
+  };
+
+  // Функция для перевода категорий
+  const getCategoryLabel = (category: string = "") => {
+    const categories: Record<string, string> = {
+      health: "Здоровье",
+      career: "Карьера",
+      family: "Семья",
+      finance: "Финансы",
+      development: "Развитие",
+      hobby: "Хобби",
+    };
+    return categories[category] || category;
   };
 
   return (
@@ -380,7 +460,7 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
         </div>
       </div>
 
-      {/* Форма добавления задачи - РАБОЧАЯ */}
+      {/* Форма добавления задачи - ИСПРАВЛЕННЫЙ ВВОД */}
       <div style={taskFormStyle}>
         <input
           type="text"
@@ -434,7 +514,7 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
                 width: isMobile ? "70px" : "100px",
                 textAlign: "center",
                 padding: isMobile ? "8px" : "10px",
-                borderColor: validateTime(startTime) ? "#F8F8FF" : "#ff4444",
+                borderColor: validateTime(startTime) ? "#E0E0E0" : "#ff4444",
               }}
               placeholder="09:00"
               maxLength={5}
@@ -457,7 +537,7 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
                 width: isMobile ? "70px" : "100px",
                 textAlign: "center",
                 padding: isMobile ? "8px" : "10px",
-                borderColor: validateTime(endTime) ? "#F8F8FF" : "#ff4444",
+                borderColor: validateTime(endTime) ? "#E0E0E0" : "#ff4444",
               }}
               placeholder="10:30"
               maxLength={5}
@@ -533,10 +613,7 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
             color: "#8A2BE2",
             marginTop: "20px",
           }}
-          onClick={() => {
-            // Логика для задач без даты
-            console.log("Добавить задачу без даты");
-          }}
+          onClick={handleAddTaskWithoutDate} // ИСПРАВЛЕНО: используем отдельную функцию
         >
           <span>⏳</span> Без даты
         </button>
@@ -594,11 +671,15 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
                       flexWrap: "wrap" as const,
                     }}
                   >
-                    <span>🏷️ {task.category}</span>
-                    {startTime && endTime && (
+                    <span>🏷️ {getCategoryLabel(task.category)}</span>
+                    {task.startTime && task.endTime && (
                       <span>
-                        ⏰ {startTime}-{endTime}
+                        ⏰ {task.startTime}-{task.endTime}
                       </span>
+                    )}
+                    {task.repeat && <span>🔄 {task.repeat}</span>}
+                    {task.alarm && (
+                      <span>⏰ Напомнить за {task.alarm} мин</span>
                     )}
                   </div>
                 </div>
@@ -698,6 +779,102 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
                 >
                   🗑️
                 </button>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Задачи без даты */}
+        <h3
+          style={{ color: "#8A2BE2", marginBottom: "15px", marginTop: "30px" }}
+        >
+          ⏳ Задачи без даты ({tasksWithoutDate.length})
+        </h3>
+        <div style={taskListStyle}>
+          {tasksWithoutDate.length === 0 ? (
+            <p
+              style={{
+                textAlign: "center",
+                color: "#999",
+                fontStyle: "italic",
+                padding: "20px",
+              }}
+            >
+              Задач без даты нет
+            </p>
+          ) : (
+            tasksWithoutDate.map((task) => (
+              <div key={task.id} style={taskItemStyle(task.completed)}>
+                <input
+                  type="checkbox"
+                  checked={task.completed}
+                  onChange={() => handleToggleTask(task.id)}
+                  style={{
+                    width: "20px",
+                    height: "20px",
+                    marginRight: "12px",
+                    accentColor: "#8A2BE2",
+                  }}
+                />
+                <div style={{ flex: 1 }}>
+                  <div
+                    style={{
+                      textDecoration: task.completed ? "line-through" : "none",
+                      color: task.completed ? "#999" : "#333",
+                    }}
+                  >
+                    {task.title}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: "0.8rem",
+                      color: "#666",
+                      marginTop: "4px",
+                      display: "flex",
+                      gap: "10px",
+                      flexWrap: "wrap" as const,
+                    }}
+                  >
+                    <span>🏷️ {getCategoryLabel(task.category)}</span>
+                    {task.startTime && task.endTime && (
+                      <span>
+                        ⏰ {task.startTime}-{task.endTime}
+                      </span>
+                    )}
+                    {task.repeat && <span>🔄 {task.repeat}</span>}
+                    {task.alarm && (
+                      <span>⏰ Напомнить за {task.alarm} мин</span>
+                    )}
+                  </div>
+                </div>
+                <div style={{ display: "flex", gap: "8px" }}>
+                  <button
+                    onClick={() => handleEditTask(task.id)}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: "#8A2BE2",
+                      cursor: "pointer",
+                      fontSize: "16px",
+                    }}
+                    title="Редактировать"
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    onClick={() => handleDeleteTask(task.id)}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: "#ff4444",
+                      cursor: "pointer",
+                      fontSize: "16px",
+                    }}
+                    title="Удалить"
+                  >
+                    🗑️
+                  </button>
+                </div>
               </div>
             ))
           )}
