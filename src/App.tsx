@@ -1,4 +1,6 @@
-﻿import React, { useState, useEffect } from "react";
+﻿// 📝 ПОЛНЫЙ ФАЙЛ App.tsx (исправленная версия):
+
+import React, { useState, useEffect } from "react";
 import { EmergencyErrorBoundary } from "./components/System/EmergencyErrorBoundary";
 import { Task, Goal, GoalStep, Reflection, Settings } from "./types";
 import { PlanningTab } from "./features/daily-planning";
@@ -218,14 +220,7 @@ const App: React.FC = () => {
               isMobile={isMobile}
             />
           )}
-          {currentTab === "goals" && (
-            <GoalsTab
-              isMobile={isMobile}
-              settings={settings}
-              goals={goals}
-              setGoals={saveGoals}
-            />
-          )}
+          {currentTab === "goals" && <GoalsTab />}
           {currentTab === "reflection" && (
             <ReflectionTab
               reflections={reflections}
