@@ -1,7 +1,4 @@
-// 📝 ПОЛНЫЙ ФАЙЛ validation/index.ts:
-
+// 📝 ШАГ 4: Экспортируем auth валидаторы
 export * from "./types/validation";
 export * from "./validators/goalValidator";
-// Будущие экспорты:
-// export * from './validators/taskValidator';
-// export * from './validators/reflectionValidator';
+export * from "./validators/authValidator"; // ← ДОБАВЛЯЕМ

@@ -1,5 +1,4 @@
-﻿// 📝 ПОЛНЫЙ ФАЙЛ App.tsx (исправленная версия):
-
+﻿// 📝 ШАГ 2: ИСПРАВЛЕННЫЙ БЛОК ИМПОРТОВ в App.tsx
 import React, { useState, useEffect } from "react";
 import { EmergencyErrorBoundary } from "./components/System/EmergencyErrorBoundary";
 import { Task, Goal, GoalStep, Reflection, Settings } from "./types";
@@ -7,6 +6,7 @@ import { PlanningTab } from "./features/daily-planning";
 import { GoalsTab } from "./features/goals-system";
 import { ReflectionTab } from "./features/archetype-planning";
 import { PomodoroTimer } from "./features/pomodoro-timer";
+// 📝 ШАГ 2: ВОЗВРАЩАЕМ исходный правильный импорт
 import { SettingsTab } from "./features/settings";
 
 const App: React.FC = () => {
