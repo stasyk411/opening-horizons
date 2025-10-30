@@ -175,7 +175,17 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
     borderLeft: "4px solid #8A2BE2",
   });
 
-  // Функции для работы с задачами
+  // Функция для перевода архетипов
+  const getArchetypeLabel = (archetype: string = "") => {
+    const archetypes: Record<string, string> = {
+      productive: "📈 Продуктивный",
+      balanced: "⚖️ Сбалансированный",
+      recovery: "🔄 Восстанавливающий",
+    };
+    return archetypes[archetype] || archetype;
+  };
+
+  // ИСПРАВЛЕННАЯ ФУНКЦИЯ ДЛЯ ЗАДАЧ С ДАТОЙ
   const handleAddTask = () => {
     if (!taskInput.trim()) {
       alert("Пожалуйста, введите описание задачи");
@@ -208,6 +218,7 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
       endTime: endTime || undefined,
       repeat: taskRepeat || undefined,
       alarm: taskAlarm || undefined,
+      archetype: archetype || undefined, // ← ДОБАВЛЯЕМ АРХЕТИП
     };
 
     setTasks([...tasks, newTask]);
@@ -252,6 +263,7 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
       endTime: endTime || undefined,
       repeat: taskRepeat || undefined,
       alarm: taskAlarm || undefined,
+      archetype: archetype || undefined, // ← ДОБАВЛЯЕМ АРХЕТИП
     };
 
     setTasks([...tasks, newTask]);
@@ -671,6 +683,10 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
                       flexWrap: "wrap" as const,
                     }}
                   >
+                    {/* ИСПРАВЛЕНО: ДОБАВЛЯЕМ АРХЕТИП */}
+                    {task.archetype && (
+                      <span>🧩 {getArchetypeLabel(task.archetype)}</span>
+                    )}
                     <span>🏷️ {getCategoryLabel(task.category)}</span>
                     {task.startTime && task.endTime && (
                       <span>
@@ -762,9 +778,19 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
                       fontSize: "0.8rem",
                       color: "#666",
                       marginTop: "4px",
+                      display: "flex",
+                      gap: "10px",
+                      flexWrap: "wrap" as const,
                     }}
                   >
-                    📅 {new Date(task.date).toLocaleDateString("ru-RU")}
+                    {/* ИСПРАВЛЕНО: ДОБАВЛЯЕМ АРХЕТИП */}
+                    {task.archetype && (
+                      <span>🧩 {getArchetypeLabel(task.archetype)}</span>
+                    )}
+                    <span>🏷️ {getCategoryLabel(task.category)}</span>
+                    <span>
+                      📅 {new Date(task.date).toLocaleDateString("ru-RU")}
+                    </span>
                   </div>
                 </div>
                 <button
@@ -835,6 +861,10 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
                       flexWrap: "wrap" as const,
                     }}
                   >
+                    {/* ИСПРАВЛЕНО: ДОБАВЛЯЕМ АРХЕТИП */}
+                    {task.archetype && (
+                      <span>🧩 {getArchetypeLabel(task.archetype)}</span>
+                    )}
                     <span>🏷️ {getCategoryLabel(task.category)}</span>
                     {task.startTime && task.endTime && (
                       <span>

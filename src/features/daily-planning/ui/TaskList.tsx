@@ -42,6 +42,16 @@ export const TaskList: React.FC<TaskListProps> = ({
     }
   };
 
+  // Функция для перевода архетипов
+  const getArchetypeLabel = (archetype: string = "") => {
+    const archetypes: Record<string, string> = {
+      productive: "📈 Продуктивный",
+      balanced: "⚖️ Сбалансированный",
+      recovery: "🔄 Восстанавливающий",
+    };
+    return archetypes[archetype] || archetype;
+  };
+
   if (tasks.length === 0) {
     return (
       <div
@@ -176,7 +186,7 @@ export const TaskList: React.FC<TaskListProps> = ({
                 </p>
               )}
 
-              {/* Мета-информация */}
+              {/* Мета-информация - ИСПРАВЛЕННАЯ С АРХЕТИПОМ */}
               <div
                 style={{
                   display: "flex",
@@ -187,8 +197,12 @@ export const TaskList: React.FC<TaskListProps> = ({
                   color: "#888",
                 }}
               >
+                {/* АРХЕТИП - НОВОЕ ПОЛЕ */}
+                {task.archetype && (
+                  <span>🧩 {getArchetypeLabel(task.archetype)}</span>
+                )}
                 {task.timeEstimate && <span>⏱️ {task.timeEstimate} мин</span>}
-                {task.category && <span>🏷️ {task.category}</span>}
+                {task.category && <span>🎯 {task.category}</span>}
                 <span>
                   📅{" "}
                   {new Date(task.createdAt).toLocaleTimeString("ru-RU", {

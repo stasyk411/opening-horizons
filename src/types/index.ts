@@ -22,6 +22,7 @@ export interface Task {
   endTime?: string;
   repeat?: string;
   alarm?: string;
+  archetype?: string; // ← ДОБАВЛЯЕМ АРХЕТИП
 }
 
 export interface Goal {

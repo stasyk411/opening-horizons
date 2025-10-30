@@ -18,7 +18,7 @@ const App: React.FC = () => {
   const [goals, setGoals] = useState<Goal[]>([]);
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [settings, setSettings] = useState<Settings>({
-    archetype: "warrior",
+    archetype: "",
     darkTheme: false,
     notifications: true,
     autoSave: true,

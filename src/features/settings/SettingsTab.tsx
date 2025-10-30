@@ -238,7 +238,8 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
 
       // Сбрасываем настройки по умолчанию
       const defaultSettings: Settings = {
-        archetype: "warrior",
+        // В функции сброса настроек меняем:
+        archetype: "", // ← УБИРАЕМ "warrior", оставляем пустую строку
         darkTheme: false,
         notifications: true,
         autoSave: true,
