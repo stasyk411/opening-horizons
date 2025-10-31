@@ -25,6 +25,60 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
   const [taskAlarm, setTaskAlarm] = useState("");
   const [archetype, setArchetype] = useState("");
 
+  // 🔄 АККОРДЕОНЫ - НОВЫЕ СОСТОЯНИЯ
+  const [expandedSections, setExpandedSections] = useState({
+    basic: true, // Базовые настройки
+    time: false, // Время и повторения
+    archetypes: false, // Архетипы
+  });
+
+  const toggleSection = (section: keyof typeof expandedSections) => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [section]: !prev[section],
+    }));
+  };
+
+  // 🔄 КОМПОНЕНТ АККОРДЕОНА
+  const AccordionSection: React.FC<{
+    title: string;
+    isExpanded: boolean;
+    onToggle: () => void;
+    children: React.ReactNode;
+  }> = ({ title, isExpanded, onToggle, children }) => {
+    return (
+      <div style={{ marginBottom: isMobile ? "20px" : "30px" }}>
+        <div
+          style={{
+            ...sectionTitleStyle,
+            cursor: "pointer",
+            userSelect: "none" as const,
+            padding: isMobile ? "12px 16px" : "16px 20px",
+            background: "linear-gradient(135deg, #8A2BE2, #4B0082)",
+            color: "white",
+            borderRadius: "12px",
+            marginBottom: "10px",
+          }}
+          onClick={onToggle}
+        >
+          <span style={{ marginRight: "10px" }}>{isExpanded ? "▼" : "▶"}</span>
+          {title}
+        </div>
+        {isExpanded && (
+          <div
+            style={{
+              padding: isMobile ? "15px" : "20px",
+              background: "#F8F8FF",
+              borderRadius: "12px",
+            }}
+          >
+            {children}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   // Стили из макета
   const sectionTitleStyle = {
     fontSize: isMobile ? "1.3rem" : "1.8rem",
@@ -366,272 +420,292 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
     >
       <h2 style={sectionTitleStyle}>Планирование Дня</h2>
 
-      {/* Секция архетипов - ТОЧНО КАК В МАКЕТЕ */}
-      <div style={archetypeSectionStyle}>
-        <h3
-          style={{
-            margin: "0 0 8px 0",
-            fontSize: isMobile ? "1.1rem" : "1.3rem",
-          }}
-        >
-          Выберите тип дня
-        </h3>
-        <p
-          style={{
-            margin: 0,
-            fontSize: isMobile ? "0.8rem" : "1rem",
-            color: "#666",
-            lineHeight: 1.4,
-          }}
-        >
-          Выберите архетип, который лучше всего соответствует вашему состоянию и
-          задачам на сегодня
-        </p>
-
-        <div style={archetypeSelectorStyle}>
-          {/* ПРОДУКТИВНЫЙ - как в макете */}
-          <div
-            style={archetypeOptionStyle(archetype === "productive")}
-            onClick={() => setArchetype("productive")}
-          >
-            <div style={archetypeBadgeStyle}>📈 ПРОДУКТИВНЫЙ</div>
-            <span
-              style={{
-                fontSize: isMobile ? "2rem" : "3.5rem",
-                marginBottom: isMobile ? "8px" : "15px",
-              }}
-            >
-              💼
-            </span>
-            <div
-              style={{
-                fontSize: isMobile ? "0.75rem" : "0.9rem",
-                opacity: 0.9,
-                marginBottom: isMobile ? "8px" : "15px",
-                lineHeight: 1.4,
-              }}
-            >
-              Сфокусируйтесь на важных задачах и достижении целей. Идеально для
-              рабочих дней и проектов.
-            </div>
-          </div>
-
-          {/* СБАЛАНСИРОВАННЫЙ - как в макете */}
-          <div
-            style={archetypeOptionStyle(archetype === "balanced")}
-            onClick={() => setArchetype("balanced")}
-          >
-            <div style={archetypeBadgeStyle}>⚖️ СБАЛАНСИРОВАННЫЙ</div>
-            <span
-              style={{
-                fontSize: isMobile ? "2rem" : "3.5rem",
-                marginBottom: isMobile ? "8px" : "15px",
-              }}
-            >
-              🌟
-            </span>
-            <div
-              style={{
-                fontSize: isMobile ? "0.75rem" : "0.9rem",
-                opacity: 0.9,
-                marginBottom: isMobile ? "8px" : "15px",
-                lineHeight: 1.4,
-              }}
-            >
-              Равномерное распределение энергии между работой, отдыхом и личными
-              делами.
-            </div>
-          </div>
-
-          {/* ВОССТАНАВЛИВАЮЩИЙ - как в макете */}
-          <div
-            style={archetypeOptionStyle(archetype === "recovery")}
-            onClick={() => setArchetype("recovery")}
-          >
-            <div style={archetypeBadgeStyle}>🔄 ВОССТАНАВЛИВАЮЩИЙ</div>
-            <span
-              style={{
-                fontSize: isMobile ? "2rem" : "3.5rem",
-                marginBottom: isMobile ? "8px" : "15px",
-              }}
-            >
-              🛌
-            </span>
-            <div
-              style={{
-                fontSize: isMobile ? "0.75rem" : "0.9rem",
-                opacity: 0.9,
-                marginBottom: isMobile ? "8px" : "15px",
-                lineHeight: 1.4,
-              }}
-            >
-              День для отдыха, восстановления сил и заботы о себе. Минимум
-              обязательств.
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Форма добавления задачи - ИСПРАВЛЕННЫЙ ВВОД */}
-      <div style={taskFormStyle}>
-        <input
-          type="text"
-          style={taskInputStyle}
-          placeholder="Опишите вашу задачу..."
-          value={taskInput}
-          onChange={(e) => setTaskInput(e.target.value)}
-          onKeyPress={(e) => {
-            if (e.key === "Enter") {
-              handleAddTask();
-            }
-          }}
-        />
-        <button style={btnStyle} onClick={handleAddTask}>
-          <span>➕</span> Добавить
-        </button>
-      </div>
-
-      {/* Опции задачи */}
-      <div style={taskOptionsStyle}>
-        <div style={optionGroupStyle}>
-          <div style={optionLabelStyle}>Сфера жизни</div>
-          <select
-            style={optionSelectStyle}
-            value={taskSphere}
-            onChange={(e) => setTaskSphere(e.target.value)}
-          >
-            <option value="health">Здоровье</option>
-            <option value="career">Карьера</option>
-            <option value="family">Семья</option>
-            <option value="finance">Финансы</option>
-            <option value="development">Развитие</option>
-            <option value="hobby">Хобби</option>
-          </select>
-        </div>
-
-        <div style={optionGroupStyle}>
-          <div style={optionLabelStyle}>Время выполнения</div>
-          <div
-            style={{
-              display: "flex",
-              gap: isMobile ? "5px" : "10px",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <input
-              type="text"
-              style={{
-                ...optionSelectStyle,
-                width: isMobile ? "70px" : "100px",
-                textAlign: "center",
-                padding: isMobile ? "8px" : "10px",
-                borderColor: validateTime(startTime) ? "#E0E0E0" : "#ff4444",
-              }}
-              placeholder="09:00"
-              maxLength={5}
-              value={startTime}
-              onChange={(e) => handleTimeInput(e.target.value, setStartTime)}
-            />
-            <span
-              style={{
-                fontWeight: "bold",
-                color: "#696969",
-                fontSize: isMobile ? "0.8rem" : "1rem",
-              }}
-            >
-              —
-            </span>
-            <input
-              type="text"
-              style={{
-                ...optionSelectStyle,
-                width: isMobile ? "70px" : "100px",
-                textAlign: "center",
-                padding: isMobile ? "8px" : "10px",
-                borderColor: validateTime(endTime) ? "#E0E0E0" : "#ff4444",
-              }}
-              placeholder="10:30"
-              maxLength={5}
-              value={endTime}
-              onChange={(e) => handleTimeInput(e.target.value, setEndTime)}
-            />
-          </div>
-          <div
-            style={{
-              fontSize: isMobile ? "0.7rem" : "0.8rem",
-              color: "#696969",
-              textAlign: "center",
-            }}
-          >
-            Формат: ЧЧ:MM
-          </div>
-        </div>
-
-        <div style={optionGroupStyle}>
-          <div style={optionLabelStyle}>Повторение</div>
-          <select
-            style={optionSelectStyle}
-            value={taskRepeat}
-            onChange={(e) => setTaskRepeat(e.target.value)}
-          >
-            <option value="">Без повторения</option>
-            <option value="daily">Ежедневно</option>
-            <option value="weekly">Еженедельно</option>
-            <option value="monthly">Ежемесячно</option>
-          </select>
-        </div>
-
-        <div style={optionGroupStyle}>
-          <div style={optionLabelStyle}>Будильник</div>
-          <select
-            style={optionSelectStyle}
-            value={taskAlarm}
-            onChange={(e) => setTaskAlarm(e.target.value)}
-          >
-            <option value="">Без будильника</option>
-            <option value="5">За 5 минут</option>
-            <option value="15">За 15 минут</option>
-            <option value="30">За 30 минут</option>
-            <option value="60">За 1 час</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Выбор даты */}
-      <div
-        style={{
-          display: "flex",
-          gap: "15px",
-          marginBottom: "20px",
-          alignItems: "center",
-          flexWrap: "wrap" as const,
-        }}
+      {/* 🔄 СЕКЦИЯ АРХЕТИПОВ В АККОРДЕОНЕ */}
+      <AccordionSection
+        title="🎭 Выберите тип дня"
+        isExpanded={expandedSections.archetypes}
+        onToggle={() => toggleSection("archetypes")}
       >
-        <div style={optionGroupStyle}>
-          <div style={optionLabelStyle}>Дата выполнения:</div>
-          <input
-            type="date"
-            value={selectedDate.toISOString().split("T")[0]}
-            onChange={(e) => setSelectedDate(new Date(e.target.value))}
-            style={optionSelectStyle}
-          />
-        </div>
-        <button
-          style={{
-            ...btnStyle,
-            background: "transparent",
-            border: "2px solid #8A2BE2",
-            color: "#8A2BE2",
-            marginTop: "20px",
-          }}
-          onClick={handleAddTaskWithoutDate} // ИСПРАВЛЕНО: используем отдельную функцию
-        >
-          <span>⏳</span> Без даты
-        </button>
-      </div>
+        <div style={archetypeSectionStyle}>
+          <h3
+            style={{
+              margin: "0 0 8px 0",
+              fontSize: isMobile ? "1.1rem" : "1.3rem",
+            }}
+          >
+            Выберите тип дня
+          </h3>
+          <p
+            style={{
+              margin: 0,
+              fontSize: isMobile ? "0.8rem" : "1rem",
+              color: "#666",
+              lineHeight: 1.4,
+            }}
+          >
+            Выберите архетип, который лучше всего соответствует вашему состоянию
+            и задачам на сегодня
+          </p>
 
-      {/* Списки задач */}
+          <div style={archetypeSelectorStyle}>
+            {/* ПРОДУКТИВНЫЙ - как в макете */}
+            <div
+              style={archetypeOptionStyle(archetype === "productive")}
+              onClick={() => setArchetype("productive")}
+            >
+              <div style={archetypeBadgeStyle}>📈 ПРОДУКТИВНЫЙ</div>
+              <span
+                style={{
+                  fontSize: isMobile ? "2rem" : "3.5rem",
+                  marginBottom: isMobile ? "8px" : "15px",
+                }}
+              >
+                💼
+              </span>
+              <div
+                style={{
+                  fontSize: isMobile ? "0.75rem" : "0.9rem",
+                  opacity: 0.9,
+                  marginBottom: isMobile ? "8px" : "15px",
+                  lineHeight: 1.4,
+                }}
+              >
+                Сфокусируйтесь на важных задачах и достижении целей. Идеально
+                для рабочих дней и проектов.
+              </div>
+            </div>
+
+            {/* СБАЛАНСИРОВАННЫЙ - как в макете */}
+            <div
+              style={archetypeOptionStyle(archetype === "balanced")}
+              onClick={() => setArchetype("balanced")}
+            >
+              <div style={archetypeBadgeStyle}>⚖️ СБАЛАНСИРОВАННЫЙ</div>
+              <span
+                style={{
+                  fontSize: isMobile ? "2rem" : "3.5rem",
+                  marginBottom: isMobile ? "8px" : "15px",
+                }}
+              >
+                🌟
+              </span>
+              <div
+                style={{
+                  fontSize: isMobile ? "0.75rem" : "0.9rem",
+                  opacity: 0.9,
+                  marginBottom: isMobile ? "8px" : "15px",
+                  lineHeight: 1.4,
+                }}
+              >
+                Равномерное распределение энергии между работой, отдыхом и
+                личными делами.
+              </div>
+            </div>
+
+            {/* ВОССТАНАВЛИВАЮЩИЙ - как в макете */}
+            <div
+              style={archetypeOptionStyle(archetype === "recovery")}
+              onClick={() => setArchetype("recovery")}
+            >
+              <div style={archetypeBadgeStyle}>🔄 ВОССТАНАВЛИВАЮЩИЙ</div>
+              <span
+                style={{
+                  fontSize: isMobile ? "2rem" : "3.5rem",
+                  marginBottom: isMobile ? "8px" : "15px",
+                }}
+              >
+                🛌
+              </span>
+              <div
+                style={{
+                  fontSize: isMobile ? "0.75rem" : "0.9rem",
+                  opacity: 0.9,
+                  marginBottom: isMobile ? "8px" : "15px",
+                  lineHeight: 1.4,
+                }}
+              >
+                День для отдыха, восстановления сил и заботы о себе. Минимум
+                обязательств.
+              </div>
+            </div>
+          </div>
+        </div>
+      </AccordionSection>
+
+      {/* 🔄 БАЗОВЫЕ НАСТРОЙКИ В АККОРДЕОНЕ */}
+      <AccordionSection
+        title="📝 Основная задача"
+        isExpanded={expandedSections.basic}
+        onToggle={() => toggleSection("basic")}
+      >
+        {/* Форма добавления задачи - ИСПРАВЛЕННЫЙ ВВОД */}
+        <div style={taskFormStyle}>
+          <input
+            type="text"
+            style={taskInputStyle}
+            placeholder="Опишите вашу задачу..."
+            value={taskInput}
+            onChange={(e) => setTaskInput(e.target.value)}
+            onKeyPress={(e) => {
+              if (e.key === "Enter") {
+                handleAddTask();
+              }
+            }}
+          />
+          <button style={btnStyle} onClick={handleAddTask}>
+            <span>➕</span> Добавить
+          </button>
+        </div>
+
+        {/* Выбор даты */}
+        <div
+          style={{
+            display: "flex",
+            gap: "15px",
+            marginBottom: "20px",
+            alignItems: "center",
+            flexWrap: "wrap" as const,
+          }}
+        >
+          <div style={optionGroupStyle}>
+            <div style={optionLabelStyle}>Дата выполнения:</div>
+            <input
+              type="date"
+              value={selectedDate.toISOString().split("T")[0]}
+              onChange={(e) => setSelectedDate(new Date(e.target.value))}
+              style={optionSelectStyle}
+            />
+          </div>
+          <button
+            style={{
+              ...btnStyle,
+              background: "transparent",
+              border: "2px solid #8A2BE2",
+              color: "#8A2BE2",
+              marginTop: "20px",
+            }}
+            onClick={handleAddTaskWithoutDate} // ИСПРАВЛЕНО: используем отдельную функцию
+          >
+            <span>⏳</span> Без даты
+          </button>
+        </div>
+      </AccordionSection>
+
+      {/* 🔄 ВРЕМЯ И ПОВТОРЕНИЯ В АККОРДЕОНЕ */}
+      <AccordionSection
+        title="⏰ Время и настройки"
+        isExpanded={expandedSections.time}
+        onToggle={() => toggleSection("time")}
+      >
+        {/* Опции задачи */}
+        <div style={taskOptionsStyle}>
+          <div style={optionGroupStyle}>
+            <div style={optionLabelStyle}>Сфера жизни</div>
+            <select
+              style={optionSelectStyle}
+              value={taskSphere}
+              onChange={(e) => setTaskSphere(e.target.value)}
+            >
+              <option value="health">Здоровье</option>
+              <option value="career">Карьера</option>
+              <option value="family">Семья</option>
+              <option value="finance">Финансы</option>
+              <option value="development">Развитие</option>
+              <option value="hobby">Хобби</option>
+            </select>
+          </div>
+
+          <div style={optionGroupStyle}>
+            <div style={optionLabelStyle}>Время выполнения</div>
+            <div
+              style={{
+                display: "flex",
+                gap: isMobile ? "5px" : "10px",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <input
+                type="text"
+                style={{
+                  ...optionSelectStyle,
+                  width: isMobile ? "70px" : "100px",
+                  textAlign: "center",
+                  padding: isMobile ? "8px" : "10px",
+                  borderColor: validateTime(startTime) ? "#E0E0E0" : "#ff4444",
+                }}
+                placeholder="09:00"
+                maxLength={5}
+                value={startTime}
+                onChange={(e) => handleTimeInput(e.target.value, setStartTime)}
+              />
+              <span
+                style={{
+                  fontWeight: "bold",
+                  color: "#696969",
+                  fontSize: isMobile ? "0.8rem" : "1rem",
+                }}
+              >
+                —
+              </span>
+              <input
+                type="text"
+                style={{
+                  ...optionSelectStyle,
+                  width: isMobile ? "70px" : "100px",
+                  textAlign: "center",
+                  padding: isMobile ? "8px" : "10px",
+                  borderColor: validateTime(endTime) ? "#E0E0E0" : "#ff4444",
+                }}
+                placeholder="10:30"
+                maxLength={5}
+                value={endTime}
+                onChange={(e) => handleTimeInput(e.target.value, setEndTime)}
+              />
+            </div>
+            <div
+              style={{
+                fontSize: isMobile ? "0.7rem" : "0.8rem",
+                color: "#696969",
+                textAlign: "center",
+              }}
+            >
+              Формат: ЧЧ:MM
+            </div>
+          </div>
+
+          <div style={optionGroupStyle}>
+            <div style={optionLabelStyle}>Повторение</div>
+            <select
+              style={optionSelectStyle}
+              value={taskRepeat}
+              onChange={(e) => setTaskRepeat(e.target.value)}
+            >
+              <option value="">Без повторения</option>
+              <option value="daily">Ежедневно</option>
+              <option value="weekly">Еженедельно</option>
+              <option value="monthly">Ежемесячно</option>
+            </select>
+          </div>
+
+          <div style={optionGroupStyle}>
+            <div style={optionLabelStyle}>Будильник</div>
+            <select
+              style={optionSelectStyle}
+              value={taskAlarm}
+              onChange={(e) => setTaskAlarm(e.target.value)}
+            >
+              <option value="">Без будильника</option>
+              <option value="5">За 5 минут</option>
+              <option value="15">За 15 минут</option>
+              <option value="30">За 30 минут</option>
+              <option value="60">За 1 час</option>
+            </select>
+          </div>
+        </div>
+      </AccordionSection>
+
+      {/* Списки задач (всегда открыты) */}
       <div style={{ marginTop: "30px" }}>
         {/* Задачи на сегодня */}
         <h3 style={{ color: "#8A2BE2", marginBottom: "15px" }}>

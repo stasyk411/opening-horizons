@@ -208,11 +208,12 @@ const GoalsTab: React.FC = () => {
           style={{
             backgroundColor: "#FF4500",
             color: "white",
-            padding: "15px",
-            borderRadius: "10px",
-            marginBottom: "20px",
+            padding: "12px",
+            borderRadius: "8px",
+            marginBottom: "15px",
             textAlign: "center",
             fontWeight: "bold",
+            fontSize: "14px",
           }}
         >
           ⚠️ {errorMessage}
@@ -220,8 +221,12 @@ const GoalsTab: React.FC = () => {
       )}
 
       {/* Форма создания цели */}
-      <div style={{ marginBottom: "40px" }}>
-        <h3>Добавить новую цель</h3>
+      <div style={{ marginBottom: "30px" }}>
+        <h3
+          style={{ fontSize: "18px", marginBottom: "12px", color: "#2F2F4F" }}
+        >
+          Добавить новую цель
+        </h3>
         <div className="task-form">
           <input
             type="text"
@@ -236,13 +241,13 @@ const GoalsTab: React.FC = () => {
           </button>
         </div>
 
-        <div style={{ marginTop: "15px" }}>
+        <div style={{ marginTop: "12px" }}>
           <textarea
             placeholder="Описание цели (необязательно)"
             value={newGoalDescription}
             onChange={(e) => setNewGoalDescription(e.target.value)}
             className="answer-input"
-            style={{ minHeight: "80px" }}
+            style={{ minHeight: "60px" }}
           />
         </div>
       </div>
@@ -254,15 +259,21 @@ const GoalsTab: React.FC = () => {
             style={{
               textAlign: "center",
               color: "#696969",
-              padding: "60px 20px",
+              padding: "40px 20px",
               gridColumn: "1 / -1",
             }}
           >
-            <div style={{ fontSize: "4rem", marginBottom: "20px" }}>🎯</div>
-            <h3 style={{ color: "#696969", marginBottom: "10px" }}>
+            <div style={{ fontSize: "3rem", marginBottom: "15px" }}>🎯</div>
+            <h3
+              style={{
+                color: "#696969",
+                marginBottom: "8px",
+                fontSize: "16px",
+              }}
+            >
               Цели еще не добавлены
             </h3>
-            <p>Создайте свою первую цель выше</p>
+            <p style={{ fontSize: "14px" }}>Создайте свою первую цель выше</p>
           </div>
         ) : (
           goals.map((goal) => {
@@ -281,13 +292,13 @@ const GoalsTab: React.FC = () => {
                   {goal.completed && (
                     <span
                       style={{
-                        fontSize: "0.7rem",
+                        fontSize: "0.65rem",
                         backgroundColor: "#32CD32",
                         color: "white",
-                        padding: "3px 10px",
-                        borderRadius: "12px",
-                        marginLeft: "10px",
-                        border: "2px solid #228B22",
+                        padding: "2px 8px",
+                        borderRadius: "10px",
+                        marginLeft: "8px",
+                        border: "1px solid #228B22",
                         fontWeight: "bold",
                         textTransform: "uppercase",
                         letterSpacing: "0.5px",
@@ -302,9 +313,9 @@ const GoalsTab: React.FC = () => {
                   <p
                     style={{
                       color: "#696969",
-                      marginBottom: "20px",
-                      fontSize: "0.95rem",
-                      lineHeight: "1.4",
+                      marginBottom: "15px",
+                      fontSize: "0.85rem",
+                      lineHeight: "1.3",
                     }}
                   >
                     {goal.description}
@@ -342,6 +353,7 @@ const GoalsTab: React.FC = () => {
                             ? "line-through"
                             : "none",
                           color: step.completed ? "#696969" : "#2F2F4F",
+                          fontSize: "13px",
                         }}
                       >
                         {step.title}
@@ -349,7 +361,7 @@ const GoalsTab: React.FC = () => {
                       <button
                         onClick={() => handleDeleteStep(goal.id, step.id)}
                         className="action-btn"
-                        style={{ fontSize: "1rem" }}
+                        style={{ fontSize: "0.9rem" }}
                         title="Удалить шаг"
                       >
                         🗑️
@@ -358,14 +370,14 @@ const GoalsTab: React.FC = () => {
                   ))}
                 </div>
 
-                {/* Форма добавления шага - ИСПРАВЛЕННАЯ ВЕРСИЯ */}
-                <div style={{ marginTop: "20px" }}>
+                {/* Форма добавления шага */}
+                <div style={{ marginTop: "15px" }}>
                   <div
                     style={{
                       display: "flex",
-                      gap: "10px",
-                      marginBottom: "15px",
-                      alignItems: "stretch", // ✅ Выравнивание по высоте
+                      gap: "8px",
+                      marginBottom: "12px",
+                      alignItems: "stretch",
                     }}
                   >
                     <input
@@ -379,9 +391,10 @@ const GoalsTab: React.FC = () => {
                         e.key === "Enter" && handleAddStep(goal.id)
                       }
                       style={{
-                        flex: "1 1 auto", // ✅ Гибкое растяжение
-                        padding: "12px",
-                        minWidth: "0", // ✅ Важно для правильного flexbox
+                        flex: "1 1 auto",
+                        padding: "10px",
+                        minWidth: "0",
+                        fontSize: "13px",
                       }}
                     />
                     <button
@@ -393,17 +406,17 @@ const GoalsTab: React.FC = () => {
                           : "#ccc",
                         border: "2px solid #8A2BE2",
                         color: newStepTitle.trim() ? "#8A2BE2" : "#666",
-                        borderRadius: "15px",
-                        padding: "12px 16px", // ✅ Уменьшаем padding
+                        borderRadius: "12px",
+                        padding: "10px 14px",
                         fontWeight: "600",
                         cursor: newStepTitle.trim() ? "pointer" : "not-allowed",
                         transition: "all 0.3s ease",
                         whiteSpace: "nowrap",
-                        flexShrink: 0, // ✅ Не сжимается
+                        flexShrink: 0,
                         display: "flex",
                         alignItems: "center",
-                        gap: "6px",
-                        fontSize: "0.9rem", // ✅ Немного уменьшаем шрифт
+                        gap: "4px",
+                        fontSize: "0.8rem",
                       }}
                       onMouseEnter={(e) => {
                         if (newStepTitle.trim()) {
@@ -426,7 +439,7 @@ const GoalsTab: React.FC = () => {
                   <div
                     style={{
                       display: "flex",
-                      gap: "10px",
+                      gap: "8px",
                       justifyContent: "space-between",
                     }}
                   >
@@ -436,6 +449,8 @@ const GoalsTab: React.FC = () => {
                       style={{
                         backgroundColor: getGoalButtonColor(goal),
                         flex: 1,
+                        padding: "10px 16px",
+                        fontSize: "13px",
                       }}
                       title={getGoalButtonTooltip(goal)}
                     >
@@ -447,7 +462,8 @@ const GoalsTab: React.FC = () => {
                       className="btn"
                       style={{
                         backgroundColor: "#FF4500",
-                        padding: "12px 20px",
+                        padding: "10px 16px",
+                        fontSize: "13px",
                       }}
                       title="Удалить цель"
                     >
@@ -463,12 +479,12 @@ const GoalsTab: React.FC = () => {
 
       <style>{`
         .section-title {
-          font-size: 1.8rem;
-          margin-bottom: 25px;
+          font-size: 1.6rem;
+          margin-bottom: 20px;
           color: #8A2BE2;
           display: flex;
           align-items: center;
-          gap: 10px;
+          gap: 8px;
         }
         
         .section-title::after {
@@ -476,21 +492,21 @@ const GoalsTab: React.FC = () => {
           flex: 1;
           height: 2px;
           background: linear-gradient(to right, #8A2BE2, transparent);
-          margin-left: 15px;
+          margin-left: 12px;
         }
         
         .task-form {
           display: grid;
           grid-template-columns: 1fr auto;
-          gap: 15px;
-          margin-bottom: 15px;
+          gap: 12px;
+          margin-bottom: 12px;
         }
         
         .task-input {
-          padding: 15px;
+          padding: 12px;
           border: 1px solid #F8F8FF;
-          border-radius: 15px;
-          font-size: 1rem;
+          border-radius: 12px;
+          font-size: 14px;
           background: #F8F8FF;
           transition: all 0.3s ease;
         }
@@ -502,22 +518,23 @@ const GoalsTab: React.FC = () => {
         }
         
         .btn {
-          padding: 15px 25px;
+          padding: 12px 20px;
           background: linear-gradient(to right, #8A2BE2, #4B0082);
           color: white;
           border: none;
-          border-radius: 15px;
+          border-radius: 12px;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.3s ease;
           display: flex;
           align-items: center;
-          gap: 8px;
+          gap: 6px;
+          font-size: 14px;
         }
         
         .btn:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 15px rgba(0,0,0,0.15);
         }
         
         .btn:disabled {
@@ -538,11 +555,11 @@ const GoalsTab: React.FC = () => {
         }
         
         .answer-input {
-          padding: 18px;
+          padding: 12px;
           border: 1px solid #F8F8FF;
-          border-radius: 15px;
-          font-size: 1rem;
-          min-height: 80px;
+          border-radius: 12px;
+          font-size: 14px;
+          min-height: 60px;
           resize: vertical;
           background: #F8F8FF;
           transition: all 0.3s ease;
@@ -557,16 +574,16 @@ const GoalsTab: React.FC = () => {
         
         .goals-container {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-          gap: 25px;
+          grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+          gap: 20px;
         }
         
         .goal-card {
           background: #F8F8FF;
-          border-radius: 20px;
-          padding: 25px;
-          box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-          transition: all 0.4s ease;
+          border-radius: 16px;
+          padding: 20px;
+          box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+          transition: all 0.3s ease;
           position: relative;
           overflow: hidden;
         }
@@ -577,45 +594,46 @@ const GoalsTab: React.FC = () => {
           top: 0;
           left: 0;
           right: 0;
-          height: 5px;
+          height: 4px;
           background: linear-gradient(to right, #8A2BE2, #9370DB);
         }
         
         .goal-card:hover {
-          transform: translateY(-10px);
-          box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+          transform: translateY(-5px);
+          box-shadow: 0 10px 25px rgba(0,0,0,0.12);
         }
         
         .goal-title {
-          font-size: 1.4rem;
-          margin-bottom: 15px;
+          font-size: 1.2rem;
+          margin-bottom: 12px;
           color: #2F2F4F;
           font-weight: bold;
           display: flex;
           align-items: center;
+          line-height: 1.3;
         }
         
         .goal-progress {
-          margin-bottom: 20px;
+          margin-bottom: 15px;
         }
         
         .progress-bar {
-          height: 10px;
+          height: 8px;
           background: #e0e0e0;
-          border-radius: 5px;
+          border-radius: 4px;
           overflow: hidden;
-          margin-bottom: 8px;
+          margin-bottom: 6px;
         }
         
         .progress-fill {
           height: 100%;
           background: linear-gradient(to right, #8A2BE2, #9370DB);
-          border-radius: 5px;
+          border-radius: 4px;
           transition: width 0.5s ease;
         }
         
         .progress-text {
-          font-size: 0.9rem;
+          font-size: 0.8rem;
           color: #696969;
           text-align: right;
         }
@@ -623,17 +641,17 @@ const GoalsTab: React.FC = () => {
         .steps-container {
           display: flex;
           flex-direction: column;
-          gap: 12px;
-          margin-bottom: 20px;
+          gap: 8px;
+          margin-bottom: 15px;
         }
         
         .step-item {
           display: flex;
           align-items: center;
-          gap: 10px;
-          padding: 12px;
+          gap: 8px;
+          padding: 8px 10px;
           background: white;
-          border-radius: 10px;
+          border-radius: 8px;
           transition: all 0.3s ease;
         }
         
@@ -642,8 +660,8 @@ const GoalsTab: React.FC = () => {
         }
         
         .step-checkbox {
-          width: 20px;
-          height: 20px;
+          width: 16px;
+          height: 16px;
           accent-color: #32CD32;
           cursor: pointer;
         }
@@ -652,11 +670,11 @@ const GoalsTab: React.FC = () => {
           background: none;
           border: none;
           cursor: pointer;
-          font-size: 1.2rem;
+          font-size: 0.9rem;
           color: #696969;
           transition: all 0.3s ease;
-          padding: 5px;
-          border-radius: 5px;
+          padding: 4px;
+          border-radius: 4px;
         }
         
         .action-btn:hover {
