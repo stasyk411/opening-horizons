@@ -50,4 +50,11 @@ export interface Reflection {
   mood: number;
   insights: string[];
   createdAt: string;
+
+  // НОВЫЕ ПОЛЯ ДЛЯ АНАЛИТИКИ
+  completedTasks?: number;
+  totalTasks?: number;
+  productivityScore?: number;
+  notes?: string;
+  rating?: number;
 }
