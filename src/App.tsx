@@ -1,12 +1,10 @@
-﻿// 📝 ШАГ 2: ИСПРАВЛЕННЫЙ БЛОК ИМПОРТОВ в App.tsx
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { EmergencyErrorBoundary } from "./components/System/EmergencyErrorBoundary";
 import { Task, Goal, GoalStep, Reflection, Settings } from "./types";
 import { PlanningTab } from "./features/daily-planning";
 import { GoalsTab } from "./features/goals-system";
 import { ReflectionTab } from "./features/archetype-planning";
 import { PomodoroTimer } from "./features/pomodoro-timer";
-// 📝 ШАГ 2: ВОЗВРАЩАЕМ исходный правильный импорт
 import { SettingsTab } from "./features/settings";
 
 const App: React.FC = () => {
@@ -25,13 +23,16 @@ const App: React.FC = () => {
     colorScheme: "purple",
   });
 
+  // PWA УСТАНОВКА
+  const [installPrompt, setInstallPrompt] = useState<any>(null);
+  const [showInstallButton, setShowInstallButton] = useState(false);
+
   // Детектор мобильных устройств
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
 
-      // Для очень маленьких экранов
       if (window.innerWidth < 400) {
         document.body.style.fontSize = "14px";
       } else {
@@ -40,7 +41,7 @@ const App: React.FC = () => {
     };
 
     window.addEventListener("resize", handleResize);
-    handleResize(); // Initial check
+    handleResize();
 
     // Загрузка данных
     const savedTasks = localStorage.getItem("life-wheel-tasks");
@@ -55,9 +56,51 @@ const App: React.FC = () => {
 
     return () => {
       window.removeEventListener("resize", handleResize);
-      document.body.style.fontSize = ""; // Cleanup
+      document.body.style.fontSize = "";
     };
   }, []);
+
+  // PWA: Отслеживаем возможность установки
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: any) => {
+      e.preventDefault();
+      setInstallPrompt(e);
+      setShowInstallButton(true);
+      console.log("📱 PWA можно установить");
+    };
+
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+
+    // Проверяем если уже установлено
+    if (window.matchMedia("(display-mode: standalone)").matches) {
+      console.log("✅ PWA уже установлено");
+      setShowInstallButton(false);
+    }
+
+    return () => {
+      window.removeEventListener(
+        "beforeinstallprompt",
+        handleBeforeInstallPrompt
+      );
+    };
+  }, []);
+
+  // PWA: Установка приложения
+  const handleInstallClick = async () => {
+    if (!installPrompt) return;
+
+    installPrompt.prompt();
+    const { outcome } = await installPrompt.userChoice;
+
+    if (outcome === "accepted") {
+      console.log("✅ Пользователь установил PWA");
+      setShowInstallButton(false);
+    } else {
+      console.log("❌ Пользователь отклонил установку");
+    }
+
+    setInstallPrompt(null);
+  };
 
   // Сохранение в localStorage
   const saveTasks = (newTasks: Task[]) => {
@@ -140,9 +183,38 @@ const App: React.FC = () => {
     flexShrink: 0,
   });
 
+  // PWA: Стиль кнопки установки
+  const installButtonStyle = {
+    position: "fixed" as const,
+    top: "20px",
+    right: "20px",
+    background: "linear-gradient(to right, #32CD32, #228B22)",
+    color: "white",
+    border: "none",
+    borderRadius: "25px",
+    padding: "12px 20px",
+    fontSize: "14px",
+    fontWeight: "bold",
+    cursor: "pointer",
+    boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
+    zIndex: 1000,
+    animation: "pulse 2s infinite",
+  };
+
   return (
     <EmergencyErrorBoundary>
       <div style={containerStyle}>
+        {/* PWA: Кнопка установки */}
+        {showInstallButton && (
+          <button
+            onClick={handleInstallClick}
+            style={installButtonStyle}
+            title="Установить приложение на устройство"
+          >
+            📱 Установить App
+          </button>
+        )}
+
         {/* Заголовок */}
         <header style={headerStyle}>
           <h1
@@ -153,8 +225,7 @@ const App: React.FC = () => {
               lineHeight: 1.2,
             }}
           >
-            🎯 {isMobile ? "Opening Horizons" : "Opening Horizons"}{" "}
-            {/* ← МЕНЯЕМ ЗДЕСЬ */}
+            🎯 {isMobile ? "Opening Horizons" : "Opening Horizons"}
           </h1>
           <p
             style={{
@@ -165,9 +236,8 @@ const App: React.FC = () => {
             }}
           >
             {isMobile
-              ? "Планировщик жизни"
-              : "Планировщик задач, целей и рефлексии для гармоничной жизни"}
-            {/* ← УБИРАЕМ "Вариант 5:" */}
+              ? "Баланс и планирование"
+              : "Баланс, планирование и рефлексия для гармоничной жизни"}
           </p>
         </header>
 
@@ -243,6 +313,15 @@ const App: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* PWA: CSS анимация для кнопки */}
+      <style>{`
+        @keyframes pulse {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.05); }
+          100% { transform: scale(1); }
+        }
+      `}</style>
     </EmergencyErrorBoundary>
   );
 };
