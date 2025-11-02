@@ -7,6 +7,7 @@ import {
   Practice,
   PracticeStep,
 } from "../data/practices";
+import { useSettings } from "../../../shared/contexts/SettingsContext"; // 🔽 ДОБАВЛЯЕМ ИМПОРТ
 
 interface EnhancedPomodoroProps {
   isMobile: boolean;
@@ -34,6 +35,9 @@ export const EnhancedPomodoro: React.FC<EnhancedPomodoroProps> = ({
     applySettings,
     getFilteredPractices,
   } = usePomodoroTimer(isMobile);
+
+  // 🔽 ДОБАВЛЯЕМ ИСПОЛЬЗОВАНИЕ SETTINGSCONTEXT
+  const { settings: appSettings } = useSettings();
 
   const [showSettings, setShowSettings] = useState(false);
   const [localSettings, setLocalSettings] = useState(settings);
@@ -164,19 +168,29 @@ export const EnhancedPomodoro: React.FC<EnhancedPomodoroProps> = ({
     return `${hours}:${minutes.toString().padStart(2, "0")}`;
   };
 
-  // Уведомления
+  // 🔽 ОБНОВЛЯЕМ УВЕДОМЛЕНИЯ С УЧЕТОМ PWA НАСТРОЕК
   const showNotification = (title: string, message: string) => {
+    // Проверяем настройки PWA перед показом уведомления
+    if (appSettings.pwaSettings?.pushNotifications === false) {
+      return; // Не показывать уведомления если отключены в настройках
+    }
+
     if ("Notification" in window && Notification.permission === "granted") {
       new Notification(title, { body: message, icon: "/icon-192.png" });
     }
   };
 
-  // Запрос разрешения на уведомления
+  // 🔽 ОБНОВЛЯЕМ ЗАПРОС РАЗРЕШЕНИЯ С УЧЕТОМ PWA НАСТРОЕК
   useEffect(() => {
+    // Проверяем настройки PWA перед запросом разрешения
+    if (appSettings.pwaSettings?.pushNotifications === false) {
+      return; // Не запрашивать разрешение если уведомления отключены
+    }
+
     if ("Notification" in window && Notification.permission === "default") {
       Notification.requestPermission();
     }
-  }, []);
+  }, [appSettings.pwaSettings?.pushNotifications]); // 🔽 ДОБАВЛЯЕМ ЗАВИСИМОСТЬ
 
   // Уведомления при смене режима
   useEffect(() => {
