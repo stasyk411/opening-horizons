@@ -1,5 +1,5 @@
 ﻿import React, { useState } from "react";
-import { Task } from "../../../shared/types"; // ← ИСПРАВЛЕННЫЙ ИМПОРТ
+import { Task } from "../../../shared/types";
 import { TaskForm } from "./TaskForm";
 import { TaskList } from "./TaskList";
 import { AccordionSection } from "./AccordionSection";
@@ -25,9 +25,9 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
 
   // 🔄 АККОРДЕОНЫ
   const [expandedSections, setExpandedSections] = useState({
-    basic: true,
-    time: false,
     archetypes: false,
+    basic: true,
+    tasks: true,
   });
 
   const toggleSection = (section: keyof typeof expandedSections) => {
@@ -42,11 +42,29 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
     const newTask: Task = {
       id: Date.now().toString(),
       ...taskData,
-      createdAt: new Date().toISOString(), // ← ИСПРАВЛЕНО: string вместо Date
-      updatedAt: new Date().toISOString(), // ← ИСПРАВЛЕНО: string вместо Date
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       archetype: archetype || undefined,
     };
     setTasks([...tasks, newTask]);
+  };
+
+  const handleAddTaskWithoutDate = () => {
+    const taskTitle = prompt("Опишите задачу без даты:");
+    if (taskTitle && taskTitle.trim()) {
+      const newTask: Task = {
+        id: Date.now().toString(),
+        title: taskTitle.trim(),
+        description: "",
+        completed: false,
+        priority: "medium",
+        date: undefined,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        archetype: archetype || undefined,
+      };
+      setTasks([...tasks, newTask]);
+    }
   };
 
   const handleUpdateTask = (taskId: string, updates: Partial<Task>) => {
@@ -55,7 +73,7 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
         ? {
             ...task,
             ...updates,
-            updatedAt: new Date().toISOString(), // ← ИСПРАВЛЕНО
+            updatedAt: new Date().toISOString(),
           }
         : task
     );
@@ -120,7 +138,7 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
 
       {/* 🔄 СЕКЦИЯ АРХЕТИПОВ */}
       <AccordionSection
-        title="🎭 Выберите тип дня"
+        title="🎭 Тип дня"
         isExpanded={expandedSections.archetypes}
         onToggle={() => toggleSection("archetypes")}
         isMobile={isMobile}
@@ -130,11 +148,40 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
           setArchetype={setArchetype}
           isMobile={isMobile}
         />
+        <div
+          style={{
+            marginTop: "15px",
+            padding: "12px",
+            background: archetype ? "rgba(138, 43, 226, 0.05)" : "#f5f5f5",
+            borderRadius: "8px",
+          }}
+        >
+          <div
+            style={{ fontSize: "14px", color: "#696969", marginBottom: "5px" }}
+          >
+            Текущий архетип:
+          </div>
+          <div
+            style={{
+              fontSize: "16px",
+              color: archetype ? "#8A2BE2" : "#999",
+              fontWeight: archetype ? 600 : "normal",
+            }}
+          >
+            {archetype
+              ? archetype === "productive"
+                ? "📈 Продуктивный"
+                : archetype === "balanced"
+                ? "⚖️ Сбалансированный"
+                : "🔄 Восстанавливающий"
+              : "Не выбран"}
+          </div>
+        </div>
       </AccordionSection>
 
-      {/* 🔄 ОСНОВНАЯ ФОРМА */}
+      {/* 🔄 НОВАЯ ЗАДАЧА */}
       <AccordionSection
-        title="📝 Основная задача"
+        title="📝 Новая задача"
         isExpanded={expandedSections.basic}
         onToggle={() => toggleSection("basic")}
         isMobile={isMobile}
@@ -143,129 +190,77 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
           onSubmit={handleAddTask}
           selectedDate={selectedDate}
           isMobile={isMobile}
+          onWithoutDate={handleAddTaskWithoutDate}
         />
       </AccordionSection>
 
-      {/* 🔄 ВРЕМЯ И НАСТРОЙКИ */}
+      {/* 🔄 ЗАДАЧИ */}
       <AccordionSection
-        title="⏰ Время и настройки"
-        isExpanded={expandedSections.time}
-        onToggle={() => toggleSection("time")}
+        title="⏰ Задачи"
+        isExpanded={expandedSections.tasks}
+        onToggle={() => toggleSection("tasks")}
         isMobile={isMobile}
       >
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: isMobile ? "1fr" : "repeat(2, 1fr)",
-            gap: isMobile ? "10px" : "15px",
-            width: "100%",
-          }}
-        >
-          <div>
-            <div
-              style={{
-                fontWeight: 600,
-                fontSize: isMobile ? "0.8rem" : "0.9rem",
-                color: "#696969",
-                marginBottom: "8px",
-              }}
-            >
-              Дата выполнения:
-            </div>
-            <input
-              type="date"
-              value={selectedDate.toISOString().split("T")[0]}
-              onChange={(e) => setSelectedDate(new Date(e.target.value))}
-              style={{
-                padding: isMobile ? "10px" : "12px",
-                border: "1px solid #E0E0E0",
-                borderRadius: isMobile ? "8px" : "10px",
-                background: "white",
-                fontSize: isMobile ? "14px" : "1rem",
-                width: "100%",
-                boxSizing: "border-box" as const,
-                color: "#333",
-                outline: "none",
-              }}
-            />
-          </div>
-
-          <div>
-            <div
-              style={{
-                fontWeight: 600,
-                fontSize: isMobile ? "0.8rem" : "0.9rem",
-                color: "#696969",
-                marginBottom: "8px",
-              }}
-            >
-              Текущий архетип:
-            </div>
-            <div
-              style={{
-                padding: isMobile ? "10px" : "12px",
-                border: "1px solid #E0E0E0",
-                borderRadius: isMobile ? "8px" : "10px",
-                background: archetype ? "rgba(138, 43, 226, 0.05)" : "#f5f5f5",
-                fontSize: isMobile ? "14px" : "1rem",
-                color: archetype ? "#8A2BE2" : "#999",
-                fontWeight: archetype ? 600 : "normal",
-              }}
-            >
-              {archetype
-                ? archetype === "productive"
-                  ? "📈 Продуктивный"
-                  : archetype === "balanced"
-                  ? "⚖️ Сбалансированный"
-                  : "🔄 Восстанавливающий"
-                : "Не выбран"}
-            </div>
-          </div>
-        </div>
-      </AccordionSection>
-
-      {/* СПИСКИ ЗАДАЧ */}
-      <div style={{ marginTop: "30px" }}>
         {/* ЗАДАЧИ НА СЕГОДНЯ */}
-        <h3 style={{ color: "#8A2BE2", marginBottom: "15px" }}>
-          📅 Задачи на сегодня ({todayTasks.length})
-        </h3>
-        <TaskList
-          tasks={todayTasks}
-          onUpdateTask={handleUpdateTask}
-          onDeleteTask={handleDeleteTask}
-          onToggleTask={handleToggleTask}
-          isMobile={isMobile}
-        />
+        <div style={{ marginBottom: "25px" }}>
+          <h3
+            style={{
+              color: "#8A2BE2",
+              marginBottom: "15px",
+              fontSize: "1.1rem",
+            }}
+          >
+            📅 Задачи на сегодня ({todayTasks.length})
+          </h3>
+          <TaskList
+            tasks={todayTasks}
+            onUpdateTask={handleUpdateTask}
+            onDeleteTask={handleDeleteTask}
+            onToggleTask={handleToggleTask}
+            isMobile={isMobile}
+          />
+        </div>
 
         {/* БУДУЩИЕ ЗАДАЧИ */}
-        <h3
-          style={{ color: "#8A2BE2", marginBottom: "15px", marginTop: "30px" }}
-        >
-          📋 Будущие задачи ({futureTasks.length})
-        </h3>
-        <TaskList
-          tasks={futureTasks}
-          onUpdateTask={handleUpdateTask}
-          onDeleteTask={handleDeleteTask}
-          onToggleTask={handleToggleTask}
-          isMobile={isMobile}
-        />
+        <div style={{ marginBottom: "25px" }}>
+          <h3
+            style={{
+              color: "#8A2BE2",
+              marginBottom: "15px",
+              fontSize: "1.1rem",
+            }}
+          >
+            📋 Будущие задачи ({futureTasks.length})
+          </h3>
+          <TaskList
+            tasks={futureTasks}
+            onUpdateTask={handleUpdateTask}
+            onDeleteTask={handleDeleteTask}
+            onToggleTask={handleToggleTask}
+            isMobile={isMobile}
+          />
+        </div>
 
         {/* ЗАДАЧИ БЕЗ ДАТЫ */}
-        <h3
-          style={{ color: "#8A2BE2", marginBottom: "15px", marginTop: "30px" }}
-        >
-          ⏳ Задачи без даты ({tasksWithoutDate.length})
-        </h3>
-        <TaskList
-          tasks={tasksWithoutDate}
-          onUpdateTask={handleUpdateTask}
-          onDeleteTask={handleDeleteTask}
-          onToggleTask={handleToggleTask}
-          isMobile={isMobile}
-        />
-      </div>
+        <div>
+          <h3
+            style={{
+              color: "#8A2BE2",
+              marginBottom: "15px",
+              fontSize: "1.1rem",
+            }}
+          >
+            ⏳ Задачи без даты ({tasksWithoutDate.length})
+          </h3>
+          <TaskList
+            tasks={tasksWithoutDate}
+            onUpdateTask={handleUpdateTask}
+            onDeleteTask={handleDeleteTask}
+            onToggleTask={handleToggleTask}
+            isMobile={isMobile}
+          />
+        </div>
+      </AccordionSection>
     </div>
   );
 };

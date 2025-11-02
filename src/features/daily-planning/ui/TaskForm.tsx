@@ -5,12 +5,14 @@ interface TaskFormProps {
   onSubmit: (task: Omit<Task, "id" | "createdAt">) => void;
   selectedDate: Date;
   isMobile: boolean;
+  onWithoutDate: () => void;
 }
 
 export const TaskForm: React.FC<TaskFormProps> = ({
   onSubmit,
   selectedDate,
   isMobile,
+  onWithoutDate,
 }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -19,6 +21,9 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   const [endTime, setEndTime] = useState("");
   const [repeat, setRepeat] = useState("");
   const [alarm, setAlarm] = useState("");
+  const [taskDate, setTaskDate] = useState(
+    selectedDate.toISOString().split("T")[0]
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,13 +40,13 @@ export const TaskForm: React.FC<TaskFormProps> = ({
       title: title.trim(),
       description: description.trim(),
       category: category.trim() || undefined,
-      date: selectedDate.toISOString().split("T")[0],
+      date: taskDate || undefined,
       startTime: startTime || undefined,
       endTime: endTime || undefined,
       repeat: repeat || undefined,
       alarm: alarm || undefined,
       completed: false,
-      priority: "medium", // оставляем но не используем в UI
+      priority: "medium",
     });
 
     // Сброс формы
@@ -79,6 +84,50 @@ export const TaskForm: React.FC<TaskFormProps> = ({
             fontSize: "16px",
           }}
         />
+      </div>
+
+      {/* Дата выполнения */}
+      <div style={{ marginBottom: "15px" }}>
+        <label
+          style={{
+            display: "block",
+            marginBottom: "8px",
+            fontSize: "14px",
+            fontWeight: "500",
+          }}
+        >
+          Дата выполнения:
+        </label>
+        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+          <input
+            type="date"
+            value={taskDate}
+            onChange={(e) => setTaskDate(e.target.value)}
+            style={{
+              flex: 1,
+              padding: "8px",
+              border: "1px solid #e0e0e0",
+              borderRadius: "6px",
+              background: "white",
+            }}
+          />
+          <button
+            type="button"
+            onClick={onWithoutDate}
+            style={{
+              padding: "8px 12px",
+              border: "2px solid #8A2BE2",
+              background: "transparent",
+              color: "#8A2BE2",
+              borderRadius: "6px",
+              cursor: "pointer",
+              fontSize: "12px",
+              fontWeight: "500",
+            }}
+          >
+            ⏳ Без даты
+          </button>
+        </div>
       </div>
 
       {/* Расширенные поля */}
