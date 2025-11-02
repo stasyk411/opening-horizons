@@ -43,14 +43,26 @@ export type LifeSphereConfig = {
   description: string;
 };
 
-export type Goal = {
+export interface Goal {
   id: string;
   title: string;
   description?: string;
-  completed: boolean;
+  sphere: string;
+  progress: number;
   createdAt: Date;
   updatedAt: Date;
-};
+  deadline?: Date;
+  isCompleted: boolean;
+  steps: GoalStep[];
+}
+
+export interface GoalStep {
+  id: string;
+  title: string;
+  completed: boolean;
+  order: number;
+  deadline?: Date;
+}
 
 export type DailyReview = {
   id: string;
@@ -68,6 +80,7 @@ export type WheelState = {
 };
 
 export type Mood = "very_bad" | "bad" | "neutral" | "good" | "very_good";
+
 export interface Reflection {
   id: string;
   date: string;
