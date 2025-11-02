@@ -1,5 +1,5 @@
-import React from "react";
-import { Task } from "../../../shared/types"; // ← ИСПРАВЛЕННЫЙ ИМПОРТ
+﻿import React from "react";
+import { Task } from "../../../shared/types";
 
 interface TaskListProps {
   tasks: Task[];
@@ -16,7 +16,6 @@ export const TaskList: React.FC<TaskListProps> = ({
   onToggleTask,
   isMobile,
 }) => {
-  // 🔽 ИСПРАВИТЬ ОБРАБОТКУ ДАТЫ:
   const formatTime = (dateString: string) => {
     try {
       return new Date(dateString).toLocaleTimeString("ru-RU", {
@@ -28,32 +27,6 @@ export const TaskList: React.FC<TaskListProps> = ({
     }
   };
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "high":
-        return "#ff4444";
-      case "medium":
-        return "#ffaa00";
-      case "low":
-        return "#44aa44";
-      default:
-        return "#666";
-    }
-  };
-
-  const getPriorityLabel = (priority: string) => {
-    switch (priority) {
-      case "high":
-        return "🔴 Высокий";
-      case "medium":
-        return "🟡 Средний";
-      case "low":
-        return "🔵 Низкий";
-      default:
-        return priority;
-    }
-  };
-
   // Функция для перевода архетипов
   const getArchetypeLabel = (archetype: string = "") => {
     const archetypes: Record<string, string> = {
@@ -62,6 +35,19 @@ export const TaskList: React.FC<TaskListProps> = ({
       recovery: "🔄 Восстанавливающий",
     };
     return archetypes[archetype] || archetype;
+  };
+
+  // Функция для русских названий сфер жизни
+  const getSphereName = (sphere: string = "") => {
+    const spheres: Record<string, string> = {
+      health: "❤️ Здоровье",
+      career: "💼 Карьера",
+      family: "👨‍👩‍👧‍👦 Семья",
+      finance: "💰 Финансы",
+      development: "📚 Развитие",
+      hobby: "🎨 Хобби",
+    };
+    return spheres[sphere] || sphere;
   };
 
   if (tasks.length === 0) {
@@ -169,20 +155,6 @@ export const TaskList: React.FC<TaskListProps> = ({
                 >
                   {task.title}
                 </h4>
-
-                <span
-                  style={{
-                    fontSize: "12px",
-                    padding: "4px 8px",
-                    borderRadius: "12px",
-                    background: getPriorityColor(task.priority),
-                    color: "white",
-                    fontWeight: "bold",
-                    flexShrink: 0,
-                  }}
-                >
-                  {getPriorityLabel(task.priority)}
-                </span>
               </div>
 
               {task.description && (
@@ -213,9 +185,13 @@ export const TaskList: React.FC<TaskListProps> = ({
                   <span>🧩 {getArchetypeLabel(task.archetype)}</span>
                 )}
                 {task.timeEstimate && <span>⏱️ {task.timeEstimate} мин</span>}
-                {task.category && <span>🎯 {task.category}</span>}
-                <span>📅 {formatTime(task.createdAt)}</span>{" "}
-                {/* ← ИСПРАВЛЕНО */}
+                {task.category && <span>{getSphereName(task.category)}</span>}
+                {task.startTime && task.endTime && (
+                  <span>
+                    🕒 {task.startTime} - {task.endTime}
+                  </span>
+                )}
+                <span>📅 {formatTime(task.createdAt)}</span>
               </div>
             </div>
 

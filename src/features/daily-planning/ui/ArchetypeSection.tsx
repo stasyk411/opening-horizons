@@ -1,6 +1,4 @@
-// ВСТАВЬ ЭТОТ КОД В src/features/daily-planning/ui/ArchetypeSection.tsx
-
-import React from "react";
+﻿import React from "react";
 
 interface ArchetypeSectionProps {
   archetype: string;
@@ -92,7 +90,7 @@ export const ArchetypeSection: React.FC<ArchetypeSectionProps> = ({
               marginBottom: isMobile ? "8px" : "15px",
             }}
           >
-            💼
+            📈
           </span>
           <div
             style={{
@@ -118,7 +116,7 @@ export const ArchetypeSection: React.FC<ArchetypeSectionProps> = ({
               marginBottom: isMobile ? "8px" : "15px",
             }}
           >
-            🌟
+            ⚖️
           </span>
           <div
             style={{
@@ -144,7 +142,7 @@ export const ArchetypeSection: React.FC<ArchetypeSectionProps> = ({
               marginBottom: isMobile ? "8px" : "15px",
             }}
           >
-            🛌
+            🔄
           </span>
           <div
             style={{
