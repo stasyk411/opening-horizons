@@ -6,10 +6,16 @@ import { GoalsTab } from "./features/goals-system";
 import { ReflectionTab } from "./features/archetype-planning";
 import { PomodoroTimer } from "./features/pomodoro-timer";
 import { SettingsTab } from "./features/settings";
+import { EnhancedPomodoro } from "./features/pomodoro-enhanced";
 
 const App: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<
-    "planning" | "goals" | "reflection" | "settings" | "pomodoro"
+    | "planning"
+    | "goals"
+    | "reflection"
+    | "settings"
+    | "pomodoro"
+    | "pomodoro-enhanced"
   >("planning");
   const [isMobile, setIsMobile] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -268,6 +274,12 @@ const App: React.FC = () => {
             <span>🍅</span> {isMobile ? "Таймер" : "Pomodoro"}
           </button>
           <button
+            onClick={() => setCurrentTab("pomodoro-enhanced")}
+            style={tabStyle(currentTab === "pomodoro-enhanced")}
+          >
+            <span>🌟</span> {isMobile ? "Умный" : "Умный Pomodoro"}
+          </button>
+          <button
             onClick={() => setCurrentTab("settings")}
             style={tabStyle(currentTab === "settings")}
           >
@@ -303,6 +315,9 @@ const App: React.FC = () => {
           )}
           {currentTab === "pomodoro" && (
             <PomodoroTimer isMobile={isMobile} settings={settings} />
+          )}
+          {currentTab === "pomodoro-enhanced" && (
+            <EnhancedPomodoro isMobile={isMobile} />
           )}
           {currentTab === "settings" && (
             <SettingsTab

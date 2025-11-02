@@ -1,4 +1,4 @@
-// Service Worker для Opening Horizons
+﻿// Service Worker для Opening Horizons
 const CACHE_NAME = "opening-horizons-v1.0";
 const urlsToCache = [
   "/",
@@ -10,7 +10,7 @@ const urlsToCache = [
 
 // Установка Service Worker
 self.addEventListener("install", (event) => {
-  console.log("🛠 Service Worker: Установлен");
+  console.log("🛠️ Service Worker: Установлен");
   event.waitUntil(
     caches
       .open(CACHE_NAME)
@@ -26,13 +26,13 @@ self.addEventListener("install", (event) => {
 
 // Активация - очистка старых кэшей
 self.addEventListener("activate", (event) => {
-  console.log("⚡ Service Worker: Активирован");
+  console.log("✅ Service Worker: Активирован");
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheName !== CACHE_NAME) {
-            console.log("🗑 Удаляем старый кэш:", cacheName);
+            console.log("🗑️ Удаляем старый кэш:", cacheName);
             return caches.delete(cacheName);
           }
         })
@@ -52,9 +52,9 @@ self.addEventListener("fetch", (event) => {
       })
       .catch(() => {
         // Fallback для оффлайн режима
-        return new Response("🚫 Оффлайн режим");
+        return new Response("🔄 Оффлайн режим");
       })
   );
 });
 
-console.log("📡 Service Worker загружен и готов к работе");
+console.log("📱 Service Worker загружен и готов к работе");
