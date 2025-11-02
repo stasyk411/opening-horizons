@@ -1,5 +1,6 @@
 ﻿import React, { useState, useEffect } from "react";
 import { EmergencyErrorBoundary } from "./components/System/EmergencyErrorBoundary";
+import { FeatureErrorBoundary } from "./components/System/FeatureErrorBoundary";
 import { Task, Goal, GoalStep, Reflection, Settings } from "./types";
 import { PlanningTab } from "./features/daily-planning";
 import { GoalsTab } from "./features/goals-system";
@@ -15,7 +16,6 @@ const App: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
   const [reflections, setReflections] = useState<Reflection[]>([]);
-  // И заменяем на:
   const [settings, setSettings] = useState<Settings>({
     archetype: "",
     darkTheme: false,
@@ -289,32 +289,44 @@ const App: React.FC = () => {
           }}
         >
           {currentTab === "planning" && (
-            <PlanningTab
-              tasks={tasks}
-              setTasks={saveTasks}
-              settings={settings}
-              saveSettings={saveSettings}
-              isMobile={isMobile}
-            />
+            <FeatureErrorBoundary featureName="Планирование дня">
+              <PlanningTab
+                tasks={tasks}
+                setTasks={saveTasks}
+                settings={settings}
+                saveSettings={saveSettings}
+                isMobile={isMobile}
+              />
+            </FeatureErrorBoundary>
           )}
-          {currentTab === "goals" && <GoalsTab />}
+          {currentTab === "goals" && (
+            <FeatureErrorBoundary featureName="Система целей">
+              <GoalsTab />
+            </FeatureErrorBoundary>
+          )}
           {currentTab === "reflection" && (
-            <ReflectionTab
-              reflections={reflections}
-              saveReflections={saveReflections}
-              settings={settings}
-              isMobile={isMobile}
-            />
+            <FeatureErrorBoundary featureName="Вечерний анализ">
+              <ReflectionTab
+                reflections={reflections}
+                saveReflections={saveReflections}
+                settings={settings}
+                isMobile={isMobile}
+              />
+            </FeatureErrorBoundary>
           )}
           {currentTab === "pomodoro" && (
-            <EnhancedPomodoro isMobile={isMobile} />
+            <FeatureErrorBoundary featureName="Pomodoro таймер">
+              <EnhancedPomodoro isMobile={isMobile} />
+            </FeatureErrorBoundary>
           )}
           {currentTab === "settings" && (
-            <SettingsTab
-              settings={settings}
-              saveSettings={saveSettings}
-              isMobile={isMobile}
-            />
+            <FeatureErrorBoundary featureName="Настройки">
+              <SettingsTab
+                settings={settings}
+                saveSettings={saveSettings}
+                isMobile={isMobile}
+              />
+            </FeatureErrorBoundary>
           )}
         </div>
       </div>
