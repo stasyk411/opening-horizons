@@ -1,5 +1,6 @@
 ﻿import React, { useState, useEffect } from "react";
-import { Settings } from "../../types";
+import { Settings } from "../../../types";
+import { AuthSection } from "../../auth/ui/AuthSection";
 
 interface SettingsTabProps {
   settings: Settings;
@@ -304,6 +305,10 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
       }}
     >
       <h2 style={sectionTitleStyle}>⚙️ Настройки</h2>
+
+      {/* 🔐 ДОБАВЛЯЕМ АВТОРИЗАЦИЮ КАК ПЕРВУЮ СЕКЦИЮ */}
+      <AuthSection isMobile={isMobile} darkTheme={localSettings.darkTheme} />
+
       <div style={settingsContainerStyle}>
         {/* Карточка внешнего вида */}
         <div style={settingsCardStyle}>
