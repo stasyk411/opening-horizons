@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { practices, Practice } from "../data/practices";
+import { practices, Practice, PracticeStep } from "../data/practices";
 
 export interface PomodoroSettings {
   workTime: number;
@@ -11,6 +11,8 @@ export interface UsePomodoroTimerReturn {
   isRunning: boolean;
   currentTime: number;
   currentPractice: Practice | null;
+  currentStepIndex: number;
+  currentStepTime: number;
   sessionCount: number;
   techniquesUsed: number;
   totalSeconds: number;
@@ -30,6 +32,8 @@ export const usePomodoroTimer = (isMobile: boolean): UsePomodoroTimerReturn => {
   const [isRunning, setIsRunning] = useState(false);
   const [currentTime, setCurrentTime] = useState(25 * 60);
   const [currentPractice, setCurrentPractice] = useState<Practice | null>(null);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [currentStepTime, setCurrentStepTime] = useState(0);
   const [sessionCount, setSessionCount] = useState(0);
   const [techniquesUsed, setTechniquesUsed] = useState(0);
   const [totalSeconds, setTotalSeconds] = useState(0);
@@ -64,7 +68,21 @@ export const usePomodoroTimer = (isMobile: boolean): UsePomodoroTimerReturn => {
     return practiceQueueRef.current.shift()!;
   }, [shufflePracticeQueue]);
 
-  // ФИКС: Простой интервальный таймер вместо requestAnimationFrame
+  // Переход к следующему шагу
+  const nextStep = useCallback(() => {
+    if (
+      !currentPractice ||
+      currentStepIndex >= currentPractice.steps.length - 1
+    ) {
+      return;
+    }
+
+    console.log("➡️ Next step:", currentStepIndex + 1);
+    setCurrentStepIndex((prev) => prev + 1);
+    setCurrentStepTime(currentPractice.steps[currentStepIndex + 1].duration);
+  }, [currentPractice, currentStepIndex]);
+
+  // Основной таймер
   useEffect(() => {
     if (isRunning) {
       console.log("▶️ Starting timer interval");
@@ -82,6 +100,27 @@ export const usePomodoroTimer = (isMobile: boolean): UsePomodoroTimerReturn => {
           return newTime;
         });
 
+        // Обработка шагов практики
+        if (mode === "practice" && currentPractice) {
+          setCurrentStepTime((prev) => {
+            const newStepTime = prev - 1;
+
+            if (newStepTime <= 0) {
+              nextStep();
+              return (
+                currentPractice.steps[
+                  Math.min(
+                    currentStepIndex + 1,
+                    currentPractice.steps.length - 1
+                  )
+                ]?.duration || 0
+              );
+            }
+
+            return newStepTime;
+          });
+        }
+
         setTotalSeconds((prev) => prev + 1);
       }, 1000);
     } else {
@@ -96,7 +135,7 @@ export const usePomodoroTimer = (isMobile: boolean): UsePomodoroTimerReturn => {
         clearInterval(intervalRef.current);
       }
     };
-  }, [isRunning]);
+  }, [isRunning, mode, currentPractice, currentStepIndex, nextStep]);
 
   const toggleTimer = useCallback(() => {
     console.log("🔘 Toggle timer, current state:", isRunning, "->", !isRunning);
@@ -109,6 +148,8 @@ export const usePomodoroTimer = (isMobile: boolean): UsePomodoroTimerReturn => {
     setMode("work");
     setCurrentTime(settings.workTime * 60);
     setCurrentPractice(null);
+    setCurrentStepIndex(0);
+    setCurrentStepTime(0);
   }, [settings.workTime]);
 
   const completeSession = useCallback(() => {
@@ -122,6 +163,8 @@ export const usePomodoroTimer = (isMobile: boolean): UsePomodoroTimerReturn => {
       setCurrentPractice(nextPractice);
       setMode("practice");
       setCurrentTime(nextPractice.duration);
+      setCurrentStepIndex(0);
+      setCurrentStepTime(nextPractice.steps[0]?.duration || 0);
     } else {
       console.log("🌿 Practice -> Work");
       setSessionCount((prev) => prev + 1);
@@ -129,6 +172,8 @@ export const usePomodoroTimer = (isMobile: boolean): UsePomodoroTimerReturn => {
       setMode("work");
       setCurrentTime(settings.workTime * 60);
       setCurrentPractice(null);
+      setCurrentStepIndex(0);
+      setCurrentStepTime(0);
     }
   }, [mode, settings.workTime, getNextPractice]);
 
@@ -140,6 +185,8 @@ export const usePomodoroTimer = (isMobile: boolean): UsePomodoroTimerReturn => {
       setCurrentPractice(practice);
       setMode("practice");
       setCurrentTime(practice.duration);
+      setCurrentStepIndex(0);
+      setCurrentStepTime(practice.steps[0]?.duration || 0);
     }
   }, []);
 
@@ -169,6 +216,8 @@ export const usePomodoroTimer = (isMobile: boolean): UsePomodoroTimerReturn => {
     isRunning,
     currentTime,
     currentPractice,
+    currentStepIndex,
+    currentStepTime,
     sessionCount,
     techniquesUsed,
     totalSeconds,

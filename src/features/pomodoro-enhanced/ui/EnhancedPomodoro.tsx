@@ -1,6 +1,12 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { usePomodoroTimer } from "../hooks/usePomodoroTimer";
-import { practiceCategories, categoryDescriptions } from "../data/practices";
+import {
+  practiceCategories,
+  categoryDescriptions,
+  practices,
+  Practice,
+  PracticeStep,
+} from "../data/practices";
 
 interface EnhancedPomodoroProps {
   isMobile: boolean;
@@ -10,18 +16,17 @@ export const EnhancedPomodoro: React.FC<EnhancedPomodoroProps> = ({
   isMobile,
 }) => {
   const {
-    // Состояния
     mode,
     isRunning,
     currentTime,
     currentPractice,
+    currentStepIndex,
+    currentStepTime,
     sessionCount,
     techniquesUsed,
     totalSeconds,
     settings,
     currentCategory,
-
-    // Методы
     toggleTimer,
     resetTimer,
     selectPractice,
@@ -30,7 +35,11 @@ export const EnhancedPomodoro: React.FC<EnhancedPomodoroProps> = ({
     getFilteredPractices,
   } = usePomodoroTimer(isMobile);
 
-  // Стили в нашем формате
+  const [showSettings, setShowSettings] = useState(false);
+  const [localSettings, setLocalSettings] = useState(settings);
+  const [showSteps, setShowSteps] = useState(false);
+
+  // Стили
   const containerStyle = {
     background: "white",
     borderRadius: isMobile ? "15px" : "20px",
@@ -123,6 +132,23 @@ export const EnhancedPomodoro: React.FC<EnhancedPomodoroProps> = ({
     border: "2px solid transparent",
   };
 
+  const settingsPanelStyle = {
+    background: "#F8F8FF",
+    borderRadius: "12px",
+    padding: "20px",
+    marginBottom: "20px",
+    border: "2px solid #8A2BE2",
+  };
+
+  const inputStyle = {
+    padding: "10px",
+    border: "2px solid #E0E0E0",
+    borderRadius: "8px",
+    fontSize: "16px",
+    width: "80px",
+    textAlign: "center" as const,
+  };
+
   // Форматирование времени
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
@@ -138,6 +164,53 @@ export const EnhancedPomodoro: React.FC<EnhancedPomodoroProps> = ({
     return `${hours}:${minutes.toString().padStart(2, "0")}`;
   };
 
+  // Уведомления
+  const showNotification = (title: string, message: string) => {
+    if ("Notification" in window && Notification.permission === "granted") {
+      new Notification(title, { body: message, icon: "/icon-192.png" });
+    }
+  };
+
+  // Запрос разрешения на уведомления
+  useEffect(() => {
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+  }, []);
+
+  // Уведомления при смене режима
+  useEffect(() => {
+    if (currentTime === 0) return;
+
+    if (mode === "work" && currentTime === settings.workTime * 60 - 1) {
+      showNotification(
+        "🍅 Pomodoro",
+        "Рабочая сессия началась! Сфокусируйтесь!"
+      );
+    } else if (
+      mode === "practice" &&
+      currentPractice &&
+      currentTime === currentPractice.duration - 1
+    ) {
+      showNotification("🌿 Практика", `Начинается: ${currentPractice.name}`);
+    }
+  }, [currentTime, mode, currentPractice, settings.workTime]);
+
+  // Шаги практики
+  const getCurrentStep = (): PracticeStep | null => {
+    if (!currentPractice || currentStepIndex >= currentPractice.steps.length)
+      return null;
+    return currentPractice.steps[currentStepIndex];
+  };
+
+  const getStepProgress = (): number => {
+    if (!currentPractice || !getCurrentStep()) return 0;
+    const currentStep = getCurrentStep()!;
+    return (
+      ((currentStep.duration - currentStepTime) / currentStep.duration) * 100
+    );
+  };
+
   return (
     <div style={containerStyle}>
       {/* Заголовок */}
@@ -145,6 +218,105 @@ export const EnhancedPomodoro: React.FC<EnhancedPomodoroProps> = ({
         <span>🍅</span>
         Умный Pomodoro Таймер
       </h2>
+
+      {/* Настройки */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "20px",
+        }}
+      >
+        <button
+          style={secondaryBtnStyle}
+          onClick={() => setShowSettings(!showSettings)}
+        >
+          <span>⚙️</span> Настройки
+        </button>
+
+        <div style={{ display: "flex", gap: "10px" }}>
+          <div style={{ fontSize: "0.9rem", color: "#666" }}>
+            💼 {sessionCount} сессий
+          </div>
+          <div style={{ fontSize: "0.9rem", color: "#666" }}>
+            🌿 {techniquesUsed} практик
+          </div>
+        </div>
+      </div>
+
+      {showSettings && (
+        <div style={settingsPanelStyle}>
+          <h3 style={{ color: "#8A2BE2", marginBottom: "15px" }}>
+            ⚙️ Настройки времени
+          </h3>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
+              gap: "15px",
+            }}
+          >
+            <div>
+              <label
+                style={{
+                  display: "block",
+                  marginBottom: "5px",
+                  fontWeight: 600,
+                }}
+              >
+                🕐 Работа (минуты)
+              </label>
+              <input
+                type="number"
+                style={inputStyle}
+                value={localSettings.workTime}
+                onChange={(e) =>
+                  setLocalSettings((prev) => ({
+                    ...prev,
+                    workTime: parseInt(e.target.value) || 25,
+                  }))
+                }
+                min="1"
+                max="120"
+              />
+            </div>
+            <div>
+              <label
+                style={{
+                  display: "block",
+                  marginBottom: "5px",
+                  fontWeight: 600,
+                }}
+              >
+                🔄 Отдых (секунды)
+              </label>
+              <input
+                type="number"
+                style={inputStyle}
+                value={localSettings.breakTime}
+                onChange={(e) =>
+                  setLocalSettings((prev) => ({
+                    ...prev,
+                    breakTime: parseInt(e.target.value) || 30,
+                  }))
+                }
+                min="1"
+                max="600"
+              />
+            </div>
+          </div>
+          <button
+            style={{ ...btnStyle, marginTop: "15px" }}
+            onClick={() => {
+              applySettings(localSettings);
+              setShowSettings(false);
+            }}
+          >
+            💾 Применить настройки
+          </button>
+        </div>
+      )}
 
       {/* Секция таймера */}
       <div style={timerSectionStyle}>
@@ -172,7 +344,7 @@ export const EnhancedPomodoro: React.FC<EnhancedPomodoroProps> = ({
 
         <div style={timerDisplayStyle}>{formatTime(currentTime)}</div>
 
-        {/* Прогресс бар */}
+        {/* Прогресс бар основного таймера */}
         <div
           style={{
             width: "100%",
@@ -187,41 +359,89 @@ export const EnhancedPomodoro: React.FC<EnhancedPomodoroProps> = ({
             style={{
               height: "100%",
               backgroundColor: mode === "work" ? "#8A2BE2" : "#2ecc71",
-              width: `${(1 - currentTime / (settings.workTime * 60)) * 100}%`,
+              width: `${
+                (1 -
+                  currentTime /
+                    (mode === "work"
+                      ? settings.workTime * 60
+                      : currentPractice?.duration || 1)) *
+                100
+              }%`,
               transition: "width 1s linear",
               borderRadius: "4px",
             }}
           />
         </div>
 
-        {/* Мини-статистика */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-around",
-            margin: "20px 0",
-            textAlign: "center" as const,
-          }}
-        >
-          <div>
-            <div style={{ fontSize: "1.2rem", fontWeight: 700 }}>
-              {sessionCount}
+        {/* Шаги практики */}
+        {mode === "practice" && currentPractice && (
+          <div style={{ marginBottom: "15px" }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "8px",
+              }}
+            >
+              <div style={{ fontSize: "0.9rem", fontWeight: 600 }}>
+                📋 Шаг {currentStepIndex + 1} из {currentPractice.steps.length}
+              </div>
+              <button
+                style={{
+                  ...secondaryBtnStyle,
+                  padding: "5px 10px",
+                  fontSize: "0.8rem",
+                }}
+                onClick={() => setShowSteps(!showSteps)}
+              >
+                {showSteps ? "▲" : "▼"} Шаги
+              </button>
             </div>
-            <div style={{ fontSize: "0.8rem", opacity: 0.7 }}>💼 Сессий</div>
+
+            {getCurrentStep() && (
+              <>
+                <div
+                  style={{
+                    fontSize: "0.9rem",
+                    marginBottom: "5px",
+                    fontWeight: 600,
+                  }}
+                >
+                  {getCurrentStep()!.name}
+                </div>
+                <div
+                  style={{
+                    fontSize: "0.8rem",
+                    marginBottom: "8px",
+                    color: "#666",
+                  }}
+                >
+                  {getCurrentStep()!.instruction}
+                </div>
+                <div
+                  style={{
+                    width: "100%",
+                    height: "4px",
+                    backgroundColor: "rgba(0,0,0,0.1)",
+                    borderRadius: "2px",
+                    overflow: "hidden",
+                  }}
+                >
+                  <div
+                    style={{
+                      height: "100%",
+                      backgroundColor: "#2ecc71",
+                      width: `${getStepProgress()}%`,
+                      transition: "width 1s linear",
+                      borderRadius: "2px",
+                    }}
+                  />
+                </div>
+              </>
+            )}
           </div>
-          <div>
-            <div style={{ fontSize: "1.2rem", fontWeight: 700 }}>
-              {formatTotalTime(totalSeconds)}
-            </div>
-            <div style={{ fontSize: "0.8rem", opacity: 0.7 }}>⏱️ Время</div>
-          </div>
-          <div>
-            <div style={{ fontSize: "1.2rem", fontWeight: 700 }}>
-              {techniquesUsed}
-            </div>
-            <div style={{ fontSize: "0.8rem", opacity: 0.7 }}>🌿 Практик</div>
-          </div>
-        </div>
+        )}
 
         {/* Управление */}
         <div
@@ -242,6 +462,71 @@ export const EnhancedPomodoro: React.FC<EnhancedPomodoroProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Детальные шаги практики */}
+      {showSteps && mode === "practice" && currentPractice && (
+        <div
+          style={{
+            background: "#F8F8FF",
+            borderRadius: "12px",
+            padding: "15px",
+            marginBottom: "20px",
+            border: "2px solid #2ecc71",
+          }}
+        >
+          <h4 style={{ color: "#2ecc71", marginBottom: "10px" }}>
+            📋 Шаги выполнения
+          </h4>
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            {currentPractice.steps.map((step, index) => (
+              <div
+                key={index}
+                style={{
+                  padding: "10px",
+                  borderRadius: "8px",
+                  background:
+                    index === currentStepIndex
+                      ? "rgba(46, 204, 113, 0.2)"
+                      : index < currentStepIndex
+                      ? "rgba(46, 204, 113, 0.1)"
+                      : "rgba(0,0,0,0.05)",
+                  borderLeft: `4px solid ${
+                    index === currentStepIndex
+                      ? "#2ecc71"
+                      : index < currentStepIndex
+                      ? "#27ae60"
+                      : "#bdc3c7"
+                  }`,
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <div style={{ fontWeight: 600, fontSize: "0.9rem" }}>
+                    {step.name}
+                  </div>
+                  <div style={{ fontSize: "0.8rem", color: "#666" }}>
+                    ⏱️ {step.duration} сек
+                  </div>
+                </div>
+                <div
+                  style={{
+                    fontSize: "0.8rem",
+                    color: "#666",
+                    marginTop: "4px",
+                  }}
+                >
+                  {step.instruction}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Практики восстановления */}
       <div style={{ marginTop: "30px" }}>
