@@ -1,4 +1,4 @@
-п»їimport React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Goal, GoalStep } from "../../../shared/types";
 import { GoalForm } from "./GoalForm";
 import { GoalsList } from "./GoalsList";
@@ -11,7 +11,7 @@ const GoalsTab: React.FC = () => {
   const [filter, setFilter] = useState<"all" | "active" | "completed">("all");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Р—Р°РіСЂСѓР·РєР° С†РµР»РµР№ РёР· localStorage
+  // Загрузка целей из localStorage
   useEffect(() => {
     loadGoals();
   }, []);
@@ -35,7 +35,7 @@ const GoalsTab: React.FC = () => {
       localStorage.setItem("life-wheel-goals", JSON.stringify(updatedGoals));
     } catch (error) {
       console.error("Error saving goals:", error);
-      showError("РћС€РёР±РєР° РїСЂРё СЃРѕС…СЂР°РЅРµРЅРёРё С†РµР»РµР№");
+      showError("Ошибка при сохранении целей");
     }
   };
 
@@ -44,7 +44,7 @@ const GoalsTab: React.FC = () => {
     setTimeout(() => setErrorMessage(null), 5000);
   };
 
-  // РћР±СЂР°Р±РѕС‚С‡РёРєРё С†РµР»РµР№
+  // Обработчики целей
   const handleAddGoal = (goalData: any) => {
     try {
       const newGoal: Goal = {
@@ -57,14 +57,13 @@ const GoalsTab: React.FC = () => {
         updatedAt: new Date().toISOString(),
         deadline: goalData.deadline,
         completed: false,
-        isCompleted: false,
-        priority: goalData.priority || "medium", // в†ђ Р”РћР‘РђР’Р›Р•РќРћ
-        category: goalData.category || "general", // в†ђ Р”РћР‘РђР’Р›Р•РќРћ
+        priority: goalData.priority || "medium", // < ДОБАВЛЕНО
+        category: goalData.category || "general", // < ДОБАВЛЕНО
         steps:
           goalData.steps?.map((step: any, index: number) => ({
             id: `${Date.now()}-${index}`,
             title: step.title,
-            completed: false,
+            isCompleted: false,
             order: index,
             deadline: step.deadline,
           })) || [],
@@ -74,7 +73,7 @@ const GoalsTab: React.FC = () => {
       saveGoals(updatedGoals);
       setShowGoalForm(false);
     } catch (error) {
-      showError("РћС€РёР±РєР° РїСЂРё СЃРѕР·РґР°РЅРёРё С†РµР»Рё");
+      showError("Ошибка при создании цели");
     }
   };
 
@@ -86,7 +85,7 @@ const GoalsTab: React.FC = () => {
             step.id === stepId ? { ...step, completed: !step.completed } : step
           );
 
-          // РџРµСЂРµСЃС‡РµС‚ РїСЂРѕРіСЂРµСЃСЃР°
+          // Пересчет прогресса
           const completedSteps = updatedSteps.filter(
             (step) => step.completed
           ).length;
@@ -110,18 +109,18 @@ const GoalsTab: React.FC = () => {
 
       saveGoals(updatedGoals);
     } catch (error) {
-      showError("РћС€РёР±РєР° РїСЂРё РѕР±РЅРѕРІР»РµРЅРёРё С€Р°РіР°");
+      showError("Ошибка при обновлении шага");
     }
   };
 
   const handleDeleteGoal = (goalId: string) => {
     try {
-      if (confirm("РЈРґР°Р»РёС‚СЊ СЌС‚Сѓ С†РµР»СЊ?")) {
+      if (confirm("Удалить эту цель?")) {
         const updatedGoals = goals.filter((goal) => goal.id !== goalId);
         saveGoals(updatedGoals);
       }
     } catch (error) {
-      showError("РћС€РёР±РєР° РїСЂРё СѓРґР°Р»РµРЅРёРё С†РµР»Рё");
+      showError("Ошибка при удалении цели");
     }
   };
 
@@ -134,7 +133,7 @@ const GoalsTab: React.FC = () => {
       let updatedGoals: Goal[];
 
       if (hasSteps) {
-        // Р”Р»СЏ С†РµР»РµР№ СЃ С€Р°РіР°РјРё - РїРµСЂРµРєР»СЋС‡Р°РµРј РІСЃРµ С€Р°РіРё
+        // Для целей с шагами - переключаем все шаги
         const allStepsCompleted = goal.steps.every((step) => step.completed);
         updatedGoals = goals.map((g) =>
           g.id === goalId
@@ -152,7 +151,7 @@ const GoalsTab: React.FC = () => {
             : g
         );
       } else {
-        // Р”Р»СЏ С†РµР»РµР№ Р±РµР· С€Р°РіРѕРІ - РїСЂРѕСЃС‚Рѕ РїРµСЂРµРєР»СЋС‡Р°РµРј completed
+        // Для целей без шагов - просто переключаем completed
         updatedGoals = goals.map((g) =>
           g.id === goalId
             ? {
@@ -168,11 +167,11 @@ const GoalsTab: React.FC = () => {
 
       saveGoals(updatedGoals);
     } catch (error) {
-      showError("РћС€РёР±РєР° РїСЂРё РѕР±РЅРѕРІР»РµРЅРёРё С†РµР»Рё");
+      showError("Ошибка при обновлении цели");
     }
   };
 
-  // Р¤РёР»СЊС‚СЂР°С†РёСЏ С†РµР»РµР№
+  // Фильтрация целей
   const filteredGoals = goals.filter((goal) => {
     switch (filter) {
       case "active":
@@ -184,7 +183,7 @@ const GoalsTab: React.FC = () => {
     }
   });
 
-  // РЎС‚Р°С‚РёСЃС‚РёРєР°
+  // Статистика
   const stats = {
     total: goals.length,
     completed: goals.filter((g) => g.completed).length,
@@ -215,19 +214,19 @@ const GoalsTab: React.FC = () => {
 
   return (
     <div style={containerStyle}>
-      <h2 style={sectionTitleStyle}>рџЋЇ РЎРёСЃС‚РµРјР° Р¦РµР»РµР№</h2>
+      <h2 style={sectionTitleStyle}>?? Система Целей</h2>
 
-      {/* РЎС‚Р°С‚РёСЃС‚РёРєР° */}
+      {/* Статистика */}
       <GoalStats stats={stats} />
 
-      {/* Р¤РёР»СЊС‚СЂС‹ */}
+      {/* Фильтры */}
       <GoalFilters
         currentFilter={filter}
         onFilterChange={setFilter}
         onAddGoal={() => setShowGoalForm(true)}
       />
 
-      {/* РЎРѕРѕР±С‰РµРЅРёРµ РѕР± РѕС€РёР±РєРµ */}
+      {/* Сообщение об ошибке */}
       {errorMessage && (
         <div
           style={{
@@ -243,7 +242,7 @@ const GoalsTab: React.FC = () => {
         </div>
       )}
 
-      {/* Р¤РѕСЂРјР° СЃРѕР·РґР°РЅРёСЏ С†РµР»Рё */}
+      {/* Форма создания цели */}
       {showGoalForm && (
         <GoalForm
           onSubmit={handleAddGoal}
@@ -251,7 +250,7 @@ const GoalsTab: React.FC = () => {
         />
       )}
 
-      {/* РЎРїРёСЃРѕРє С†РµР»РµР№ */}
+      {/* Список целей */}
       <GoalsList
         goals={filteredGoals}
         onAddGoal={handleAddGoal}
@@ -267,14 +266,14 @@ const GoalsTab: React.FC = () => {
             color: "#666",
           }}
         >
-          <div style={{ fontSize: "4rem", marginBottom: "20px" }}>рџЋЇ</div>
+          <div style={{ fontSize: "4rem", marginBottom: "20px" }}>??</div>
           <h3 style={{ margin: "0 0 10px 0", color: "#333" }}>
-            РЈ РІР°СЃ РїРѕРєР° РЅРµС‚ С†РµР»РµР№
+            У вас пока нет целей
           </h3>
           <p style={{ margin: 0, lineHeight: 1.5 }}>
-            РќР°С‡РЅРёС‚Рµ СЃ СЃРѕР·РґР°РЅРёСЏ РїРµСЂРІРѕР№ С†РµР»Рё!
+            Начните с создания первой цели!
             <br />
-            Р Р°Р·Р±РµР№С‚Рµ Р±РѕР»СЊС€РёРµ С†РµР»Рё РЅР° РјР°Р»РµРЅСЊРєРёРµ С€Р°РіРё РґР»СЏ Р»СѓС‡С€РµРіРѕ РїСЂРѕРіСЂРµСЃСЃР°.
+            Разбейте большие цели на маленькие шаги для лучшего прогресса.
           </p>
         </div>
       )}
@@ -283,3 +282,10 @@ const GoalsTab: React.FC = () => {
 };
 
 export { GoalsTab };
+
+
+
+
+
+
+

@@ -113,3 +113,4 @@ export interface CreateGoalData {
   deadline?: string;
   steps?: Array<{ title: string; deadline?: string }>;
 }
+
