@@ -1,5 +1,4 @@
-﻿// ПОЛНЫЙ ИСПРАВЛЕННЫЙ APP.TSX:
-import React, { useState, useEffect, lazy, Suspense } from "react";
+﻿import React, { useState, useEffect, lazy, Suspense } from "react";
 import { EmergencyErrorBoundary } from "./components/System/EmergencyErrorBoundary";
 import { FeatureErrorBoundary } from "./components/System/FeatureErrorBoundary";
 import {
@@ -8,10 +7,12 @@ import {
 } from "./shared/contexts/SettingsContext";
 import { Task, Goal, Reflection } from "./shared/types";
 
-// 🔽 ПРАВИЛЬНЫЙ LAZY LOADING ДЛЯ РАЗНЫХ ТИПОВ ЭКСПОРТОВ
-
-// GoalsTab использует default export
-const GoalsTab = lazy(() => import("./features/goals-system/ui/GoalsTab"));
+// 🔽 ИСПРАВЛЕННЫЙ LAZY LOADING ДЛЯ GOALSTAB
+const GoalsTab = lazy(() =>
+  import("./features/goals-system/ui/GoalsTab").then((module) => ({
+    default: module.GoalsTab,
+  }))
+);
 
 // Остальные компоненты используют named exports
 const PlanningTab = lazy(() =>
@@ -69,7 +70,7 @@ const LoadingFallback: React.FC<{ featureName: string }> = ({
   </div>
 );
 
-// 🔽 ОСТАЛЬНАЯ ЧАСТЬ APP.TSX ОСТАЕТСЯ БЕЗ ИЗМЕНЕНИЙ
+// 🔽 ОСНОВНОЙ КОНТЕНТ APP.TSX
 const AppContent: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<
     "planning" | "goals" | "reflection" | "settings" | "pomodoro"

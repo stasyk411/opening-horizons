@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { CreateGoalData } from "../../../shared/types/goals";
+import { CreateGoalData } from "../../../shared/types"; // ← ИСПРАВЛЕННЫЙ ИМПОРТ
 
 interface GoalFormProps {
   onSubmit: (goalData: CreateGoalData) => void;
@@ -21,9 +21,9 @@ export const GoalForm: React.FC<GoalFormProps> = ({ onSubmit, onCancel }) => {
       sphere,
       steps: steps
         .filter((step) => step.trim() !== "")
-        .map((step, index) => ({
+        .map((step) => ({
           title: step,
-          order: index,
+          deadline: undefined, // ← ДОБАВЛЕНО для совместимости
         })),
     };
 

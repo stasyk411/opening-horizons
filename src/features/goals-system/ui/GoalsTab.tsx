@@ -1,6 +1,4 @@
-﻿// ВСТАВЬ ЭТОТ КОД В GoalsTab.tsx (ЗАМЕНИ ВЕСЬ ФАЙЛ):
-
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { Goal, GoalStep } from "../../../shared/types";
 import { GoalForm } from "./GoalForm";
 import { GoalsList } from "./GoalsList";
@@ -55,10 +53,13 @@ const GoalsTab: React.FC = () => {
         description: goalData.description || "",
         sphere: goalData.sphere || "personal",
         progress: 0,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
         deadline: goalData.deadline,
+        completed: false,
         isCompleted: false,
+        priority: goalData.priority || "medium", // ← ДОБАВЛЕНО
+        category: goalData.category || "general", // ← ДОБАВЛЕНО
         steps:
           goalData.steps?.map((step: any, index: number) => ({
             id: `${Date.now()}-${index}`,
@@ -99,8 +100,9 @@ const GoalsTab: React.FC = () => {
             ...goal,
             steps: updatedSteps,
             progress,
+            completed: isCompleted,
             isCompleted,
-            updatedAt: new Date(),
+            updatedAt: new Date().toISOString(),
           };
         }
         return goal;
@@ -143,8 +145,9 @@ const GoalsTab: React.FC = () => {
                   completed: !allStepsCompleted,
                 })),
                 progress: !allStepsCompleted ? 100 : 0,
+                completed: !allStepsCompleted,
                 isCompleted: !allStepsCompleted,
-                updatedAt: new Date(),
+                updatedAt: new Date().toISOString(),
               }
             : g
         );
@@ -154,9 +157,10 @@ const GoalsTab: React.FC = () => {
           g.id === goalId
             ? {
                 ...g,
-                isCompleted: !g.isCompleted,
-                progress: !g.isCompleted ? 100 : 0,
-                updatedAt: new Date(),
+                completed: !g.completed,
+                isCompleted: !g.completed,
+                progress: !g.completed ? 100 : 0,
+                updatedAt: new Date().toISOString(),
               }
             : g
         );
@@ -172,9 +176,9 @@ const GoalsTab: React.FC = () => {
   const filteredGoals = goals.filter((goal) => {
     switch (filter) {
       case "active":
-        return !goal.isCompleted;
+        return !goal.completed;
       case "completed":
-        return goal.isCompleted;
+        return goal.completed;
       default:
         return true;
     }
@@ -183,12 +187,12 @@ const GoalsTab: React.FC = () => {
   // Статистика
   const stats = {
     total: goals.length,
-    completed: goals.filter((g) => g.isCompleted).length,
-    active: goals.filter((g) => !g.isCompleted).length,
+    completed: goals.filter((g) => g.completed).length,
+    active: goals.filter((g) => !g.completed).length,
     progress:
       goals.length > 0
         ? Math.round(
-            (goals.filter((g) => g.isCompleted).length / goals.length) * 100
+            (goals.filter((g) => g.completed).length / goals.length) * 100
           )
         : 0,
   };
@@ -253,7 +257,6 @@ const GoalsTab: React.FC = () => {
         onAddGoal={handleAddGoal}
         onToggleStep={handleToggleStep}
         onDeleteGoal={handleDeleteGoal}
-        onToggleGoal={handleToggleGoal}
       />
 
       {goals.length === 0 && !showGoalForm && (

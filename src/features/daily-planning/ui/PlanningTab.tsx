@@ -1,5 +1,5 @@
 ﻿import React, { useState } from "react";
-import { Task } from "../../../types";
+import { Task } from "../../../shared/types"; // ← ИСПРАВЛЕННЫЙ ИМПОРТ
 import { TaskForm } from "./TaskForm";
 import { TaskList } from "./TaskList";
 import { AccordionSection } from "./AccordionSection";
@@ -42,9 +42,8 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
     const newTask: Task = {
       id: Date.now().toString(),
       ...taskData,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      userId: "current-user", // TODO: заменить на реального пользователя
+      createdAt: new Date().toISOString(), // ← ИСПРАВЛЕНО: string вместо Date
+      updatedAt: new Date().toISOString(), // ← ИСПРАВЛЕНО: string вместо Date
       archetype: archetype || undefined,
     };
     setTasks([...tasks, newTask]);
@@ -52,7 +51,13 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
 
   const handleUpdateTask = (taskId: string, updates: Partial<Task>) => {
     const updatedTasks = tasks.map((task) =>
-      task.id === taskId ? { ...task, ...updates, updatedAt: new Date() } : task
+      task.id === taskId
+        ? {
+            ...task,
+            ...updates,
+            updatedAt: new Date().toISOString(), // ← ИСПРАВЛЕНО
+          }
+        : task
     );
     setTasks(updatedTasks);
   };

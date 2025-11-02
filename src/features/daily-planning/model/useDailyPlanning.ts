@@ -30,8 +30,9 @@ export const useDailyPlanning = ({
       category: selectedSphere.id,
       priority: "medium" as const,
       userId: "demo-user",
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      date: new Date().toISOString().split("T")[0], // ← ДОБАВЛЕНО: текущая дата
+      createdAt: new Date().toISOString(), // ← ИСПРАВЛЕНО: string вместо Date
+      updatedAt: new Date().toISOString(), // ← ИСПРАВЛЕНО: string вместо Date
     };
 
     onAddTask(newTaskData);

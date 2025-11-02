@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Goal, CreateGoalData } from "../../../shared/types/goals";
+import { Goal, CreateGoalData } from "../../../shared/types"; // ← ИСПРАВЛЕННЫЙ ИМПОРТ
 import { GoalForm } from "./GoalForm";
 import { GoalItem } from "./GoalItem";
 
@@ -18,8 +18,9 @@ export const GoalsList: React.FC<GoalsListProps> = ({
 }) => {
   const [showForm, setShowForm] = useState(false);
 
-  const activeGoals = goals.filter((goal) => !goal.isCompleted);
-  const completedGoals = goals.filter((goal) => goal.isCompleted);
+  // 🔽 ИСПРАВЛЯЕМ ФИЛЬТРАЦИЮ - используем completed вместо isCompleted
+  const activeGoals = goals.filter((goal) => !goal.completed);
+  const completedGoals = goals.filter((goal) => goal.completed);
 
   return (
     <div className="p-4 space-y-6">

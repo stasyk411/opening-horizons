@@ -1,5 +1,5 @@
 import React from "react";
-import { Task } from "../../../types";
+import { Task } from "../../../shared/types"; // ← ИСПРАВЛЕННЫЙ ИМПОРТ
 
 interface TaskListProps {
   tasks: Task[];
@@ -16,6 +16,18 @@ export const TaskList: React.FC<TaskListProps> = ({
   onToggleTask,
   isMobile,
 }) => {
+  // 🔽 ИСПРАВИТЬ ОБРАБОТКУ ДАТЫ:
+  const formatTime = (dateString: string) => {
+    try {
+      return new Date(dateString).toLocaleTimeString("ru-RU", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch {
+      return "неизвестно";
+    }
+  };
+
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case "high":
@@ -186,7 +198,7 @@ export const TaskList: React.FC<TaskListProps> = ({
                 </p>
               )}
 
-              {/* Мета-информация - ИСПРАВЛЕННАЯ С АРХЕТИПОМ */}
+              {/* Мета-информация */}
               <div
                 style={{
                   display: "flex",
@@ -197,19 +209,13 @@ export const TaskList: React.FC<TaskListProps> = ({
                   color: "#888",
                 }}
               >
-                {/* АРХЕТИП - НОВОЕ ПОЛЕ */}
                 {task.archetype && (
                   <span>🧩 {getArchetypeLabel(task.archetype)}</span>
                 )}
                 {task.timeEstimate && <span>⏱️ {task.timeEstimate} мин</span>}
                 {task.category && <span>🎯 {task.category}</span>}
-                <span>
-                  📅{" "}
-                  {new Date(task.createdAt).toLocaleTimeString("ru-RU", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </span>
+                <span>📅 {formatTime(task.createdAt)}</span>{" "}
+                {/* ← ИСПРАВЛЕНО */}
               </div>
             </div>
 
