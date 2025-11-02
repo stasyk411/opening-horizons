@@ -15,12 +15,17 @@ const App: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
   const [reflections, setReflections] = useState<Reflection[]>([]);
+  // И заменяем на:
   const [settings, setSettings] = useState<Settings>({
     archetype: "",
     darkTheme: false,
     notifications: true,
     autoSave: true,
     colorScheme: "purple",
+    pwaSettings: {
+      offlineMode: true,
+      pushNotifications: true,
+    },
   });
 
   // PWA УСТАНОВКА

@@ -4,6 +4,12 @@
   notifications: boolean;
   autoSave: boolean;
   colorScheme: string;
+
+  // 🔽 ДЕЛАЕМ PWA НАСТРОЙКИ ОПЦИОНАЛЬНЫМИ:
+  pwaSettings?: {
+    offlineMode: boolean;
+    pushNotifications: boolean;
+  };
 }
 
 export interface Task {
@@ -58,3 +64,5 @@ export interface Reflection {
   notes?: string;
   rating?: number;
 }
+
+// УДАЛЯЕМ ДУБЛИРУЮЩЕЕСЯ ОБЪЯВЛЕНИЕ Settings В КОНЦЕ ФАЙЛА

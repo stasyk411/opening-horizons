@@ -238,12 +238,15 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
 
       // Сбрасываем настройки по умолчанию
       const defaultSettings: Settings = {
-        // В функции сброса настроек меняем:
-        archetype: "", // ← УБИРАЕМ "warrior", оставляем пустую строку
+        archetype: "",
         darkTheme: false,
         notifications: true,
         autoSave: true,
         colorScheme: "purple",
+        pwaSettings: {
+          offlineMode: true,
+          pushNotifications: true,
+        },
       };
 
       setLocalSettings(defaultSettings);
@@ -398,6 +401,90 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
           </div>
         </div>
 
+        {/* Карточка PWA настроек */}
+        <div style={settingsCardStyle}>
+          <div style={settingsTitleStyle}>
+            <span>📱</span> PWA Настройки
+          </div>
+
+          <div style={settingsOptionStyle}>
+            <span style={settingsLabelStyle}>Оффлайн режим</span>
+            <label style={toggleStyle}>
+              <input
+                type="checkbox"
+                checked={localSettings.pwaSettings?.offlineMode ?? true}
+                onChange={(e) => {
+                  const newPwaSettings = {
+                    offlineMode: e.target.checked,
+                    pushNotifications:
+                      localSettings.pwaSettings?.pushNotifications ?? true,
+                  };
+                  const newSettings = {
+                    ...localSettings,
+                    pwaSettings: newPwaSettings,
+                  };
+                  setLocalSettings(newSettings);
+                  saveSettings(newSettings);
+                }}
+                style={{ opacity: 0, width: 0, height: 0 }}
+              />
+              <span
+                style={{
+                  ...sliderStyle,
+                  backgroundColor:
+                    localSettings.pwaSettings?.offlineMode ?? true
+                      ? "#8A2BE2"
+                      : "#ccc",
+                }}
+              >
+                <span
+                  style={sliderBeforeStyle(
+                    localSettings.pwaSettings?.offlineMode ?? true
+                  )}
+                />
+              </span>
+            </label>
+          </div>
+
+          <div style={{ ...settingsOptionStyle, borderBottom: "none" }}>
+            <span style={settingsLabelStyle}>Pomodoro уведомления</span>
+            <label style={toggleStyle}>
+              <input
+                type="checkbox"
+                checked={localSettings.pwaSettings?.pushNotifications ?? true}
+                onChange={(e) => {
+                  const newPwaSettings = {
+                    offlineMode: localSettings.pwaSettings?.offlineMode ?? true,
+                    pushNotifications: e.target.checked,
+                  };
+                  const newSettings = {
+                    ...localSettings,
+                    pwaSettings: newPwaSettings,
+                  };
+                  setLocalSettings(newSettings);
+                  saveSettings(newSettings);
+                }}
+                style={{ opacity: 0, width: 0, height: 0 }}
+              />
+              <span
+                style={{
+                  ...sliderStyle,
+                  backgroundColor:
+                    localSettings.pwaSettings?.pushNotifications ?? true
+                      ? "#8A2BE2"
+                      : "#ccc",
+                }}
+              >
+                <span
+                  style={sliderBeforeStyle(
+                    localSettings.pwaSettings?.pushNotifications ?? true
+                  )}
+                />
+              </span>
+            </label>
+          </div>
+        </div>
+
         {/* Карточка управления данными */}
         <div style={settingsCardStyle}>
           <div style={settingsTitleStyle}>Управление данными</div>
@@ -526,84 +613,6 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
             >
               <span>💾</span> Сохранить профиль
             </button>
-          </div>
-        </div>
-      </div>
-      // УДАЛЯЕМ этот блок из SettingsTab:
-      {/* Статистика приложения */}
-      <div
-        style={{
-          ...settingsCardStyle,
-          marginTop: isMobile ? "15px" : "25px",
-          textAlign: "center" as const,
-        }}
-      >
-        <div style={settingsTitleStyle}>📊 Статистика приложения</div>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4, 1fr)",
-            gap: "15px",
-            textAlign: "center" as const,
-          }}
-        >
-          <div>
-            <div
-              style={{
-                fontSize: "1.5rem",
-                fontWeight: "bold",
-                color: "#8A2BE2",
-              }}
-            >
-              {
-                JSON.parse(localStorage.getItem("life-wheel-tasks") || "[]")
-                  .length
-              }
-            </div>
-            <div style={{ fontSize: "0.8rem", color: "#666" }}>Задачи</div>
-          </div>
-          <div>
-            <div
-              style={{
-                fontSize: "1.5rem",
-                fontWeight: "bold",
-                color: "#8A2BE2",
-              }}
-            >
-              {
-                JSON.parse(localStorage.getItem("life-wheel-goals") || "[]")
-                  .length
-              }
-            </div>
-            <div style={{ fontSize: "0.8rem", color: "#666" }}>Цели</div>
-          </div>
-          <div>
-            <div
-              style={{
-                fontSize: "1.5rem",
-                fontWeight: "bold",
-                color: "#8A2BE2",
-              }}
-            >
-              {
-                JSON.parse(
-                  localStorage.getItem("life-wheel-reflections") || "[]"
-                ).length
-              }
-            </div>
-            <div style={{ fontSize: "0.8rem", color: "#666" }}>Анализы</div>
-          </div>
-          <div>
-            <div
-              style={{
-                fontSize: "1.5rem",
-                fontWeight: "bold",
-                color: "#8A2BE2",
-              }}
-            >
-              v1.0.0
-            </div>
-            <div style={{ fontSize: "0.8rem", color: "#666" }}>Версия</div>
           </div>
         </div>
       </div>
