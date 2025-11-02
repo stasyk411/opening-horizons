@@ -68,3 +68,18 @@ export type WheelState = {
 };
 
 export type Mood = "very_bad" | "bad" | "neutral" | "good" | "very_good";
+export interface Reflection {
+  id: string;
+  date: string;
+  mood: number;
+  answers: Record<string, string>;
+  insights: string[];
+  createdAt: string;
+
+  // ДОПОЛНИТЕЛЬНЫЕ ПОЛЯ ДЛЯ АНАЛИТИКИ
+  completedTasks?: number;
+  totalTasks?: number;
+  productivityScore?: number;
+  notes?: string;
+  rating?: number;
+}

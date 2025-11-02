@@ -1,17 +1,75 @@
-﻿import React, { useState, useEffect } from "react";
+﻿// ПОЛНЫЙ ИСПРАВЛЕННЫЙ APP.TSX:
+import React, { useState, useEffect, lazy, Suspense } from "react";
 import { EmergencyErrorBoundary } from "./components/System/EmergencyErrorBoundary";
 import { FeatureErrorBoundary } from "./components/System/FeatureErrorBoundary";
 import {
   SettingsProvider,
   useSettings,
 } from "./shared/contexts/SettingsContext";
-import { Task, Goal, GoalStep, Reflection } from "./types";
-import { PlanningTab } from "./features/daily-planning";
-import { GoalsTab } from "./features/goals-system";
-import { ReflectionTab } from "./features/archetype-planning";
-import { SettingsTab } from "./features/settings";
-import { EnhancedPomodoro } from "./features/pomodoro-enhanced";
+import { Task, Goal, Reflection } from "./shared/types";
 
+// 🔽 ПРАВИЛЬНЫЙ LAZY LOADING ДЛЯ РАЗНЫХ ТИПОВ ЭКСПОРТОВ
+
+// GoalsTab использует default export
+const GoalsTab = lazy(() => import("./features/goals-system/ui/GoalsTab"));
+
+// Остальные компоненты используют named exports
+const PlanningTab = lazy(() =>
+  import("./features/daily-planning/ui/PlanningTab").then((module) => ({
+    default: module.PlanningTab,
+  }))
+);
+
+// 🔽 ИСПРАВЛЕННЫЙ ПУТЬ ДЛЯ REFLECTIONTAB
+const ReflectionTab = lazy(() =>
+  import("./features/archetype-planning/ui/ReflectionTab").then((module) => ({
+    default: module.ReflectionTab,
+  }))
+);
+
+const SettingsTab = lazy(() =>
+  import("./features/settings/ui/SettingsTab").then((module) => ({
+    default: module.SettingsTab,
+  }))
+);
+
+const EnhancedPomodoro = lazy(() =>
+  import("./features/pomodoro-enhanced/ui/EnhancedPomodoro").then((module) => ({
+    default: module.EnhancedPomodoro,
+  }))
+);
+
+// 🔽 КОМПОНЕНТ ЗАГРУЗКИ
+const LoadingFallback: React.FC<{ featureName: string }> = ({
+  featureName,
+}) => (
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      padding: "40px",
+      background: "rgba(138, 43, 226, 0.1)",
+      borderRadius: "15px",
+      margin: "20px 0",
+    }}
+  >
+    <div
+      style={{
+        fontSize: "18px",
+        color: "#8A2BE2",
+        display: "flex",
+        alignItems: "center",
+        gap: "10px",
+      }}
+    >
+      <span>⏳</span>
+      Загрузка {featureName}...
+    </div>
+  </div>
+);
+
+// 🔽 ОСТАЛЬНАЯ ЧАСТЬ APP.TSX ОСТАЕТСЯ БЕЗ ИЗМЕНЕНИЙ
 const AppContent: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<
     "planning" | "goals" | "reflection" | "settings" | "pomodoro"
@@ -269,7 +327,7 @@ const AppContent: React.FC = () => {
           </button>
         </nav>
 
-        {/* Основной контент */}
+        {/* 🔽 ОСНОВНОЙ КОНТЕНТ С LAZY LOADING */}
         <div
           style={{
             maxWidth: "1200px",
@@ -279,42 +337,60 @@ const AppContent: React.FC = () => {
         >
           {currentTab === "planning" && (
             <FeatureErrorBoundary featureName="Планирование дня">
-              <PlanningTab
-                tasks={tasks}
-                setTasks={saveTasks}
-                settings={settings}
-                saveSettings={updateSettings}
-                isMobile={isMobile}
-              />
+              <Suspense
+                fallback={<LoadingFallback featureName="Планирования Дня" />}
+              >
+                <PlanningTab
+                  tasks={tasks}
+                  setTasks={saveTasks}
+                  settings={settings}
+                  saveSettings={updateSettings}
+                  isMobile={isMobile}
+                />
+              </Suspense>
             </FeatureErrorBoundary>
           )}
           {currentTab === "goals" && (
             <FeatureErrorBoundary featureName="Система целей">
-              <GoalsTab />
+              <Suspense
+                fallback={<LoadingFallback featureName="Системы Целей" />}
+              >
+                <GoalsTab />
+              </Suspense>
             </FeatureErrorBoundary>
           )}
           {currentTab === "reflection" && (
             <FeatureErrorBoundary featureName="Вечерний анализ">
-              <ReflectionTab
-                reflections={reflections}
-                saveReflections={saveReflections}
-                settings={settings}
-                isMobile={isMobile}
-              />
+              <Suspense
+                fallback={<LoadingFallback featureName="Вечернего Анализа" />}
+              >
+                <ReflectionTab
+                  reflections={reflections}
+                  saveReflections={saveReflections}
+                  settings={settings}
+                  isMobile={isMobile}
+                />
+              </Suspense>
             </FeatureErrorBoundary>
           )}
           {currentTab === "pomodoro" && (
             <FeatureErrorBoundary featureName="Pomodoro таймер">
-              <EnhancedPomodoro isMobile={isMobile} />
+              <Suspense
+                fallback={<LoadingFallback featureName="Pomodoro Таймера" />}
+              >
+                <EnhancedPomodoro isMobile={isMobile} />
+              </Suspense>
             </FeatureErrorBoundary>
           )}
           {currentTab === "settings" && (
             <FeatureErrorBoundary featureName="Настройки">
-              <SettingsTab
-                settings={settings}
-                saveSettings={updateSettings}
-                isMobile={isMobile}
-              />
+              <Suspense fallback={<LoadingFallback featureName="Настроек" />}>
+                <SettingsTab
+                  settings={settings}
+                  saveSettings={updateSettings}
+                  isMobile={isMobile}
+                />
+              </Suspense>
             </FeatureErrorBoundary>
           )}
         </div>
