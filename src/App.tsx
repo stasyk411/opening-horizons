@@ -1,14 +1,18 @@
 ﻿import React, { useState, useEffect } from "react";
 import { EmergencyErrorBoundary } from "./components/System/EmergencyErrorBoundary";
 import { FeatureErrorBoundary } from "./components/System/FeatureErrorBoundary";
-import { Task, Goal, GoalStep, Reflection, Settings } from "./types";
+import {
+  SettingsProvider,
+  useSettings,
+} from "./shared/contexts/SettingsContext";
+import { Task, Goal, GoalStep, Reflection } from "./types";
 import { PlanningTab } from "./features/daily-planning";
 import { GoalsTab } from "./features/goals-system";
 import { ReflectionTab } from "./features/archetype-planning";
 import { SettingsTab } from "./features/settings";
 import { EnhancedPomodoro } from "./features/pomodoro-enhanced";
 
-const App: React.FC = () => {
+const AppContent: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<
     "planning" | "goals" | "reflection" | "settings" | "pomodoro"
   >("planning");
@@ -16,17 +20,9 @@ const App: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
   const [reflections, setReflections] = useState<Reflection[]>([]);
-  const [settings, setSettings] = useState<Settings>({
-    archetype: "",
-    darkTheme: false,
-    notifications: true,
-    autoSave: true,
-    colorScheme: "purple",
-    pwaSettings: {
-      offlineMode: true,
-      pushNotifications: true,
-    },
-  });
+
+  // Используем настройки из контекста
+  const { settings, updateSettings } = useSettings();
 
   // PWA УСТАНОВКА
   const [installPrompt, setInstallPrompt] = useState<any>(null);
@@ -52,12 +48,10 @@ const App: React.FC = () => {
     const savedTasks = localStorage.getItem("life-wheel-tasks");
     const savedGoals = localStorage.getItem("life-wheel-goals");
     const savedReflections = localStorage.getItem("life-wheel-reflections");
-    const savedSettings = localStorage.getItem("life-wheel-settings");
 
     if (savedTasks) setTasks(JSON.parse(savedTasks));
     if (savedGoals) setGoals(JSON.parse(savedGoals));
     if (savedReflections) setReflections(JSON.parse(savedReflections));
-    if (savedSettings) setSettings(JSON.parse(savedSettings));
 
     return () => {
       window.removeEventListener("resize", handleResize);
@@ -124,11 +118,6 @@ const App: React.FC = () => {
       "life-wheel-reflections",
       JSON.stringify(newReflections)
     );
-  };
-
-  const saveSettings = (newSettings: Settings) => {
-    setSettings(newSettings);
-    localStorage.setItem("life-wheel-settings", JSON.stringify(newSettings));
   };
 
   // Адаптивные стили
@@ -294,7 +283,7 @@ const App: React.FC = () => {
                 tasks={tasks}
                 setTasks={saveTasks}
                 settings={settings}
-                saveSettings={saveSettings}
+                saveSettings={updateSettings}
                 isMobile={isMobile}
               />
             </FeatureErrorBoundary>
@@ -323,7 +312,7 @@ const App: React.FC = () => {
             <FeatureErrorBoundary featureName="Настройки">
               <SettingsTab
                 settings={settings}
-                saveSettings={saveSettings}
+                saveSettings={updateSettings}
                 isMobile={isMobile}
               />
             </FeatureErrorBoundary>
@@ -340,6 +329,14 @@ const App: React.FC = () => {
         }
       `}</style>
     </EmergencyErrorBoundary>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <SettingsProvider>
+      <AppContent />
+    </SettingsProvider>
   );
 };
 
