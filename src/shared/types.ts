@@ -4,11 +4,20 @@
   description?: string;
   completed: boolean;
   sphere: string;
-  category: string; // ← ДОБАВИТЬ ЭТУ СТРОКУ
+  category: string;
   priority: "low" | "medium" | "high";
   createdAt: Date;
   updatedAt: Date;
   userId: string;
+
+  // ДОБАВЛЯЕМ НОВЫЕ ПОЛЯ ДЛЯ PLANNINGTAB
+  startTime?: string;
+  endTime?: string;
+  repeat?: string;
+  alarm?: string;
+  archetype?: string;
+  timeEstimate?: number;
+  date?: string;
 }
 
 export interface LifeSphere {
@@ -16,7 +25,7 @@ export interface LifeSphere {
   name: string;
   value: number;
   color: string;
-  icon: string; // ← ДОБАВИТЬ ЭТУ СТРОКУ
+  icon: string;
 }
 
 export interface Archetype {
@@ -26,9 +35,8 @@ export interface Archetype {
   color: string;
 }
 
-// Добавить эти типы в конец файла
 export type LifeSphereConfig = {
-  id: string; // Исправлено: было LifeSphere, должно быть string
+  id: string;
   name: string;
   icon: string;
   color: string;
@@ -54,7 +62,7 @@ export type DailyReview = {
 };
 
 export type WheelState = {
-  sphere: string; // Исправлено: было LifeSphere, должно быть string
+  sphere: string;
   value: number;
   lastUpdated: Date;
 };
