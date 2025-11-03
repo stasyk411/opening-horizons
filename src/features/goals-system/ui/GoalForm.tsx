@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { CreateGoalData } from "../../../shared/types"; // ← ИСПРАВЛЕННЫЙ ИМПОРТ
+﻿import React, { useState } from "react";
+import { CreateGoalData } from "../../../shared/types";
 
 interface GoalFormProps {
   onSubmit: (goalData: CreateGoalData) => void;
@@ -23,61 +23,84 @@ export const GoalForm: React.FC<GoalFormProps> = ({ onSubmit, onCancel }) => {
         .filter((step) => step.trim() !== "")
         .map((step) => ({
           title: step,
-          deadline: undefined, // ← ДОБАВЛЕНО для совместимости
+          deadline: undefined,
         })),
     };
 
     onSubmit(goalData);
   };
 
-  const addStep = () => {
-    setSteps((prev) => [...prev, ""]);
+  const handleStepChange = (index: number, value: string) => {
+    const newSteps = [...steps];
+    newSteps[index] = value;
+    setSteps(newSteps);
   };
 
-  const updateStep = (index: number, value: string) => {
-    setSteps((prev) => prev.map((step, i) => (i === index ? value : step)));
+  const addStep = () => {
+    setSteps([...steps, ""]);
   };
 
   const removeStep = (index: number) => {
-    setSteps((prev) => prev.filter((_, i) => i !== index));
+    if (steps.length > 1) {
+      const newSteps = steps.filter((_, i) => i !== index);
+      setSteps(newSteps);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="bg-white rounded-lg p-6 space-y-4">
       <h3 className="text-lg font-bold">Новая цель</h3>
 
+      {/* Название цели */}
       <div>
-        <label className="block text-sm font-medium mb-1">Название цели</label>
+        <label htmlFor="goal-title" className="block text-sm font-medium mb-1">
+          Название цели
+        </label>
         <input
           type="text"
+          id="goal-title"
+          name="goalTitle"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           className="w-full p-2 border rounded-lg"
-          placeholder="Например: Научиться играть на гитаре"
+          placeholder="Введите название цели"
           required
         />
       </div>
 
+      {/* Описание */}
       <div>
-        <label className="block text-sm font-medium mb-1">Описание</label>
+        <label
+          htmlFor="goal-description"
+          className="block text-sm font-medium mb-1"
+        >
+          Описание
+        </label>
         <textarea
+          id="goal-description"
+          name="goalDescription"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           className="w-full p-2 border rounded-lg"
-          placeholder="Описание цели..."
-          rows={2}
+          placeholder="Описание цели (необязательно)"
+          rows={3}
         />
       </div>
 
+      {/* Сфера жизни */}
       <div>
-        <label className="block text-sm font-medium mb-1">Сфера жизни</label>
+        <label htmlFor="goal-sphere" className="block text-sm font-medium mb-1">
+          Сфера жизни
+        </label>
         <select
+          id="goal-sphere"
+          name="goalSphere"
           value={sphere}
           onChange={(e) => setSphere(e.target.value)}
           className="w-full p-2 border rounded-lg"
         >
           <option value="Развитие">Развитие</option>
-          <option value="Работа">Работа</option>
+          <option value="Карьера">Карьера</option>
           <option value="Здоровье">Здоровье</option>
           <option value="Отношения">Отношения</option>
           <option value="Финансы">Финансы</option>
@@ -85,6 +108,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({ onSubmit, onCancel }) => {
         </select>
       </div>
 
+      {/* Шаги к цели */}
       <div>
         <div className="flex justify-between items-center mb-2">
           <label className="block text-sm font-medium">Шаги к цели</label>
@@ -102,8 +126,10 @@ export const GoalForm: React.FC<GoalFormProps> = ({ onSubmit, onCancel }) => {
             <div key={index} className="flex gap-2">
               <input
                 type="text"
+                id={`goal-step-${index}`}
+                name={`goalStep${index}`}
                 value={step}
-                onChange={(e) => updateStep(index, e.target.value)}
+                onChange={(e) => handleStepChange(index, e.target.value)}
                 className="flex-1 p-2 border rounded-lg"
                 placeholder={`Шаг ${index + 1}`}
               />
@@ -121,6 +147,7 @@ export const GoalForm: React.FC<GoalFormProps> = ({ onSubmit, onCancel }) => {
         </div>
       </div>
 
+      {/* Кнопки */}
       <div className="flex gap-3 pt-4">
         <button
           type="submit"

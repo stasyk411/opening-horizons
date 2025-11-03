@@ -1,5 +1,5 @@
 ﻿import React from "react";
-import { Goal } from "../../../shared/types"; // ← ИСПРАВЛЕННЫЙ ИМПОРТ
+import { Goal } from "../../../shared/types";
 
 interface GoalItemProps {
   goal: Goal;
@@ -12,7 +12,6 @@ export const GoalItem: React.FC<GoalItemProps> = ({
   onToggleStep,
   onDelete,
 }) => {
-  // 🔽 ИСПРАВЛЯЕМ ОБРАБОТКУ ДАТЫ
   const formatDate = (dateString: string) => {
     try {
       return new Date(dateString).toLocaleDateString();
@@ -22,7 +21,6 @@ export const GoalItem: React.FC<GoalItemProps> = ({
   };
 
   return (
-    // СТАЛО (responsive):
     <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200 mx-2 sm:mx-0">
       {/* Заголовок и прогресс */}
       <div className="flex justify-between items-start mb-3">
@@ -43,7 +41,7 @@ export const GoalItem: React.FC<GoalItemProps> = ({
 
         <button
           onClick={() => onDelete(goal.id)}
-          className="text-red-500 hover:text-red-700 text-lg"
+          className="text-red-500 hover:text-red-700 text-xl min-w-[44px] min-h-[44px] flex items-center justify-center"
         >
           ×
         </button>
@@ -63,7 +61,7 @@ export const GoalItem: React.FC<GoalItemProps> = ({
         </div>
       </div>
 
-      {/* Список шагов */}
+      {/* Список шагов - ИСПРАВЛЕННЫЕ ЧЕКБОКСЫ */}
       <div className="space-y-2">
         {goal.steps.map((step, index) => (
           <div
@@ -72,17 +70,20 @@ export const GoalItem: React.FC<GoalItemProps> = ({
           >
             <input
               type="checkbox"
-              checked={step.completed}
+              id={`step-${step.id}`}
+              name={`step-completed-${step.id}`}
+              checked={step.completed || false}
               onChange={() => onToggleStep(goal.id, step.id)}
-              className="w-4 h-4 text-blue-500 rounded"
+              className="w-6 h-6 sm:w-5 sm:h-5 text-blue-500 rounded"
             />
-            <span
-              className={`flex-1 ${
+            <label
+              htmlFor={`step-${step.id}`}
+              className={`flex-1 cursor-pointer ${
                 step.completed ? "line-through text-gray-400" : "text-gray-700"
               }`}
             >
               {step.title}
-            </span>
+            </label>
             <span className="text-xs text-gray-400">{index + 1}</span>
           </div>
         ))}

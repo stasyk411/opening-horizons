@@ -73,6 +73,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({
       <div style={{ marginBottom: "15px" }}>
         <input
           type="text"
+          id="task-title"
+          name="taskTitle"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Опишите вашу задачу..."
@@ -83,12 +85,14 @@ export const TaskForm: React.FC<TaskFormProps> = ({
             borderRadius: "8px",
             fontSize: "16px",
           }}
+          required
         />
       </div>
 
       {/* Дата выполнения */}
       <div style={{ marginBottom: "15px" }}>
         <label
+          htmlFor="task-date"
           style={{
             display: "block",
             marginBottom: "8px",
@@ -101,6 +105,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({
         <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
           <input
             type="date"
+            id="task-date"
+            name="taskDate"
             value={taskDate}
             onChange={(e) => setTaskDate(e.target.value)}
             style={{
@@ -142,6 +148,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
         {/* Время начала */}
         <div>
           <label
+            htmlFor="task-start-time"
             style={{
               display: "block",
               marginBottom: "5px",
@@ -153,6 +160,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({
           </label>
           <input
             type="time"
+            id="task-start-time"
+            name="taskStartTime"
             value={startTime}
             onChange={(e) => setStartTime(e.target.value)}
             style={{
@@ -167,6 +176,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
         {/* Время окончания */}
         <div>
           <label
+            htmlFor="task-end-time"
             style={{
               display: "block",
               marginBottom: "5px",
@@ -178,6 +188,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({
           </label>
           <input
             type="time"
+            id="task-end-time"
+            name="taskEndTime"
             value={endTime}
             onChange={(e) => setEndTime(e.target.value)}
             style={{
@@ -201,6 +213,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
         {/* Повторение */}
         <div>
           <label
+            htmlFor="task-repeat"
             style={{
               display: "block",
               marginBottom: "5px",
@@ -211,6 +224,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({
             Повторение
           </label>
           <select
+            id="task-repeat"
+            name="taskRepeat"
             value={repeat}
             onChange={(e) => setRepeat(e.target.value)}
             style={{
@@ -231,6 +246,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
         {/* Будильник */}
         <div>
           <label
+            htmlFor="task-alarm"
             style={{
               display: "block",
               marginBottom: "5px",
@@ -241,6 +257,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({
             Будильник
           </label>
           <select
+            id="task-alarm"
+            name="taskAlarm"
             value={alarm}
             onChange={(e) => setAlarm(e.target.value)}
             style={{
@@ -263,6 +281,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
       {/* Сфера жизни */}
       <div style={{ marginBottom: "15px" }}>
         <label
+          htmlFor="task-category"
           style={{
             display: "block",
             marginBottom: "5px",
@@ -273,6 +292,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({
           Сфера жизни
         </label>
         <select
+          id="task-category"
+          name="taskCategory"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
           style={{
