@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { Goal } from "../../../shared/types"; // ← ИСПРАВЛЕННЫЙ ИМПОРТ
 
 interface GoalItemProps {
@@ -22,7 +22,8 @@ export const GoalItem: React.FC<GoalItemProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-lg p-4 border border-gray-200">
+    // СТАЛО (responsive):
+    <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200 mx-2 sm:mx-0">
       {/* Заголовок и прогресс */}
       <div className="flex justify-between items-start mb-3">
         <div className="flex-1">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+п»їimport React, { useState, useEffect } from "react";
 import { Goal, GoalStep } from "../../../shared/types";
 import { GoalForm } from "./GoalForm";
 import { GoalsList } from "./GoalsList";
@@ -11,7 +11,7 @@ const GoalsTab: React.FC = () => {
   const [filter, setFilter] = useState<"all" | "active" | "completed">("all");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Загрузка целей из localStorage
+  // Р—Р°РіСЂСѓР·РєР° С†РµР»РµР№ РёР· localStorage
   useEffect(() => {
     loadGoals();
   }, []);
@@ -35,7 +35,7 @@ const GoalsTab: React.FC = () => {
       localStorage.setItem("life-wheel-goals", JSON.stringify(updatedGoals));
     } catch (error) {
       console.error("Error saving goals:", error);
-      showError("Ошибка при сохранении целей");
+      showError("РћС€РёР±РєР° РїСЂРё СЃРѕС…СЂР°РЅРµРЅРёРё С†РµР»РµР№");
     }
   };
 
@@ -44,7 +44,7 @@ const GoalsTab: React.FC = () => {
     setTimeout(() => setErrorMessage(null), 5000);
   };
 
-  // Обработчики целей
+  // РћР±СЂР°Р±РѕС‚С‡РёРєРё С†РµР»РµР№
   const handleAddGoal = (goalData: any) => {
     try {
       const newGoal: Goal = {
@@ -57,8 +57,8 @@ const GoalsTab: React.FC = () => {
         updatedAt: new Date().toISOString(),
         deadline: goalData.deadline,
         completed: false,
-        priority: goalData.priority || "medium", // < ДОБАВЛЕНО
-        category: goalData.category || "general", // < ДОБАВЛЕНО
+        priority: goalData.priority || "medium",
+        category: goalData.category || "general",
         steps:
           goalData.steps?.map((step: any, index: number) => ({
             id: `${Date.now()}-${index}`,
@@ -73,7 +73,7 @@ const GoalsTab: React.FC = () => {
       saveGoals(updatedGoals);
       setShowGoalForm(false);
     } catch (error) {
-      showError("Ошибка при создании цели");
+      showError("РћС€РёР±РєР° РїСЂРё СЃРѕР·РґР°РЅРёРё С†РµР»Рё");
     }
   };
 
@@ -85,7 +85,7 @@ const GoalsTab: React.FC = () => {
             step.id === stepId ? { ...step, completed: !step.completed } : step
           );
 
-          // Пересчет прогресса
+          // РџРµСЂРµСЃС‡РµС‚ РїСЂРѕРіСЂРµСЃСЃР°
           const completedSteps = updatedSteps.filter(
             (step) => step.completed
           ).length;
@@ -109,18 +109,18 @@ const GoalsTab: React.FC = () => {
 
       saveGoals(updatedGoals);
     } catch (error) {
-      showError("Ошибка при обновлении шага");
+      showError("РћС€РёР±РєР° РїСЂРё РѕР±РЅРѕРІР»РµРЅРёРё С€Р°РіР°");
     }
   };
 
   const handleDeleteGoal = (goalId: string) => {
     try {
-      if (confirm("Удалить эту цель?")) {
+      if (confirm("РЈРґР°Р»РёС‚СЊ СЌС‚Сѓ С†РµР»СЊ?")) {
         const updatedGoals = goals.filter((goal) => goal.id !== goalId);
         saveGoals(updatedGoals);
       }
     } catch (error) {
-      showError("Ошибка при удалении цели");
+      showError("РћС€РёР±РєР° РїСЂРё СѓРґР°Р»РµРЅРёРё С†РµР»Рё");
     }
   };
 
@@ -133,7 +133,7 @@ const GoalsTab: React.FC = () => {
       let updatedGoals: Goal[];
 
       if (hasSteps) {
-        // Для целей с шагами - переключаем все шаги
+        // Р”Р»СЏ С†РµР»РµР№ СЃ С€Р°РіР°РјРё - РїРµСЂРµРєР»СЋС‡Р°РµРј РІСЃРµ С€Р°РіРё
         const allStepsCompleted = goal.steps.every((step) => step.completed);
         updatedGoals = goals.map((g) =>
           g.id === goalId
@@ -151,7 +151,7 @@ const GoalsTab: React.FC = () => {
             : g
         );
       } else {
-        // Для целей без шагов - просто переключаем completed
+        // Р”Р»СЏ С†РµР»РµР№ Р±РµР· С€Р°РіРѕРІ - РїСЂРѕСЃС‚Рѕ РїРµСЂРµРєР»СЋС‡Р°РµРј completed
         updatedGoals = goals.map((g) =>
           g.id === goalId
             ? {
@@ -167,11 +167,11 @@ const GoalsTab: React.FC = () => {
 
       saveGoals(updatedGoals);
     } catch (error) {
-      showError("Ошибка при обновлении цели");
+      showError("РћС€РёР±РєР° РїСЂРё РѕР±РЅРѕРІР»РµРЅРёРё С†РµР»Рё");
     }
   };
 
-  // Фильтрация целей
+  // Р¤РёР»СЊС‚СЂР°С†РёСЏ С†РµР»РµР№
   const filteredGoals = goals.filter((goal) => {
     switch (filter) {
       case "active":
@@ -183,7 +183,7 @@ const GoalsTab: React.FC = () => {
     }
   });
 
-  // Статистика
+  // РЎС‚Р°С‚РёСЃС‚РёРєР°
   const stats = {
     total: goals.length,
     completed: goals.filter((g) => g.completed).length,
@@ -196,53 +196,31 @@ const GoalsTab: React.FC = () => {
         : 0,
   };
 
-  const sectionTitleStyle = {
-    fontSize: "1.8rem",
-    marginBottom: "25px",
-    color: "#8A2BE2",
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-  };
-
-  const containerStyle = {
-    background: "white",
-    borderRadius: "20px",
-    padding: "30px",
-    boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
-  };
-
   return (
-    <div style={containerStyle}>
-      <h2 style={sectionTitleStyle}>?? Система Целей</h2>
+    <div className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 lg:p-8 mx-2 sm:mx-0 shadow-lg">
+      {/* Р—Р°РіРѕР»РѕРІРѕРє СЃ responsive СЃС‚РёР»СЏРјРё */}
+      <h2 className="text-2xl sm:text-3xl font-bold text-purple-600 mb-4 sm:mb-6 flex items-center gap-3">
+        рџЋЇ РЎРёСЃС‚РµРјР° Р¦РµР»РµР№
+      </h2>
 
-      {/* Статистика */}
+      {/* РЎС‚Р°С‚РёСЃС‚РёРєР° */}
       <GoalStats stats={stats} />
 
-      {/* Фильтры */}
+      {/* Р¤РёР»СЊС‚СЂС‹ */}
       <GoalFilters
         currentFilter={filter}
         onFilterChange={setFilter}
         onAddGoal={() => setShowGoalForm(true)}
       />
 
-      {/* Сообщение об ошибке */}
+      {/* РЎРѕРѕР±С‰РµРЅРёРµ РѕР± РѕС€РёР±РєРµ СЃ Tailwind */}
       {errorMessage && (
-        <div
-          style={{
-            background: "#ff4444",
-            color: "white",
-            padding: "12px 16px",
-            borderRadius: "8px",
-            marginBottom: "20px",
-            textAlign: "center",
-          }}
-        >
+        <div className="bg-red-500 text-white p-3 sm:p-4 rounded-lg mb-4 sm:mb-5 text-center mx-2 sm:mx-0">
           {errorMessage}
         </div>
       )}
 
-      {/* Форма создания цели */}
+      {/* Р¤РѕСЂРјР° СЃРѕР·РґР°РЅРёСЏ С†РµР»Рё */}
       {showGoalForm && (
         <GoalForm
           onSubmit={handleAddGoal}
@@ -250,7 +228,7 @@ const GoalsTab: React.FC = () => {
         />
       )}
 
-      {/* Список целей */}
+      {/* РЎРїРёСЃРѕРє С†РµР»РµР№ */}
       <GoalsList
         goals={filteredGoals}
         onAddGoal={handleAddGoal}
@@ -258,22 +236,17 @@ const GoalsTab: React.FC = () => {
         onDeleteGoal={handleDeleteGoal}
       />
 
+      {/* Empty state СЃ responsive СЃС‚РёР»СЏРјРё */}
       {goals.length === 0 && !showGoalForm && (
-        <div
-          style={{
-            textAlign: "center",
-            padding: "40px 20px",
-            color: "#666",
-          }}
-        >
-          <div style={{ fontSize: "4rem", marginBottom: "20px" }}>??</div>
-          <h3 style={{ margin: "0 0 10px 0", color: "#333" }}>
-            У вас пока нет целей
+        <div className="text-center p-6 sm:p-8 md:p-10 text-gray-600 mx-2 sm:mx-0">
+          <div className="text-5xl sm:text-6xl mb-4 sm:mb-5">рџЋЇ</div>
+          <h3 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4 text-gray-800">
+            РЈ РІР°СЃ РїРѕРєР° РЅРµС‚ С†РµР»РµР№
           </h3>
-          <p style={{ margin: 0, lineHeight: 1.5 }}>
-            Начните с создания первой цели!
-            <br />
-            Разбейте большие цели на маленькие шаги для лучшего прогресса.
+          <p className="text-base sm:text-lg leading-relaxed">
+            РќР°С‡РЅРёС‚Рµ СЃ СЃРѕР·РґР°РЅРёСЏ РїРµСЂРІРѕР№ С†РµР»Рё!
+            <br className="hidden sm:block" />
+            Р Р°Р·Р±РµР№С‚Рµ Р±РѕР»СЊС€РёРµ С†РµР»Рё РЅР° РјР°Р»РµРЅСЊРєРёРµ С€Р°РіРё РґР»СЏ Р»СѓС‡С€РµРіРѕ РїСЂРѕРіСЂРµСЃСЃР°.
           </p>
         </div>
       )}
@@ -282,10 +255,3 @@ const GoalsTab: React.FC = () => {
 };
 
 export { GoalsTab };
-
-
-
-
-
-
-

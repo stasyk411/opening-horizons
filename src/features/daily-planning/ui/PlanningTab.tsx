@@ -58,7 +58,8 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
         description: "",
         completed: false,
         priority: "medium",
-        date: undefined,
+        // СТАЛО:
+        date: new Date().toISOString().split("T")[0], // Формат YYYY-MM-DD
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         archetype: archetype || undefined,

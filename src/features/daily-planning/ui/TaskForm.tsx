@@ -40,7 +40,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
       title: title.trim(),
       description: description.trim(),
       category: category.trim() || undefined,
-      date: taskDate || undefined,
+      date: taskDate || new Date().toISOString().split("T")[0],
       startTime: startTime || undefined,
       endTime: endTime || undefined,
       repeat: repeat || undefined,

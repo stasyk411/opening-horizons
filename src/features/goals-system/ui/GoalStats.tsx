@@ -1,6 +1,4 @@
-// ВСТАВЬ ЭТОТ КОД В GoalStats.tsx:
-
-import React from "react";
+﻿import React from "react";
 
 interface GoalStatsProps {
   stats: {
@@ -12,31 +10,6 @@ interface GoalStatsProps {
 }
 
 export const GoalStats: React.FC<GoalStatsProps> = ({ stats }) => {
-  const statsContainerStyle = {
-    background: "linear-gradient(135deg, #8A2BE2, #4B0082)",
-    color: "white",
-    padding: "25px",
-    borderRadius: "15px",
-    marginBottom: "25px",
-    boxShadow: "0 10px 25px rgba(138, 43, 226, 0.3)",
-  };
-
-  const progressBarStyle = {
-    background: "rgba(255, 255, 255, 0.2)",
-    borderRadius: "10px",
-    height: "12px",
-    margin: "15px 0",
-    overflow: "hidden" as const,
-  };
-
-  const progressFillStyle = {
-    background: "linear-gradient(to right, #00FF00, #32CD32)",
-    height: "100%",
-    width: `${stats.progress}%`,
-    borderRadius: "10px",
-    transition: "width 0.5s ease",
-  };
-
   const getMotivationalMessage = () => {
     if (stats.total === 0) return "🎯 Начните с первой цели!";
     if (stats.progress === 100) return "🎉 Все цели завершены! Вы великолепны!";
@@ -49,67 +22,48 @@ export const GoalStats: React.FC<GoalStatsProps> = ({ stats }) => {
   };
 
   return (
-    <div style={statsContainerStyle}>
-      <h3
-        style={{
-          margin: "0 0 20px 0",
-          fontSize: "1.3rem",
-          textAlign: "center" as const,
-        }}
-      >
+    <div className="bg-gradient-to-br from-purple-600 to-indigo-800 text-white p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-lg mb-4 sm:mb-6 mx-2 sm:mx-0">
+      <h3 className="text-lg sm:text-xl font-semibold text-center mb-4 sm:mb-5">
         📊 Статистика целей
       </h3>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
-          gap: "15px",
-          marginBottom: "20px",
-        }}
-      >
-        <div style={{ textAlign: "center" as const }}>
-          <div style={{ fontSize: "2rem", fontWeight: "bold" }}>
-            {stats.total}
-          </div>
-          <div style={{ fontSize: "0.9rem", opacity: 0.9 }}>Всего</div>
+      {/* Responsive grid: 2 колонки на mobile, 4 на desktop */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-5">
+        <div className="text-center">
+          <div className="text-2xl sm:text-3xl font-bold">{stats.total}</div>
+          <div className="text-xs sm:text-sm opacity-90 mt-1">Всего</div>
         </div>
 
-        <div style={{ textAlign: "center" as const }}>
-          <div style={{ fontSize: "2rem", fontWeight: "bold" }}>
-            {stats.active}
-          </div>
-          <div style={{ fontSize: "0.9rem", opacity: 0.9 }}>Активных</div>
+        <div className="text-center">
+          <div className="text-2xl sm:text-3xl font-bold">{stats.active}</div>
+          <div className="text-xs sm:text-sm opacity-90 mt-1">Активных</div>
         </div>
 
-        <div style={{ textAlign: "center" as const }}>
-          <div style={{ fontSize: "2rem", fontWeight: "bold" }}>
+        <div className="text-center">
+          <div className="text-2xl sm:text-3xl font-bold">
             {stats.completed}
           </div>
-          <div style={{ fontSize: "0.9rem", opacity: 0.9 }}>Завершено</div>
+          <div className="text-xs sm:text-sm opacity-90 mt-1">Завершено</div>
         </div>
 
-        <div style={{ textAlign: "center" as const }}>
-          <div style={{ fontSize: "2rem", fontWeight: "bold" }}>
+        <div className="text-center">
+          <div className="text-2xl sm:text-3xl font-bold">
             {stats.progress}%
           </div>
-          <div style={{ fontSize: "0.9rem", opacity: 0.9 }}>Прогресс</div>
+          <div className="text-xs sm:text-sm opacity-90 mt-1">Прогресс</div>
         </div>
       </div>
 
-      <div style={progressBarStyle}>
-        <div style={progressFillStyle}></div>
+      {/* Progress bar */}
+      <div className="bg-white bg-opacity-20 rounded-full h-2 sm:h-3 mb-3 sm:mb-4 overflow-hidden">
+        <div
+          className="bg-gradient-to-r from-green-400 to-green-500 h-full rounded-full transition-all duration-500"
+          style={{ width: `${stats.progress}%` }}
+        ></div>
       </div>
 
-      <div
-        style={{
-          fontSize: "0.9rem",
-          textAlign: "center" as const,
-          opacity: 0.9,
-          fontStyle: "italic",
-          marginTop: "10px",
-        }}
-      >
+      {/* Motivational message */}
+      <div className="text-xs sm:text-sm text-center opacity-90 italic">
         {getMotivationalMessage()}
       </div>
     </div>

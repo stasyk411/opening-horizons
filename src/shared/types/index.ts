@@ -1,4 +1,4 @@
-// 🔽 ИСПРАВЛЯЕМ LIFESPHERE - ДЕЛАЕМ ЕГО ИНТЕРФЕЙСОМ
+﻿// 🔽 ИСПРАВЛЯЕМ LIFESPHERE - ДЕЛАЕМ ЕГО ИНТЕРФЕЙСОМ
 export interface LifeSphere {
   id: string;
   name: string;
@@ -113,4 +113,3 @@ export interface CreateGoalData {
   deadline?: string;
   steps?: Array<{ title: string; deadline?: string }>;
 }
-
