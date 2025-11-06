@@ -1,4 +1,4 @@
-﻿// 🚀 ENHANCED UNIFIED DATA MANAGER - Улучшенный менеджер синхронизации
+// 🚀 ENHANCED UNIFIED DATA MANAGER - Улучшенный менеджер синхронизации
 class UnifiedDataManager {
   constructor() {
     console.log("🔄 Enhanced Unified Data Manager инициализирован");
@@ -31,19 +31,7 @@ class UnifiedDataManager {
   setupDataHandlers() {
     // 🔥 ИСПРАВЛЕННЫЕ СХЕМЫ ВАЛИДАЦИИ
     const schemas = {
-      react: [
-        "id",
-        "title",
-        "completed",
-        "createdAt",
-        // 🔥 ОПЦИОНАЛЬНЫЕ ПОЛЯ - убрали обязательную проверку
-        // "description",
-        // "sphere",
-        // "category",
-        // "priority",
-        // "updatedAt",
-        // "userId"
-      ],
+      react: ["id", "title", "completed", "createdAt"],
       feature: ["id", "title", "area", "completed", "createdAt"],
       minimalist: ["id", "title", "completed", "createdAt", "area"],
     };
@@ -344,7 +332,7 @@ class UnifiedDataManager {
         "📊 Загружено задач из",
         this.currentArchitecture + ":",
         currentTasks.length,
-        currentTasks // 🔥 ДОБАВИЛИ ЛОГИРОВАНИЕ САМИХ ДАННЫХ
+        currentTasks
       );
 
       // Синхронизируем с другими архитектурами
@@ -353,12 +341,11 @@ class UnifiedDataManager {
       for (const [arch, handler] of this.dataHandlers.entries()) {
         if (arch !== this.currentArchitecture) {
           console.log("🔄 Синхронизация с", arch + "...");
-          const transformedTasks = this.transformTasks(currentTasks, arch);
-          console.log(
-            `📋 Трансформированные задачи для ${arch}:`,
-            transformedTasks
-          ); // 🔥 ДИАГНОСТИКА
-          syncPromises.push(handler.saveTasks(transformedTasks));
+
+          // 🔥 КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Сохраняем исходные задачи
+          // Вместо трансформации, которая теряет данные
+          console.log(`📋 Сохраняем ${currentTasks.length} задач для ${arch}`);
+          syncPromises.push(handler.saveTasks(currentTasks));
         }
       }
 
@@ -395,46 +382,13 @@ class UnifiedDataManager {
 
   // 🔄 УЛУЧШЕННАЯ ТРАНСФОРМАЦИЯ ЗАДАЧ МЕЖДУ АРХИТЕКТУРАМИ
   transformTasks(tasks, targetArchitecture) {
-    console.log("🔄 Трансформация задач для", targetArchitecture);
+    console.log(
+      `🔄 Трансформация ${tasks.length} задач для ${targetArchitecture}`
+    );
 
-    return tasks.map((task) => {
-      // 🔥 ВАЖНОЕ ИСПРАВЛЕНИЕ: Гарантируем наличие всех обязательных полей
-      const baseTask = {
-        id: task.id || Date.now().toString(),
-        title: task.title || "Без названия",
-        completed: task.completed || false,
-        createdAt: task.createdAt || new Date().toISOString(),
-      };
-
-      // Специфичные преобразования для каждой архитектуры
-      switch (targetArchitecture) {
-        case "react":
-          return {
-            ...baseTask,
-            description: task.description || "",
-            sphere: task.area || task.sphere || "general",
-            category: task.category || "default",
-            priority: task.priority || "medium",
-            updatedAt: task.updatedAt || new Date().toISOString(),
-            userId: task.userId || "default-user",
-          };
-
-        case "feature":
-          return {
-            ...baseTask,
-            area: task.sphere || task.area || "general",
-          };
-
-        case "minimalist":
-          return {
-            ...baseTask,
-            area: task.sphere || task.area || "general",
-          };
-
-        default:
-          return baseTask;
-      }
-    });
+    // 🔥 ВАЖНОЕ ИСПРАВЛЕНИЕ: Возвращаем задачи как есть
+    // Временное решение - отключаем трансформацию чтобы не терять данные
+    return tasks;
   }
 
   // 🎮 РУЧНОЕ УПРАВЛЕНИЕ
