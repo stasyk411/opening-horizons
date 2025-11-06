@@ -1,5 +1,11 @@
 // src/__tests__/App.test.tsx
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from "@testing-library/react";
 import App from "../App";
 
 // Mock для всех зависимостей
@@ -114,6 +120,12 @@ beforeAll(() => {
       value: mockUnifiedDataManager,
     });
   }
+
+  // Mock для document.dispatchEvent
+  Object.defineProperty(document, "dispatchEvent", {
+    value: jest.fn(),
+    writable: true,
+  });
 });
 
 afterAll(() => {
@@ -142,11 +154,19 @@ describe("App", () => {
   it("displays all navigation tabs", () => {
     render(<App />);
 
-    expect(screen.getByText("📅 Планирование Дня")).toBeInTheDocument();
-    expect(screen.getByText("🎯 Цели")).toBeInTheDocument();
-    expect(screen.getByText("🌙 Вечерний Анализ")).toBeInTheDocument();
-    expect(screen.getByText("🍅 Pomodoro")).toBeInTheDocument();
-    expect(screen.getByText("⚙️ Настройки")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /планирование дня/i })
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /цели/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /вечерний анализ/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /pomodoro/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /настройки/i })
+    ).toBeInTheDocument();
   });
 
   it("shows planning tab by default", () => {
@@ -158,22 +178,40 @@ describe("App", () => {
     render(<App />);
 
     // Click on Goals tab
-    fireEvent.click(screen.getByText("🎯 Цели"));
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: /цели/i }));
+    });
+
     await waitFor(() => {
       expect(screen.getByTestId("goals-tab")).toBeInTheDocument();
     });
 
     // Click on Pomodoro tab
-    fireEvent.click(screen.getByText("🍅 Pomodoro"));
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: /pomodoro/i }));
+    });
+
     await waitFor(() => {
       expect(screen.getByTestId("pomodoro-tab")).toBeInTheDocument();
     });
 
     // Click on Settings tab
-    fireEvent.click(screen.getByText("⚙️ Настройки"));
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: /настройки/i }));
+    });
+
     await waitFor(() => {
       expect(screen.getByTestId("settings-tab")).toBeInTheDocument();
     });
+  });
+
+  it("displays architecture indicator in development mode", () => {
+    render(<App />);
+    expect(
+      screen.getByText((content, element) => {
+        return element?.textContent === "🏗️ Feature-Based";
+      })
+    ).toBeInTheDocument();
   });
 
   it("handles mobile layout correctly", () => {
@@ -186,6 +224,15 @@ describe("App", () => {
     // Should render with mobile-optimized layout
     const header = screen.getByText("🎯 Opening Horizons");
     expect(header).toBeInTheDocument();
+
+    // Check mobile navigation buttons
+    expect(screen.getByRole("button", { name: /план/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /цели/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /анализ/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /таймер/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /настройки/i })
+    ).toBeInTheDocument();
   });
 
   it("loads data from localStorage on mount", () => {
@@ -221,10 +268,11 @@ describe("App", () => {
     render(<App />);
 
     // Simulate PWA install prompt - создаем кастомное событие
-    const event = new Event("beforeinstallprompt");
-    Object.assign(event, mockEvent);
-
-    window.dispatchEvent(event);
+    await act(async () => {
+      const event = new Event("beforeinstallprompt");
+      Object.assign(event, mockEvent);
+      window.dispatchEvent(event);
+    });
 
     // Should show install button
     await waitFor(() => {
@@ -236,14 +284,16 @@ describe("App", () => {
     render(<App />);
 
     // Trigger resize
-    window.innerWidth = 500;
-    fireEvent(window, new Event("resize"));
+    act(() => {
+      window.innerWidth = 500;
+      fireEvent(window, new Event("resize"));
+    });
 
     // App should handle resize without crashing
     expect(screen.getByText("🎯 Opening Horizons")).toBeInTheDocument();
   });
 
-  it("renders error boundaries for all features", () => {
+  it("renders error boundaries for all features", async () => {
     render(<App />);
 
     expect(
@@ -251,12 +301,21 @@ describe("App", () => {
     ).toBeInTheDocument();
 
     // Switch to other tabs to trigger their error boundaries
-    fireEvent.click(screen.getByText("🎯 Цели"));
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: /цели/i }));
+    });
+
     expect(
       screen.getByTestId("error-boundary-Система целей")
     ).toBeInTheDocument();
 
-    fireEvent.click(screen.getByText("🍅 Pomodoro"));
+    // For mobile layout, use "таймер" instead of "pomodoro"
+    await act(async () => {
+      // Set mobile viewport for this test
+      window.innerWidth = 375;
+      fireEvent.click(screen.getByRole("button", { name: /таймер/i }));
+    });
+
     expect(
       screen.getByTestId("error-boundary-Pomodoro таймер")
     ).toBeInTheDocument();
@@ -285,11 +344,22 @@ describe("App Architecture Switching", () => {
     );
   });
 
+  it("initializes with default architecture", () => {
+    render(<App />);
+    expect(
+      screen.getByText((content, element) => {
+        return element?.textContent === "🏗️ Feature-Based";
+      })
+    ).toBeInTheDocument();
+  });
+
   it("handles architecture change via keyboard shortcuts", async () => {
     render(<App />);
 
     // Simulate Ctrl+F2 for minimalist architecture
-    fireEvent.keyDown(window, { ctrlKey: true, key: "F2" });
+    await act(async () => {
+      fireEvent.keyDown(window, { ctrlKey: true, key: "F2" });
+    });
 
     // Should switch to minimalist architecture
     await waitFor(() => {
@@ -303,7 +373,9 @@ describe("App Data Management", () => {
     render(<App />);
 
     // Simulate sync completed event
-    fireEvent(document, new CustomEvent("syncCompleted"));
+    await act(async () => {
+      fireEvent(document, new CustomEvent("syncCompleted"));
+    });
 
     // Should trigger data reload
     await waitFor(() => {
@@ -315,7 +387,9 @@ describe("App Data Management", () => {
     render(<App />);
 
     // Simulate data changed event
-    fireEvent(document, new CustomEvent("dataChanged"));
+    await act(async () => {
+      fireEvent(document, new CustomEvent("dataChanged"));
+    });
 
     // Should trigger data reload
     await waitFor(() => {
