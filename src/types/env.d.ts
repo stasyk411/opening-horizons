@@ -1,4 +1,4 @@
-// Environment Variables Types
+﻿// Environment Variables Types
 interface ImportMetaEnv {
   readonly VITE_APP_MODE: "development" | "production";
   readonly VITE_DEFAULT_ARCHITECTURE: "feature" | "react" | "minimalist";
