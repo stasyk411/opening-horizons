@@ -19,23 +19,30 @@ class UnifiedDataManager {
     this.setupEventListeners();
     this.setupDataHandlers();
     this.setupCacheCleanup();
+
+    // 🔥 ВАЖНОЕ ИСПРАВЛЕНИЕ: Отправляем событие когда готов
+    setTimeout(() => {
+      document.dispatchEvent(new CustomEvent("unifiedDataManagerReady"));
+      console.log("✅ Unified Data Manager полностью инициализирован и готов");
+    }, 100);
   }
 
   // 🔧 НАСТРОЙКА ОБРАБОТЧИКОВ ДАННЫХ С ВАЛИДАЦИЕЙ
   setupDataHandlers() {
-    // Схемы валидации для каждой архитектуры
+    // 🔥 ИСПРАВЛЕННЫЕ СХЕМЫ ВАЛИДАЦИИ
     const schemas = {
       react: [
         "id",
         "title",
-        "description",
         "completed",
-        "sphere",
-        "category",
-        "priority",
         "createdAt",
-        "updatedAt",
-        "userId",
+        // 🔥 ОПЦИОНАЛЬНЫЕ ПОЛЯ - убрали обязательную проверку
+        // "description",
+        // "sphere",
+        // "category",
+        // "priority",
+        // "updatedAt",
+        // "userId"
       ],
       feature: ["id", "title", "area", "completed", "createdAt"],
       minimalist: ["id", "title", "completed", "createdAt", "area"],
@@ -140,7 +147,7 @@ class UnifiedDataManager {
     });
   }
 
-  // ✅ ВАЛИДАЦИЯ ДАННЫХ
+  // ✅ УЛУЧШЕННАЯ ВАЛИДАЦИЯ ДАННЫХ
   validateData(data, schema, architecture) {
     if (!Array.isArray(data)) {
       console.warn(`⚠️ ${architecture}: Данные не являются массивом`);
@@ -148,16 +155,32 @@ class UnifiedDataManager {
     }
 
     return data.filter((task) => {
-      // Проверяем обязательные поля
-      const isValid = schema.every((field) => task.hasOwnProperty(field));
+      // 🔥 ВАЖНОЕ ИСПРАВЛЕНИЕ: Проверяем только ОБЯЗАТЕЛЬНЫЕ поля
+      const requiredFields = ["id", "title", "completed", "createdAt"];
+      const hasRequiredFields = requiredFields.every((field) =>
+        task.hasOwnProperty(field)
+      );
 
-      if (!isValid) {
+      if (!hasRequiredFields) {
         console.warn(
-          `⚠️ ${architecture}: Задача с ID ${task.id} не прошла валидацию`
+          `⚠️ ${architecture}: Задача с ID ${task.id} не имеет обязательных полей`,
+          task
+        );
+        return false;
+      }
+
+      // 🔥 ДОПОЛНИТЕЛЬНО: Логируем проблемные задачи для отладки
+      const missingFields = requiredFields.filter(
+        (field) => !task.hasOwnProperty(field)
+      );
+      if (missingFields.length > 0) {
+        console.warn(
+          `⚠️ ${architecture}: Задача ${task.id} отсутствуют поля:`,
+          missingFields
         );
       }
 
-      return isValid;
+      return true;
     });
   }
 
@@ -209,6 +232,8 @@ class UnifiedDataManager {
     document.addEventListener("architectureChanged", (event) => {
       this.currentArchitecture = event.detail.architecture;
       console.log("🏗️ Архитектура изменена на:", this.currentArchitecture);
+
+      // 🔥 ВАЖНОЕ ИСПРАВЛЕНИЕ: Запускаем синхронизацию ПРИ КАЖДОМ переключении
       this.queueSync();
     });
 
@@ -318,7 +343,8 @@ class UnifiedDataManager {
       console.log(
         "📊 Загружено задач из",
         this.currentArchitecture + ":",
-        currentTasks.length
+        currentTasks.length,
+        currentTasks // 🔥 ДОБАВИЛИ ЛОГИРОВАНИЕ САМИХ ДАННЫХ
       );
 
       // Синхронизируем с другими архитектурами
@@ -328,6 +354,10 @@ class UnifiedDataManager {
         if (arch !== this.currentArchitecture) {
           console.log("🔄 Синхронизация с", arch + "...");
           const transformedTasks = this.transformTasks(currentTasks, arch);
+          console.log(
+            `📋 Трансформированные задачи для ${arch}:`,
+            transformedTasks
+          ); // 🔥 ДИАГНОСТИКА
           syncPromises.push(handler.saveTasks(transformedTasks));
         }
       }
@@ -363,12 +393,12 @@ class UnifiedDataManager {
     }
   }
 
-  // 🔄 ТРАНСФОРМАЦИЯ ЗАДАЧ МЕЖДУ АРХИТЕКТУРАМИ
+  // 🔄 УЛУЧШЕННАЯ ТРАНСФОРМАЦИЯ ЗАДАЧ МЕЖДУ АРХИТЕКТУРАМИ
   transformTasks(tasks, targetArchitecture) {
     console.log("🔄 Трансформация задач для", targetArchitecture);
 
     return tasks.map((task) => {
-      // Базовые поля, общие для всех архитектур
+      // 🔥 ВАЖНОЕ ИСПРАВЛЕНИЕ: Гарантируем наличие всех обязательных полей
       const baseTask = {
         id: task.id || Date.now().toString(),
         title: task.title || "Без названия",
@@ -385,7 +415,7 @@ class UnifiedDataManager {
             sphere: task.area || task.sphere || "general",
             category: task.category || "default",
             priority: task.priority || "medium",
-            updatedAt: new Date().toISOString(),
+            updatedAt: task.updatedAt || new Date().toISOString(),
             userId: task.userId || "default-user",
           };
 
@@ -453,4 +483,5 @@ class UnifiedDataManager {
 // 🚀 СОЗДАЕМ ГЛОБАЛЬНЫЙ ЭКЗЕМПЛЯР
 window.unifiedDataManager = new UnifiedDataManager();
 
+// ✅ ЭКСПОРТ ДЛЯ TypeScript
 export default UnifiedDataManager;
