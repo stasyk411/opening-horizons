@@ -1,4 +1,4 @@
-﻿// Компонент RestCove
+// Компонент RestCove
 export default function RestCove() {
   return (
     <div className="p-8">

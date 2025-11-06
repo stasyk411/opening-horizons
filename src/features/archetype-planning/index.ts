@@ -1,4 +1,4 @@
-﻿// УДАЛИТЬ ЭТУ СТРОКУ:
+// УДАЛИТЬ ЭТУ СТРОКУ:
 // export { ReflectionTab } from './ReflectionTab';
 
 // ОСТАВИТЬ ТОЛЬКО ЭТУ:

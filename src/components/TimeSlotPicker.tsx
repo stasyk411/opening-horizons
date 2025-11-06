@@ -1,4 +1,4 @@
-﻿// Компонент TimeSlotPicker
+// Компонент TimeSlotPicker
 export default function TimeSlotPicker() {
   return (
     <div className="p-8">

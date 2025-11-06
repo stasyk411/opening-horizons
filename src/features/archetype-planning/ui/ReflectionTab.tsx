@@ -1,4 +1,4 @@
-﻿// ВСТАВЬ ЭТОТ КОД В ReflectionTab.tsx (ЗАМЕНИ ВЕСЬ ФАЙЛ):
+// ВСТАВЬ ЭТОТ КОД В ReflectionTab.tsx (ЗАМЕНИ ВЕСЬ ФАЙЛ):
 
 import React, { useState, useEffect } from "react";
 import { Reflection, Task } from "../../../shared/types";
