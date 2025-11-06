@@ -70,10 +70,30 @@ const LoadingFallback: React.FC<{ featureName: string }> = ({
   </div>
 );
 
-// 🔽 ИНДИКАТОР АРХИТЕКТУРЫ
-const ArchitectureIndicator: React.FC<{ architecture: string }> = ({
-  architecture,
-}) => {
+// 🔧 КОНФИГУРАЦИЯ РЕЖИМОВ
+const getAppConfig = () => {
+  const isDevelopment = import.meta.env.VITE_APP_MODE === "development";
+  const defaultArchitecture =
+    import.meta.env.VITE_DEFAULT_ARCHITECTURE || "feature";
+  const enableArchSwitcher =
+    import.meta.env.VITE_ENABLE_ARCH_SWITCHER === "true";
+  const enableDevTools = import.meta.env.VITE_ENABLE_DEV_TOOLS === "true";
+
+  return {
+    isDevelopment,
+    defaultArchitecture,
+    enableArchSwitcher,
+    enableDevTools,
+  };
+};
+
+// 🔽 ИНДИКАТОР АРХИТЕКТУРЫ (ТОЛЬКО В DEVELOPMENT)
+const ArchitectureIndicator: React.FC<{
+  architecture: string;
+  show: boolean;
+}> = ({ architecture, show }) => {
+  if (!show) return null;
+
   const getArchitectureInfo = (arch: string) => {
     switch (arch) {
       case "feature":
@@ -117,6 +137,8 @@ const ArchitectureIndicator: React.FC<{ architecture: string }> = ({
 
 // 🔽 ОСНОВНОЙ КОНТЕНТ APP.TSX
 const AppContent: React.FC = () => {
+  const config = getAppConfig();
+
   const [currentTab, setCurrentTab] = useState<
     "planning" | "goals" | "reflection" | "settings" | "pomodoro"
   >("planning");
@@ -124,7 +146,12 @@ const AppContent: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
   const [reflections, setReflections] = useState<Reflection[]>([]);
-  const [currentArchitecture, setCurrentArchitecture] = useState("feature");
+
+  // 🔥 ВАЖНО: В production используем только Feature-Based
+  const [currentArchitecture, setCurrentArchitecture] = useState(
+    config.defaultArchitecture
+  );
+
   const [isDataManagerReady, setIsDataManagerReady] = useState(false);
 
   // Используем настройки из контекста
@@ -240,8 +267,11 @@ const AppContent: React.FC = () => {
     };
   }, []);
 
-  // 🔧 ОБРАБОТЧИК ГОРЯЧИХ КЛАВИШ ДЛЯ ПЕРЕКЛЮЧЕНИЯ АРХИТЕКТУР
+  // 🔧 ОБРАБОТЧИК ГОРЯЧИХ КЛАВИШ ДЛЯ ПЕРЕКЛЮЧЕНИЯ АРХИТЕКТУР (ТОЛЬКО В DEVELOPMENT)
   useEffect(() => {
+    // В production отключаем переключение архитектур
+    if (!config.enableArchSwitcher) return;
+
     const handleKeyPress = async (e: KeyboardEvent) => {
       if (e.ctrlKey) {
         let newArchitecture = currentArchitecture;
@@ -283,7 +313,7 @@ const AppContent: React.FC = () => {
 
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [currentArchitecture]);
+  }, [currentArchitecture, config.enableArchSwitcher]);
 
   // 🔧 СЛУШАТЕЛИ ИЗМЕНЕНИЙ ДАННЫХ
   useEffect(() => {
@@ -473,8 +503,11 @@ const AppContent: React.FC = () => {
   return (
     <EmergencyErrorBoundary>
       <div style={containerStyle}>
-        {/* 🔧 ИНДИКАТОР ТЕКУЩЕЙ АРХИТЕКТУРЫ */}
-        <ArchitectureIndicator architecture={currentArchitecture} />
+        {/* 🔧 ИНДИКАТОР ТЕКУЩЕЙ АРХИТЕКТУРЫ (ТОЛЬКО В DEVELOPMENT) */}
+        <ArchitectureIndicator
+          architecture={currentArchitecture}
+          show={config.enableDevTools}
+        />
 
         {/* PWA: Кнопка установки */}
         {showInstallButton && (
@@ -487,30 +520,32 @@ const AppContent: React.FC = () => {
           </button>
         )}
 
-        {/* 🔧 КНОПКА ДЛЯ ТЕСТИРОВАНИЯ СИНХРОНИЗАЦИИ */}
-        <button
-          onClick={() => {
-            console.log("🔄 Принудительная перезагрузка данных");
-            loadArchitectureData(currentArchitecture);
-            window.unifiedDataManager?.queueSync();
-          }}
-          style={{
-            position: "fixed",
-            bottom: "20px",
-            left: "20px",
-            background: "#FF6B35",
-            color: "white",
-            border: "none",
-            borderRadius: "25px",
-            padding: "10px 15px",
-            fontSize: "12px",
-            cursor: "pointer",
-            zIndex: 1000,
-          }}
-          title="Принудительно перезагрузить данные и синхронизировать"
-        >
-          🔄 Тест синхронизации
-        </button>
+        {/* 🔧 КНОПКА ДЛЯ ТЕСТИРОВАНИЯ СИНХРОНИЗАЦИИ (ТОЛЬКО В DEVELOPMENT) */}
+        {config.enableDevTools && (
+          <button
+            onClick={() => {
+              console.log("🔄 Принудительная перезагрузка данных");
+              loadArchitectureData(currentArchitecture);
+              window.unifiedDataManager?.queueSync();
+            }}
+            style={{
+              position: "fixed",
+              bottom: "20px",
+              left: "20px",
+              background: "#FF6B35",
+              color: "white",
+              border: "none",
+              borderRadius: "25px",
+              padding: "10px 15px",
+              fontSize: "12px",
+              cursor: "pointer",
+              zIndex: 1000,
+            }}
+            title="Принудительно перезагрузить данные и синхронизировать"
+          >
+            🔄 Тест синхронизации
+          </button>
+        )}
 
         {/* Заголовок */}
         <header style={headerStyle}>
