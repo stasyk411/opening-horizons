@@ -32,7 +32,7 @@ export interface Settings {
 // 🎯 ЕДИНАЯ СТРУКТУРА TASK ДЛЯ ВСЕГО ПРИЛОЖЕНИЯ
 export interface Task {
   // ОСНОВНЫЕ ПОЛЯ
-  id: string | number;
+  id: string; // 🔥 ИСПРАВЛЕНО: был string | number
   title: string;
   completed: boolean;
   createdAt: string;
@@ -58,6 +58,7 @@ export interface Task {
   alarm?: string;
 }
 
+// 🎯 ТИПЫ ДЛЯ ЦЕЛЕЙ (GOALS)
 export interface Goal {
   id: string;
   title: string;
@@ -82,6 +83,7 @@ export interface GoalStep {
   deadline?: string;
 }
 
+// 🎯 ТИПЫ ДЛЯ РЕФЛЕКСИЙ (REFLECTIONS)
 export interface Reflection {
   id: string;
   date: string;

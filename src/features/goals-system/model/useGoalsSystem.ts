@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 export interface GoalStep {
   id: number;
@@ -13,9 +13,12 @@ export interface Goal {
   createdAt: string;
 }
 
-export const useGoalsSystem = (externalGoals?: Goal[], externalSetGoals?: (goals: Goal[]) => void) => {
+export const useGoalsSystem = (
+  externalGoals?: Goal[],
+  externalSetGoals?: (goals: Goal[]) => void
+) => {
   const [goals, setGoals] = useState<Goal[]>(externalGoals || []);
-  const [newGoal, setNewGoal] = useState({ text: '', category: 'personal' });
+  const [newGoal, setNewGoal] = useState({ text: "", category: "personal" });
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
 
   // Синхронизация с внешним состоянием
@@ -27,7 +30,7 @@ export const useGoalsSystem = (externalGoals?: Goal[], externalSetGoals?: (goals
 
   const addGoal = () => {
     if (!newGoal.text.trim()) {
-      alert('Введите текст цели!');
+      alert("Введите текст цели!");
       return;
     }
 
@@ -39,19 +42,19 @@ export const useGoalsSystem = (externalGoals?: Goal[], externalSetGoals?: (goals
     };
 
     const updatedGoals = [...goals, goal];
-    
+
     if (externalSetGoals) {
       externalSetGoals(updatedGoals);
     } else {
       setGoals(updatedGoals);
     }
-    
-    setNewGoal({ text: '', category: 'personal' });
+
+    setNewGoal({ text: "", category: "personal" });
   };
 
   const deleteGoal = (goalId: number) => {
-    const updatedGoals = goals.filter(goal => goal.id !== goalId);
-    
+    const updatedGoals = goals.filter((goal) => goal.id !== goalId);
+
     if (externalSetGoals) {
       externalSetGoals(updatedGoals);
     } else {
@@ -68,16 +71,16 @@ export const useGoalsSystem = (externalGoals?: Goal[], externalSetGoals?: (goals
   };
 
   const saveGoal = (updatedGoal: Goal) => {
-    const updatedGoals = goals.map(goal => 
+    const updatedGoals = goals.map((goal) =>
       goal.id === updatedGoal.id ? updatedGoal : goal
     );
-    
+
     if (externalSetGoals) {
       externalSetGoals(updatedGoals);
     } else {
       setGoals(updatedGoals);
     }
-    
+
     setEditingGoal(null);
   };
 

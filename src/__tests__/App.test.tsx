@@ -1,5 +1,6 @@
 // src/__tests__/App.test.tsx
 import { render, screen } from "@testing-library/react";
+import React from "react";
 import App from "../App";
 
 // Простые моки без сложной логики
@@ -8,17 +9,22 @@ jest.mock("../shared/contexts/SettingsContext", () => ({
     settings: { darkTheme: false },
     updateSettings: jest.fn(),
   }),
-  SettingsProvider: ({ children }) => children,
+  SettingsProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
 jest.mock("../components/System/EmergencyErrorBoundary", () => ({
-  EmergencyErrorBoundary: ({ children }) => children,
+  EmergencyErrorBoundary: ({ children }: { children: React.ReactNode }) =>
+    children,
 }));
 
 jest.mock("../components/System/FeatureErrorBoundary", () => ({
-  FeatureErrorBoundary: ({ children, featureName }) => (
-    <div data-testid={`error-boundary-${featureName}`}>{children}</div>
-  ),
+  FeatureErrorBoundary: ({
+    children,
+    featureName,
+  }: {
+    children: React.ReactNode;
+    featureName: string;
+  }) => <div data-testid={`error-boundary-${featureName}`}>{children}</div>,
 }));
 
 // Простые моки для ленивых компонентов
@@ -47,7 +53,7 @@ beforeAll(() => {
   // Mock для matchMedia
   Object.defineProperty(window, "matchMedia", {
     writable: true,
-    value: jest.fn().mockImplementation((query) => ({
+    value: jest.fn().mockImplementation((query: string) => ({
       matches: false,
       media: query,
       onchange: null,
@@ -71,9 +77,12 @@ beforeAll(() => {
   // Mock для unifiedDataManager - создаем только если не существует
   if (!window.unifiedDataManager) {
     window.unifiedDataManager = {
-      dataHandlers: new Map(),
+      // 🔥 ДОБАВЛЕНЫ ОБЯЗАТЕЛЬНЫЕ МЕТОДЫ
+      loadTasks: jest.fn().mockResolvedValue([]),
+      saveTasks: jest.fn().mockResolvedValue(undefined),
+      syncData: jest.fn().mockResolvedValue(undefined),
       queueSync: jest.fn(),
-      getHandler: jest.fn(),
+      dataHandlers: new Map(),
     };
   }
 });
@@ -82,10 +91,12 @@ describe("App", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     // Сбрасываем localStorage mock
-    window.localStorage.getItem.mockImplementation((key) => {
-      if (key.includes("life-wheel")) return "[]";
-      return null;
-    });
+    (window.localStorage.getItem as jest.Mock).mockImplementation(
+      (key: string) => {
+        if (key.includes("life-wheel")) return "[]";
+        return null;
+      }
+    );
   });
 
   it("renders without crashing", () => {
