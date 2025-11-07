@@ -1,4 +1,4 @@
-﻿// 📁 app.js - ПОЛНАЯ РАБОЧАЯ ВЕРСИЯ С MINIMALIST
+// 📁 app.js - ПОЛНАЯ РАБОЧАЯ ВЕРСИЯ С MINIMALIST
 
 console.log("🚀 Feature-Based Architecture ЗАГРУЖАЕТСЯ...");
 
@@ -177,13 +177,15 @@ class SimpleFeatureApp {
 
     tasks.push(newTask);
 
-    // Сохраняем обратно в LocalStorage
-    localStorage.setItem("feature-tasks", JSON.stringify(tasks));
-    console.log("💾 Feature-Based: Задача сохранена в LocalStorage");
-
-    // Синхронизируем
-    if (window.unifiedDataManager) {
+    // 🔥 ИСПРАВЛЕНИЕ: Сохраняем через UDM вместо прямой записи
+    if (window.unifiedDataManager && window.unifiedDataManager.saveTasks) {
+      window.unifiedDataManager.saveTasks("feature", tasks);
       window.unifiedDataManager.syncData();
+      console.log("✅ Feature-Based: Задача сохранена через UDM");
+    } else {
+      // Fallback на старую логику
+      localStorage.setItem("feature-tasks", JSON.stringify(tasks));
+      console.log("💾 Feature-Based: Задача сохранена в LocalStorage");
     }
   }
 
@@ -222,15 +224,17 @@ class SimpleFeatureApp {
     const tasks = saved ? JSON.parse(saved) : [];
 
     const updatedTasks = tasks.filter((task) => task.id !== taskId);
-    localStorage.setItem("feature-tasks", JSON.stringify(updatedTasks));
+
+    // 🔥 ИСПРАВЛЕНИЕ: Сохраняем через UDM
+    if (window.unifiedDataManager && window.unifiedDataManager.saveTasks) {
+      window.unifiedDataManager.saveTasks("feature", updatedTasks);
+      window.unifiedDataManager.syncData();
+    } else {
+      localStorage.setItem("feature-tasks", JSON.stringify(updatedTasks));
+    }
 
     // Обновляем отображение
     this.showFeatureTasks();
-
-    // Синхронизируем
-    if (window.unifiedDataManager) {
-      window.unifiedDataManager.syncData();
-    }
   }
 }
 
@@ -493,25 +497,29 @@ class SimpleArchManager {
     const tasks = saved ? JSON.parse(saved) : [];
 
     const updatedTasks = tasks.filter((task) => task.id !== taskId);
-    localStorage.setItem("minimalist-tasks", JSON.stringify(updatedTasks));
+
+    // 🔥 ИСПРАВЛЕНИЕ: Сохраняем через UDM
+    if (window.unifiedDataManager && window.unifiedDataManager.saveTasks) {
+      window.unifiedDataManager.saveTasks("minimalist", updatedTasks);
+      window.unifiedDataManager.syncData();
+      console.log("✅ Minimalist: Задача удалена через UDM");
+    } else {
+      localStorage.setItem("minimalist-tasks", JSON.stringify(updatedTasks));
+      console.log("💾 Minimalist: Задача удалена из LocalStorage");
+    }
 
     // Обновляем отображение
     this.showMinimalistTasks();
-
-    // Синхронизируем
-    if (window.unifiedDataManager) {
-      window.unifiedDataManager.syncData();
-    }
   }
 
-  // Обновим метод addMinimalistTask() чтобы обновлять отображение:
+  // Обновим метод addMinimalistTask() чтобы использовать UDM
   addMinimalistTask() {
     console.log("➕ Добавляем задачу в Minimalist");
     const input = document.querySelector(".task-field");
     if (input && input.value.trim()) {
       const taskText = input.value.trim();
 
-      // СОХРАНЯЕМ ЗАДАЧУ В LOCALSTORAGE
+      // 🔥 ИСПРАВЛЕНИЕ: Сохраняем через UDM
       this.saveMinimalistTask(taskText);
 
       // ОЧИЩАЕМ ПОЛЕ И ОБНОВЛЯЕМ ОТОБРАЖЕНИЕ
@@ -523,7 +531,8 @@ class SimpleArchManager {
       alert("📝 Введите текст задачи!");
     }
   }
-  // Добавим метод для сохранения задач Minimalist
+
+  // 🔥 ПЕРЕПИСАННЫЙ МЕТОД СОХРАНЕНИЯ MINIMALIST ЗАДАЧ
   saveMinimalistTask(taskText) {
     // Загружаем текущие задачи
     const saved = localStorage.getItem("minimalist-tasks");
@@ -540,15 +549,18 @@ class SimpleArchManager {
 
     tasks.push(newTask);
 
-    // Сохраняем обратно в LocalStorage
-    localStorage.setItem("minimalist-tasks", JSON.stringify(tasks));
-    console.log("💾 Minimalist: Задача сохранена в LocalStorage");
-
-    // Запускаем синхронизацию
-    if (window.unifiedDataManager) {
+    // 🔥 ИСПРАВЛЕНИЕ: Сохраняем через UDM вместо прямой записи
+    if (window.unifiedDataManager && window.unifiedDataManager.saveTasks) {
+      window.unifiedDataManager.saveTasks("minimalist", tasks);
       window.unifiedDataManager.syncData();
+      console.log("✅ Minimalist: Задача сохранена через UDM");
+    } else {
+      // Fallback на старую логику
+      localStorage.setItem("minimalist-tasks", JSON.stringify(tasks));
+      console.log("💾 Minimalist: Задача сохранена в LocalStorage");
     }
   }
+
   toggleMinimalistTimer() {
     console.log("⏰ Переключаем Minimalist таймер");
     const timerBtn = document.querySelector(".timer-btn");

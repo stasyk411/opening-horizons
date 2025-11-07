@@ -1,4 +1,4 @@
-﻿// 🔽 ИСПРАВЛЯЕМ LIFESPHERE - ДЕЛАЕМ ЕГО ИНТЕРФЕЙСОМ
+// 🔽 ИСПРАВЛЯЕМ LIFESPHERE - ДЕЛАЕМ ЕГО ИНТЕРФЕЙСОМ
 export interface LifeSphere {
   id: string;
   name: string;
@@ -8,12 +8,8 @@ export interface LifeSphere {
   description?: string;
 }
 
-// УДАЛЯЕМ СТАРЫЕ ОБЪЯВЛЕНИЯ:
-// export const LIFE_SPHERES = [ ... ];
-// export type LifeSphere = (typeof LIFE_SPHERES)[number];
-
 export interface LifeSphereConfig {
-  id: string; // ← ИСПРАВЛЕНО: string вместо LifeSphere
+  id: string;
   name: string;
   value?: number;
   color: string;
@@ -33,22 +29,33 @@ export interface Settings {
   };
 }
 
+// 🎯 ЕДИНАЯ СТРУКТУРА TASK ДЛЯ ВСЕГО ПРИЛОЖЕНИЯ
 export interface Task {
-  id: string;
+  // ОСНОВНЫЕ ПОЛЯ
+  id: string | number;
   title: string;
-  description?: string;
   completed: boolean;
-  priority: "low" | "medium" | "high";
-  date: string;
-  timeEstimate?: number;
-  category?: string;
   createdAt: string;
+
+  // ДАТЫ И ВРЕМЯ
+  date?: string;
   updatedAt?: string;
   startTime?: string;
   endTime?: string;
+
+  // КАТЕГОРИЗАЦИЯ (совместимость со всеми архитектурами)
+  category?: string;
+  area?: string;
+  archetype?: string;
+
+  // ПРИОРИТЕТ И ОПИСАНИЕ
+  priority?: "low" | "medium" | "high";
+  description?: string;
+
+  // ДОПОЛНИТЕЛЬНЫЕ ПОЛЯ
+  timeEstimate?: number;
   repeat?: string;
   alarm?: string;
-  archetype?: string;
 }
 
 export interface Goal {
@@ -102,7 +109,7 @@ export type Priority = "low" | "medium" | "high";
 export type RecurrenceType = "none" | "daily" | "weekly" | "monthly";
 
 export interface WheelState {
-  sphere: string; // ← ИСПРАВЛЕНО: string вместо LifeSphere
+  sphere: string;
   score: number;
 }
 

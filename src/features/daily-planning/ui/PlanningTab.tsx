@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { Task } from "../../../shared/types";
 import { TaskForm } from "./TaskForm";
 import { TaskList } from "./TaskList";
@@ -23,7 +23,6 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [archetype, setArchetype] = useState("");
 
-  // 🔄 АККОРДЕОНЫ
   const [expandedSections, setExpandedSections] = useState({
     archetypes: false,
     basic: true,
@@ -37,14 +36,44 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
     }));
   };
 
-  // ОБРАБОТЧИКИ ЗАДАЧ
+  // 🎯 ОБНОВЛЕННАЯ ФИЛЬТРАЦИЯ - СОВМЕСТИМОСТЬ СО ВСЕМИ АРХИТЕКТУРАМИ
+  const getTodayTasks = () => {
+    const today = selectedDate.toISOString().split("T")[0];
+    return tasks.filter((task) => {
+      const taskDate =
+        task.date || (task.createdAt ? task.createdAt.split("T")[0] : null);
+      return taskDate === today;
+    });
+  };
+
+  const getFutureTasks = () => {
+    const today = selectedDate.toISOString().split("T")[0];
+    return tasks.filter((task) => {
+      const taskDate =
+        task.date || (task.createdAt ? task.createdAt.split("T")[0] : null);
+      return taskDate && taskDate > today;
+    });
+  };
+
+  const getTasksWithoutDate = () => {
+    return tasks.filter((task) => {
+      return (
+        !task.date && (!task.createdAt || task.area === "general" || !task.area)
+      );
+    });
+  };
+
+  // 🎯 ОБНОВЛЕННЫЕ ОБРАБОТЧИКИ - БЕЗ ANY
   const handleAddTask = (taskData: Omit<Task, "id" | "createdAt">) => {
     const newTask: Task = {
       id: Date.now().toString(),
       ...taskData,
+      completed: false,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       archetype: archetype || undefined,
+      date: taskData.date || new Date().toISOString().split("T")[0],
+      area: "general",
     };
     setTasks([...tasks, newTask]);
   };
@@ -58,11 +87,11 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
         description: "",
         completed: false,
         priority: "medium",
-        // СТАЛО:
-        date: new Date().toISOString().split("T")[0], // Формат YYYY-MM-DD
+        date: "",
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         archetype: archetype || undefined,
+        area: "general",
       };
       setTasks([...tasks, newTask]);
     }
@@ -94,26 +123,10 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
     });
   };
 
-  // ФИЛЬТРАЦИЯ ЗАДАЧ
-  const getTodayTasks = () => {
-    const today = selectedDate.toISOString().split("T")[0];
-    return tasks.filter((task) => task.date === today);
-  };
-
-  const getFutureTasks = () => {
-    const today = selectedDate.toISOString().split("T")[0];
-    return tasks.filter((task) => task.date && task.date > today);
-  };
-
-  const getTasksWithoutDate = () => {
-    return tasks.filter((task) => !task.date || task.date === "");
-  };
-
   const todayTasks = getTodayTasks();
   const futureTasks = getFutureTasks();
   const tasksWithoutDate = getTasksWithoutDate();
 
-  // СТИЛИ
   const sectionTitleStyle = {
     fontSize: isMobile ? "1.3rem" : "1.8rem",
     marginBottom: isMobile ? "15px" : "25px",
@@ -137,7 +150,6 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
     <div style={containerStyle}>
       <h2 style={sectionTitleStyle}>Планирование Дня</h2>
 
-      {/* 🔄 СЕКЦИЯ АРХЕТИПОВ */}
       <AccordionSection
         title="🎭 Тип дня"
         isExpanded={expandedSections.archetypes}
@@ -180,7 +192,6 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
         </div>
       </AccordionSection>
 
-      {/* 🔄 НОВАЯ ЗАДАЧА */}
       <AccordionSection
         title="📝 Новая задача"
         isExpanded={expandedSections.basic}
@@ -195,14 +206,12 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
         />
       </AccordionSection>
 
-      {/* 🔄 ЗАДАЧИ */}
       <AccordionSection
         title="⏰ Задачи"
         isExpanded={expandedSections.tasks}
         onToggle={() => toggleSection("tasks")}
         isMobile={isMobile}
       >
-        {/* ЗАДАЧИ НА СЕГОДНЯ */}
         <div style={{ marginBottom: "25px" }}>
           <h3
             style={{
@@ -222,7 +231,6 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
           />
         </div>
 
-        {/* БУДУЩИЕ ЗАДАЧИ */}
         <div style={{ marginBottom: "25px" }}>
           <h3
             style={{
@@ -242,7 +250,6 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
           />
         </div>
 
-        {/* ЗАДАЧИ БЕЗ ДАТЫ */}
         <div>
           <h3
             style={{

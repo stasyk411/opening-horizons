@@ -6,7 +6,6 @@ import {
   useSettings,
 } from "./shared/contexts/SettingsContext";
 import { Task, Goal, Reflection } from "./shared/types";
-import ArchitectureIndicator from "./components/ArchitectureIndicator";
 
 // 🔽 ИСПРАВЛЕННЫЙ LAZY LOADING ДЛЯ GOALSTAB
 const GoalsTab = lazy(() =>
@@ -71,27 +70,53 @@ const LoadingFallback: React.FC<{ featureName: string }> = ({
   </div>
 );
 
-// 🔧 КОНФИГУРАЦИЯ РЕЖИМОВ
-const getAppConfig = () => {
-  const isDevelopment = import.meta.env.VITE_APP_MODE === "development";
-  const defaultArchitecture =
-    import.meta.env.VITE_DEFAULT_ARCHITECTURE || "feature";
-  const enableArchSwitcher =
-    import.meta.env.VITE_ENABLE_ARCH_SWITCHER === "true";
-  const enableDevTools = import.meta.env.VITE_ENABLE_DEV_TOOLS === "true";
-
-  return {
-    isDevelopment,
-    defaultArchitecture,
-    enableArchSwitcher,
-    enableDevTools,
+// 🔽 ИНДИКАТОР АРХИТЕКТУРЫ
+const ArchitectureIndicator: React.FC<{ architecture: string }> = ({
+  architecture,
+}) => {
+  const getArchitectureInfo = (arch: string) => {
+    switch (arch) {
+      case "feature":
+        return { name: "Feature-Based", color: "#8A2BE2", emoji: "🏗️" };
+      case "react":
+        return { name: "React", color: "#61DAFB", emoji: "⚛️" };
+      case "minimalist":
+        return { name: "Minimalist", color: "#32CD32", emoji: "🎯" };
+      default:
+        return { name: "Unknown", color: "#666", emoji: "❓" };
+    }
   };
+
+  const info = getArchitectureInfo(architecture);
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        top: "10px",
+        left: "10px",
+        background: info.color,
+        color: "white",
+        padding: "8px 12px",
+        borderRadius: "20px",
+        fontSize: "12px",
+        fontWeight: "bold",
+        zIndex: 1001,
+        boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
+        display: "flex",
+        alignItems: "center",
+        gap: "5px",
+      }}
+      title={`Текущая архитектура: ${info.name}. Переключение: Ctrl+F1/F2/F3`}
+    >
+      <span>{info.emoji}</span>
+      {info.name}
+    </div>
+  );
 };
 
 // 🔽 ОСНОВНОЙ КОНТЕНТ APP.TSX
 const AppContent: React.FC = () => {
-  const config = getAppConfig();
-
   const [currentTab, setCurrentTab] = useState<
     "planning" | "goals" | "reflection" | "settings" | "pomodoro"
   >("planning");
@@ -99,12 +124,7 @@ const AppContent: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
   const [reflections, setReflections] = useState<Reflection[]>([]);
-
-  // 🔥 ВАЖНО: В production используем только Feature-Based
-  const [currentArchitecture, setCurrentArchitecture] = useState(
-    config.defaultArchitecture
-  );
-
+  const [currentArchitecture, setCurrentArchitecture] = useState("feature");
   const [isDataManagerReady, setIsDataManagerReady] = useState(false);
 
   // Используем настройки из контекста
@@ -114,7 +134,7 @@ const AppContent: React.FC = () => {
   const [installPrompt, setInstallPrompt] = useState<any>(null);
   const [showInstallButton, setShowInstallButton] = useState(false);
 
-  // 🔧 ИСПРАВЛЕННАЯ ФУНКЦИЯ ЗАГРУЗКИ ДАННЫХ
+  // 🔧 ИСПРАВЛЕННАЯ ФУНКЦИЯ ЗАГРУЗКИ ДАННЫХ - ПРОСТОЙ API
   const loadArchitectureData = async (architecture: string) => {
     try {
       console.log(`🔄 Загрузка данных для архитектуры: ${architecture}`);
@@ -143,50 +163,44 @@ const AppContent: React.FC = () => {
         return;
       }
 
-      const handler = window.unifiedDataManager.dataHandlers.get(architecture);
-      if (handler && handler.loadTasks) {
-        const tasks = await handler.loadTasks();
-        console.log(
-          `✅ Загружено ${tasks.length} задач для ${architecture}`,
-          tasks
-        );
+      // 🔥 ПРОСТОЙ API: используем напрямую методы UDM
+      const tasks = await window.unifiedDataManager.loadTasks(architecture);
+      console.log(
+        `✅ Загружено ${tasks.length} задач для ${architecture}`,
+        tasks
+      );
 
-        // 🔥 ВАЖНО: Обновляем состояние
-        setTasks(tasks);
-      } else {
-        console.warn(`⚠️ Обработчик для ${architecture} не найден`);
-        // Fallback на старую логику
-        const savedTasks = localStorage.getItem("life-wheel-tasks");
-        if (savedTasks) setTasks(JSON.parse(savedTasks));
-      }
+      // Обновляем состояние
+      setTasks(tasks);
+      setCurrentArchitecture(architecture);
     } catch (error) {
       console.error(`❌ Ошибка загрузки данных для ${architecture}:`, error);
+      // Fallback на старую логику
+      const savedTasks = localStorage.getItem("life-wheel-tasks");
+      if (savedTasks) setTasks(JSON.parse(savedTasks));
     }
   };
 
-  // 🔧 УНИФИЦИРОВАННОЕ СОХРАНЕНИЕ ДАННЫХ
+  // 🔧 УНИФИЦИРОВАННОЕ СОХРАНЕНИЕ ДАННЫХ - ПРОСТОЙ API
   const saveTasks = async (newTasks: Task[]) => {
     setTasks(newTasks);
 
     try {
-      // Сохраняем через Unified Data Manager для текущей архитектуры
-      const handler =
-        window.unifiedDataManager?.dataHandlers.get(currentArchitecture);
-      if (handler && handler.saveTasks) {
-        await handler.saveTasks(newTasks);
-        console.log(
-          `✅ Задачи сохранены через Unified Data Manager для ${currentArchitecture}`
-        );
+      console.log(
+        `💾 Сохранение ${newTasks.length} задач для ${currentArchitecture}`
+      );
 
-        // Запускаем синхронизацию с другими архитектурами
-        window.unifiedDataManager?.queueSync();
+      // 🔥 ПРОСТОЙ API: используем напрямую методы UDM
+      await window.unifiedDataManager.saveTasks(currentArchitecture, newTasks);
+      console.log(
+        `✅ Задачи сохранены через Unified Data Manager для ${currentArchitecture}`
+      );
 
-        // Отправляем событие об изменении данных
-        document.dispatchEvent(new CustomEvent("dataChanged"));
-      } else {
-        // Fallback на старую логику
-        localStorage.setItem("life-wheel-tasks", JSON.stringify(newTasks));
-      }
+      // Запускаем синхронизацию с другими архитектурами
+      await window.unifiedDataManager.syncData();
+
+      // Отправляем событие об изменении данных
+      document.dispatchEvent(new CustomEvent("dataChanged"));
     } catch (error) {
       console.error("❌ Ошибка сохранения задач:", error);
       // Fallback на старую логику при ошибке
@@ -220,11 +234,8 @@ const AppContent: React.FC = () => {
     };
   }, []);
 
-  // 🔧 ОБРАБОТЧИК ГОРЯЧИХ КЛАВИШ ДЛЯ ПЕРЕКЛЮЧЕНИЯ АРХИТЕКТУР (ТОЛЬКО В DEVELOPMENT)
+  // 🔧 ОБРАБОТЧИК ГОРЯЧИХ КЛАВИШ ДЛЯ ПЕРЕКЛЮЧЕНИЯ АРХИТЕКТУР
   useEffect(() => {
-    // В production отключаем переключение архитектур
-    if (!config.enableArchSwitcher) return;
-
     const handleKeyPress = async (e: KeyboardEvent) => {
       if (e.ctrlKey) {
         let newArchitecture = currentArchitecture;
@@ -243,30 +254,24 @@ const AppContent: React.FC = () => {
         if (newArchitecture !== currentArchitecture) {
           setCurrentArchitecture(newArchitecture);
 
-          // 🔥 ВАЖНОЕ ИСПРАВЛЕНИЕ: Ждем перед отправкой событий
+          // 🔥 ВАЖНОЕ ИСПРАВЛЕНИЕ: Загружаем данные для новой архитектуры
+          await loadArchitectureData(newArchitecture);
+
+          // Отправляем событие для Unified Data Manager
           setTimeout(() => {
-            // Отправляем событие для Unified Data Manager
             document.dispatchEvent(
               new CustomEvent("architectureChanged", {
                 detail: { architecture: newArchitecture },
               })
             );
-
-            // Запускаем синхронизацию если Unified Data Manager готов
-            if (window.unifiedDataManager) {
-              window.unifiedDataManager.queueSync();
-            }
           }, 200);
-
-          // Загружаем данные для новой архитектуры
-          await loadArchitectureData(newArchitecture);
         }
       }
     };
 
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [currentArchitecture, config.enableArchSwitcher]);
+  }, [currentArchitecture]);
 
   // 🔧 СЛУШАТЕЛИ ИЗМЕНЕНИЙ ДАННЫХ
   useEffect(() => {
@@ -456,11 +461,8 @@ const AppContent: React.FC = () => {
   return (
     <EmergencyErrorBoundary>
       <div style={containerStyle}>
-        {/* 🔧 ИНДИКАТОР ТЕКУЩЕЙ АРХИТЕКТУРЫ (ТОЛЬКО В DEVELOPMENT) */}
-        <ArchitectureIndicator
-          architecture={currentArchitecture}
-          show={config.enableDevTools}
-        />
+        {/* 🔧 ИНДИКАТОР ТЕКУЩЕЙ АРХИТЕКТУРЫ */}
+        <ArchitectureIndicator architecture={currentArchitecture} />
 
         {/* PWA: Кнопка установки */}
         {showInstallButton && (
@@ -473,32 +475,30 @@ const AppContent: React.FC = () => {
           </button>
         )}
 
-        {/* 🔧 КНОПКА ДЛЯ ТЕСТИРОВАНИЯ СИНХРОНИЗАЦИИ (ТОЛЬКО В DEVELOPMENT) */}
-        {config.enableDevTools && (
-          <button
-            onClick={() => {
-              console.log("🔄 Принудительная перезагрузка данных");
-              loadArchitectureData(currentArchitecture);
-              window.unifiedDataManager?.queueSync();
-            }}
-            style={{
-              position: "fixed",
-              bottom: "20px",
-              left: "20px",
-              background: "#FF6B35",
-              color: "white",
-              border: "none",
-              borderRadius: "25px",
-              padding: "10px 15px",
-              fontSize: "12px",
-              cursor: "pointer",
-              zIndex: 1000,
-            }}
-            title="Принудительно перезагрузить данные и синхронизировать"
-          >
-            🔄 Тест синхронизации
-          </button>
-        )}
+        {/* 🔧 КНОПКА ДЛЯ ТЕСТИРОВАНИЯ СИНХРОНИЗАЦИИ */}
+        <button
+          onClick={() => {
+            console.log("🔄 Принудительная перезагрузка данных");
+            loadArchitectureData(currentArchitecture);
+            window.unifiedDataManager?.syncData();
+          }}
+          style={{
+            position: "fixed",
+            bottom: "20px",
+            left: "20px",
+            background: "#FF6B35",
+            color: "white",
+            border: "none",
+            borderRadius: "25px",
+            padding: "10px 15px",
+            fontSize: "12px",
+            cursor: "pointer",
+            zIndex: 1000,
+          }}
+          title="Принудительно перезагрузить данные и синхронизировать"
+        >
+          🔄 Тест синхронизации
+        </button>
 
         {/* Заголовок */}
         <header style={headerStyle}>

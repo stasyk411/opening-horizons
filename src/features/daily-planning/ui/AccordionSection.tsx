@@ -1,4 +1,4 @@
-﻿// ВСТАВЬ ЭТОТ КОД В src/features/daily-planning/ui/AccordionSection.tsx
+// ВСТАВЬ ЭТОТ КОД В src/features/daily-planning/ui/AccordionSection.tsx
 
 import React from "react";
 
