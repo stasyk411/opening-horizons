@@ -14,9 +14,9 @@ export default defineConfig({
     },
   },
   build: {
-    // Исключаем тестовые файлы из production сборки
+    // ✅ УБИРАЕМ external - Vite сам исключит неиспользуемые тесты
     rollupOptions: {
-      external: ["**/__tests__/**", "**/*.test.*", "**/*.spec.*"],
+      // Без external - tree-shaking справится сам
     },
   },
 });
