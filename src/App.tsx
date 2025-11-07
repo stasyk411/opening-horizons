@@ -70,7 +70,7 @@ const LoadingFallback: React.FC<{ featureName: string }> = ({
   </div>
 );
 
-// 🔽 ИНДИКАТОР АРХИТЕКТУРЫ
+// 🔽 ИНДИКАТОР АРХИТЕКТУРЫ (ТОЛЬКО ДЛЯ DEVELOPMENT)
 const ArchitectureIndicator: React.FC<{ architecture: string }> = ({
   architecture,
 }) => {
@@ -126,6 +126,9 @@ const AppContent: React.FC = () => {
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [currentArchitecture, setCurrentArchitecture] = useState("feature");
   const [isDataManagerReady, setIsDataManagerReady] = useState(false);
+
+  // 🔥 ДОБАВЛЕНО: Проверка environment
+  const isDevelopment = process.env.NODE_ENV === "development";
 
   // Используем настройки из контекста
   const { settings, updateSettings } = useSettings();
@@ -461,8 +464,10 @@ const AppContent: React.FC = () => {
   return (
     <EmergencyErrorBoundary>
       <div style={containerStyle}>
-        {/* 🔧 ИНДИКАТОР ТЕКУЩЕЙ АРХИТЕКТУРЫ */}
-        <ArchitectureIndicator architecture={currentArchitecture} />
+        {/* 🔧 ИНДИКАТОР ТЕКУЩЕЙ АРХИТЕКТУРЫ (ТОЛЬКО DEVELOPMENT) */}
+        {isDevelopment && (
+          <ArchitectureIndicator architecture={currentArchitecture} />
+        )}
 
         {/* PWA: Кнопка установки */}
         {showInstallButton && (
@@ -475,30 +480,32 @@ const AppContent: React.FC = () => {
           </button>
         )}
 
-        {/* 🔧 КНОПКА ДЛЯ ТЕСТИРОВАНИЯ СИНХРОНИЗАЦИИ */}
-        <button
-          onClick={() => {
-            console.log("🔄 Принудительная перезагрузка данных");
-            loadArchitectureData(currentArchitecture);
-            window.unifiedDataManager?.syncData();
-          }}
-          style={{
-            position: "fixed",
-            bottom: "20px",
-            left: "20px",
-            background: "#FF6B35",
-            color: "white",
-            border: "none",
-            borderRadius: "25px",
-            padding: "10px 15px",
-            fontSize: "12px",
-            cursor: "pointer",
-            zIndex: 1000,
-          }}
-          title="Принудительно перезагрузить данные и синхронизировать"
-        >
-          🔄 Тест синхронизации
-        </button>
+        {/* 🔧 КНОПКА ДЛЯ ТЕСТИРОВАНИЯ СИНХРОНИЗАЦИИ (ТОЛЬКО DEVELOPMENT) */}
+        {isDevelopment && (
+          <button
+            onClick={() => {
+              console.log("🔄 Принудительная перезагрузка данных");
+              loadArchitectureData(currentArchitecture);
+              window.unifiedDataManager?.syncData();
+            }}
+            style={{
+              position: "fixed",
+              bottom: "20px",
+              left: "20px",
+              background: "#FF6B35",
+              color: "white",
+              border: "none",
+              borderRadius: "25px",
+              padding: "10px 15px",
+              fontSize: "12px",
+              cursor: "pointer",
+              zIndex: 1000,
+            }}
+            title="Принудительно перезагрузить данные и синхронизировать"
+          >
+            🔄 Тест синхронизации
+          </button>
+        )}
 
         {/* Заголовок */}
         <header style={headerStyle}>
