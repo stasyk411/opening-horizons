@@ -1,4 +1,4 @@
-// 📁 app.js - ПОЛНАЯ РАБОЧАЯ ВЕРСИЯ С MINIMALIST (ИСПРАВЛЕННАЯ)
+// 📁 app.js - ПОЛНАЯ РАБОЧАЯ ВЕРСИЯ С MINIMALIST
 
 console.log("🚀 Feature-Based Architecture ЗАГРУЖАЕТСЯ...");
 
@@ -238,43 +238,38 @@ class SimpleFeatureApp {
   }
 }
 
-// 🏗️ ПРОСТОЙ МЕНЕДЖЕР АРХИТЕКТУР С РАБОЧИМ MINIMALIST (ИСПРАВЛЕННЫЙ)
+// 🏗️ ПРОСТОЙ МЕНЕДЖЕР АРХИТЕКТУР С РАБОЧИМ MINIMALIST
 class SimpleArchManager {
   constructor() {
     console.log("🏗️ SimpleArchManager запущен");
     this.currentArch = "react";
     this.featureApp = null;
     this.minimalistInitialized = false;
-    // 🔄 ИСПРАВЛЕННАЯ ИНИЦИАЛИЗАЦИЯ UNIFIED DATA MANAGER
+    // 🔄 ИНИЦИАЛИЗАЦИЯ UNIFIED DATA MANAGER
     this.initDataManager();
     this.init();
   }
 
-  // 🔄 ИСПРАВЛЕННАЯ ИНИЦИАЛИЗАЦИЯ МЕНЕДЖЕРА ДАННЫХ
+  // 🔄 ИНИЦИАЛИЗАЦИЯ МЕНЕДЖЕРА ДАННЫХ
   initDataManager() {
     console.log("🔄 Инициализация Unified Data Manager...");
 
-    // Unified Data Manager уже встроен в этот файл (определен в конце)
-    // Не нужно загружать его динамически - это ломает production сборку
+    // Загружаем менеджер данных
+    if (typeof window.unifiedDataManager === "undefined") {
+      console.log("📥 Загружаем Unified Data Manager...");
+      // Создаем скрипт для загрузки менеджера данных
+      const script = document.createElement("script");
+      script.src = "./src/utils/unifiedDataManager.js";
+      script.type = "module";
+      document.head.appendChild(script);
 
-    if (window.unifiedDataManager) {
-      console.log("✅ Unified Data Manager уже инициализирован");
-      this.setupDataSync();
+      script.onload = () => {
+        console.log("✅ Unified Data Manager загружен");
+        this.setupDataSync();
+      };
     } else {
-      console.log(
-        "🔄 Unified Data Manager будет создан при выполнении этого файла"
-      );
-      // Ждем завершения выполнения файла, затем настраиваем синхронизацию
-      setTimeout(() => {
-        if (window.unifiedDataManager) {
-          console.log("✅ Unified Data Manager готов после задержки");
-          this.setupDataSync();
-        } else {
-          console.error(
-            "❌ Unified Data Manager не инициализирован после таймаута"
-          );
-        }
-      }, 100);
+      console.log("✅ Unified Data Manager уже загружен");
+      this.setupDataSync();
     }
   }
 
@@ -623,78 +618,3 @@ window.switchToFeatureBased = () =>
   window.simpleArchManager?.switchToFeatureBased();
 window.switchToMinimalist = () =>
   window.simpleArchManager?.switchToMinimalist();
-
-// 🔥 ВСТРОЕННЫЙ UNIFIED DATA MANAGER (УЖЕ БЫЛ В ФАЙЛЕ)
-class UnifiedDataManager {
-  constructor() {
-    console.log("🔄 Enhanced UDM инициализирован");
-    this.cache = new Map();
-  }
-
-  async saveTasks(architecture, tasks) {
-    console.log(
-      `💾 ${architecture}: Сохранение задач в LocalStorage`,
-      tasks.length
-    );
-    const key = `${architecture}-tasks`;
-    localStorage.setItem(key, JSON.stringify(tasks));
-    this.cache.set(key, tasks);
-    return Promise.resolve();
-  }
-
-  async loadTasks(architecture) {
-    const key = `${architecture}-tasks`;
-    if (this.cache.has(key)) {
-      return this.cache.get(key);
-    }
-    const data = localStorage.getItem(key);
-    const tasks = data ? JSON.parse(data) : [];
-    console.log(
-      `📥 ${architecture}: Загрузка задач из LocalStorage`,
-      tasks.length
-    );
-    this.cache.set(key, tasks);
-    return tasks;
-  }
-
-  async syncData() {
-    console.log("🔄 Улучшенная синхронизация данных...");
-
-    try {
-      // Загружаем данные из ВСЕХ архитектур
-      const featureTasks = await this.loadTasks("feature");
-      const minimalistTasks = await this.loadTasks("minimalist");
-      const reactTasks = await this.loadTasks("react");
-
-      console.log(
-        `📊 Feature: ${featureTasks.length}, Minimalist: ${minimalistTasks.length}, React: ${reactTasks.length}`
-      );
-
-      // 🔥 УЛУЧШЕННАЯ ЛОГИКА: объединяем задачи из всех источников
-      const allTasks = [...featureTasks, ...minimalistTasks, ...reactTasks];
-
-      // Убираем дубликаты по ID
-      const uniqueTasks = allTasks.filter(
-        (task, index, array) =>
-          array.findIndex((t) => t.id === task.id) === index
-      );
-
-      console.log(`🎯 Объединено ${uniqueTasks.length} уникальных задач`);
-
-      // 🔥 СОХРАНЯЕМ ВО ВСЕ АРХИТЕКТУРЫ
-      if (uniqueTasks.length > 0) {
-        await this.saveTasks("feature", uniqueTasks);
-        await this.saveTasks("minimalist", uniqueTasks);
-        await this.saveTasks("react", uniqueTasks);
-      }
-
-      console.log("✅ Улучшенная синхронизация завершена");
-    } catch (error) {
-      console.error("❌ Ошибка синхронизации:", error);
-    }
-  }
-}
-
-// Глобальный экземпляр
-window.unifiedDataManager = new UnifiedDataManager();
-console.log("✅ Enhanced UDM готов");

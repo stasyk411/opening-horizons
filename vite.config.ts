@@ -13,4 +13,10 @@ export default defineConfig({
       overlay: false,
     },
   },
+  build: {
+    // Исключаем тестовые файлы из production сборки
+    rollupOptions: {
+      external: ["**/__tests__/**", "**/*.test.*", "**/*.spec.*"],
+    },
+  },
 });
