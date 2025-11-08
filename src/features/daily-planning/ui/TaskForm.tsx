@@ -25,6 +25,18 @@ export const TaskForm: React.FC<TaskFormProps> = ({
     selectedDate.toISOString().split("T")[0]
   );
 
+  // 🔥 ФУНКЦИЯ СБРОСА ФОРМЫ
+  const resetForm = () => {
+    setTitle("");
+    setDescription("");
+    setCategory(""); // ✅ Сбрасываем к пустому значению
+    setStartTime("");
+    setEndTime("");
+    setRepeat("");
+    setAlarm("");
+    setTaskDate(selectedDate.toISOString().split("T")[0]); // ✅ Сбрасываем к текущей дате
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -49,14 +61,15 @@ export const TaskForm: React.FC<TaskFormProps> = ({
       priority: "medium",
     });
 
-    // Сброс формы
-    setTitle("");
-    setDescription("");
-    setCategory("");
-    setStartTime("");
-    setEndTime("");
-    setRepeat("");
-    setAlarm("");
+    // ✅ ПОЛНЫЙ СБРОС ФОРМЫ
+    resetForm();
+  };
+
+  // 🔥 ОБРАБОТЧИК ДЛЯ КНОПКИ "БЕЗ ДАТЫ"
+  const handleWithoutDate = () => {
+    onWithoutDate();
+    // ✅ СБРАСЫВАЕМ ФОРМУ ПОСЛЕ СОЗДАНИЯ ЗАДАЧИ БЕЗ ДАТЫ
+    // (сброс произойдет в handleAddTaskWithoutDate в PlanningTab)
   };
 
   return (
@@ -119,7 +132,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
           />
           <button
             type="button"
-            onClick={onWithoutDate}
+            onClick={handleWithoutDate}
             style={{
               padding: "8px 12px",
               border: "2px solid #8A2BE2",

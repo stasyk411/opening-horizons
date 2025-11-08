@@ -228,12 +228,9 @@ export const TaskList: React.FC<TaskListProps> = ({
                 </button>
               )}
 
+              {/* 🔥 ИСПРАВЛЕННАЯ КНОПКА УДАЛЕНИЯ */}
               <button
-                onClick={() => {
-                  if (confirm("Удалить эту задачу?")) {
-                    onDeleteTask(task.id);
-                  }
-                }}
+                onClick={() => onDeleteTask(task.id)}
                 style={{
                   padding: "6px 10px",
                   border: "1px solid #ff4444",

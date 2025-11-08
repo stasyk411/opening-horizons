@@ -36,37 +36,39 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
     }));
   };
 
-  // 🎯 ОБНОВЛЕННАЯ ФИЛЬТРАЦИЯ - СОВМЕСТИМОСТЬ СО ВСЕМИ АРХИТЕКТУРАМИ
+  // 🎯 ИСПРАВЛЕННАЯ ФИЛЬТРАЦИЯ - РАЗДЕЛЕНИЕ ПО ТИПАМ
   const getTodayTasks = () => {
     const today = selectedDate.toISOString().split("T")[0];
     return tasks.filter((task) => {
-      const taskDate =
-        task.date || (task.createdAt ? task.createdAt.split("T")[0] : null);
-      return taskDate === today;
+      // ✅ ТОЛЬКО ЗАДАЧИ С ДАТОЙ СЕГОДНЯ
+      return task.date && task.date === today;
     });
   };
 
   const getFutureTasks = () => {
     const today = selectedDate.toISOString().split("T")[0];
     return tasks.filter((task) => {
-      const taskDate =
-        task.date || (task.createdAt ? task.createdAt.split("T")[0] : null);
-      return taskDate && taskDate > today;
+      // ✅ ТОЛЬКО ЗАДАЧИ С ДАТОЙ В БУДУЩЕМ
+      return task.date && task.date > today;
     });
   };
 
   const getTasksWithoutDate = () => {
     return tasks.filter((task) => {
-      return (
-        !task.date && (!task.createdAt || task.area === "general" || !task.area)
-      );
+      // ✅ ТОЛЬКО ЗАДАЧИ БЕЗ ДАТЫ
+      return !task.date;
     });
+  };
+
+  // 🎯 ГЕНЕРАЦИЯ УНИКАЛЬНОГО ID
+  const generateUniqueId = (): string => {
+    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   };
 
   // 🎯 ОБНОВЛЕННЫЕ ОБРАБОТЧИКИ - БЕЗ ANY
   const handleAddTask = (taskData: Omit<Task, "id" | "createdAt">) => {
     const newTask: Task = {
-      id: Date.now().toString(),
+      id: generateUniqueId(), // 🔥 УНИКАЛЬНЫЙ ID
       ...taskData,
       completed: false,
       createdAt: new Date().toISOString(),
@@ -82,12 +84,12 @@ const PlanningTab: React.FC<PlanningTabProps> = ({
     const taskTitle = prompt("Опишите задачу без даты:");
     if (taskTitle && taskTitle.trim()) {
       const newTask: Task = {
-        id: Date.now().toString(),
+        id: generateUniqueId(), // 🔥 УНИКАЛЬНЫЙ ID
         title: taskTitle.trim(),
         description: "",
         completed: false,
         priority: "medium",
-        date: "",
+        date: "", // 🔥 ПУСТАЯ ДАТА - НЕ ПОПАДЕТ В "СЕГОДНЯ"
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         archetype: archetype || undefined,
