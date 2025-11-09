@@ -7,7 +7,7 @@ import {
   Practice,
   PracticeStep,
 } from "../data/practices";
-import { useSettings } from "../../../shared/contexts/SettingsContext"; // 🔽 ДОБАВЛЯЕМ ИМПОРТ
+import { useSettings } from "../../../shared/contexts/SettingsContext";
 
 interface EnhancedPomodoroProps {
   isMobile: boolean;
@@ -36,7 +36,6 @@ export const EnhancedPomodoro: React.FC<EnhancedPomodoroProps> = ({
     getFilteredPractices,
   } = usePomodoroTimer(isMobile);
 
-  // 🔽 ДОБАВЛЯЕМ ИСПОЛЬЗОВАНИЕ SETTINGSCONTEXT
   const { settings: appSettings } = useSettings();
 
   const [showSettings, setShowSettings] = useState(false);
@@ -168,15 +167,44 @@ export const EnhancedPomodoro: React.FC<EnhancedPomodoroProps> = ({
     return `${hours}:${minutes.toString().padStart(2, "0")}`;
   };
 
-  // 🔽 ОБНОВЛЯЕМ УВЕДОМЛЕНИЯ С УЧЕТОМ PWA НАСТРОЕК
+  // 🔧 ИСПРАВЛЕННАЯ ФУНКЦИЯ УВЕДОМЛЕНИЙ
   const showNotification = (title: string, message: string) => {
     // Проверяем настройки PWA перед показом уведомления
     if (appSettings.pwaSettings?.pushNotifications === false) {
-      return; // Не показывать уведомления если отключены в настройках
+      return;
     }
 
     if ("Notification" in window && Notification.permission === "granted") {
-      new Notification(title, { body: message, icon: "/icon-192.png" });
+      try {
+        // Используем Service Worker для уведомлений если доступен
+        if ("serviceWorker" in navigator && "Notification" in window) {
+          navigator.serviceWorker.ready
+            .then((registration) => {
+              registration.showNotification(title, {
+                body: message,
+                icon: "/icon-192.png",
+              });
+            })
+            .catch((error) => {
+              console.log("Service Worker не готов для уведомлений:", error);
+              // Fallback для браузеров без Service Worker
+              try {
+                new Notification(title, {
+                  body: message,
+                  icon: "/icon-192.png",
+                });
+              } catch (fallbackError) {
+                console.log("Уведомления не поддерживаются:", fallbackError);
+              }
+            });
+        } else {
+          // Fallback для браузеров без Service Worker
+          new Notification(title, { body: message, icon: "/icon-192.png" });
+        }
+      } catch (error) {
+        console.log("Уведомления не доступны:", error);
+        // Приложение продолжает работать без уведомлений
+      }
     }
   };
 
@@ -184,13 +212,13 @@ export const EnhancedPomodoro: React.FC<EnhancedPomodoroProps> = ({
   useEffect(() => {
     // Проверяем настройки PWA перед запросом разрешения
     if (appSettings.pwaSettings?.pushNotifications === false) {
-      return; // Не запрашивать разрешение если уведомления отключены
+      return;
     }
 
     if ("Notification" in window && Notification.permission === "default") {
       Notification.requestPermission();
     }
-  }, [appSettings.pwaSettings?.pushNotifications]); // 🔽 ДОБАВЛЯЕМ ЗАВИСИМОСТЬ
+  }, [appSettings.pwaSettings?.pushNotifications]);
 
   // Уведомления при смене режима
   useEffect(() => {
